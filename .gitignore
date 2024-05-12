@@ -1,0 +1,13 @@
+# node_modules
+node_modules
+
+# environments
+.env.local
+.env
+.env.production
+.env.dev
+.env.staging
+.env.test
+
+# lock files
+package-lock.json

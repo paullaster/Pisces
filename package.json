@@ -1,0 +1,30 @@
+{
+  "name": "pisces",
+  "version": "1.0.0",
+  "description": "noel online fishmart API repository",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node  --env-file=.env.local --watch ./server.js",
+    "production": "node --env-file=.env  server.js",
+    "test": "test"
+  },
+  "keywords": [
+    "NODEJS",
+    "ECOMMERRCE",
+    "JAVASCRIPT"
+  ],
+  "author": "paullaster okoth",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "axios": "^1.6.8",
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "jimp": "^0.22.12",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.9.7",
+    "nodemailer": "^6.9.13",
+    "sequelize": "^6.37.3"
+  }
+}
