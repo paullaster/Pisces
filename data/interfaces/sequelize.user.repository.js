@@ -44,15 +44,28 @@ export class SequelizeUserRespository extends UserRepository {
         }
     }
     async create(email, username, password) {
-        const user = await this.dataSource.create({ email, username, password });
+        try {
+            const user = await this.dataSource.create({ email, username, password });
         return this.mapToUser(user);
+        } catch (error) {
+            return { sucess: false, error: error.message };
+        }
     }
     async update(user) {
-        await this.dataSource.update(user, { where: { email: user.email } });
+        try {
+            await this.dataSource.update(user, { where: { email: user.email } });
         return this.mapToUser(user);
+        } catch (error) {
+            return { sucess: false, error: error.message };
+        }
     }
     async delete(email) {
-        await this.dataSource.destroy({ where: { email } });
+        try {
+            await this.dataSource.destroy({ where: { email } });
+            return { success: true };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
     }
     mapToUser(user) {
         const { email, username } = user;
