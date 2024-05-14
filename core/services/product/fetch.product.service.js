@@ -19,16 +19,16 @@ export class FetchProductService {
             if (pid.trim().length>10) {
                 return {success: false, error: 'Product ID cannot be more than 10 characters'};
             }
-            const product = await this.productRepository.getProductById(pid);
-            if (!product) {
-                return {success: false, error: 'Product does not exist'};
+            const {success, data, error } = await this.productRepository.getProductById(pid);
+            if (!success) {
+                return {success: false, error};
             }
-            return {success: true, product: product};
+            return {success: true, product: data};
         } catch (error) {
             return {success: false, error: error.message}
         }
     }
-    async fetchProductByName(name) {
+    async fetchProductByName(name, offset = 0, limit = 10) {
         try {
             if (!name) {
                 return {success: false, error: 'Product name is required'};
@@ -39,18 +39,22 @@ export class FetchProductService {
             if (name.trim().length===0) {
                 return {success: false, error: 'Product name cannot be empty'};
             }
-            const product = await this.productRepository.getProductByName(name);
-            if (!product) {
-                return {success: false, error: 'Product does not exist'};
+            const {success, error, data } = await this.productRepository.getProductByName(name, offset, limit);
+            if (!success) {
+                return {success: false, error};
             }
-            return {success: true, product: product};
+            return {success: true, product: data};
         } catch (error) {
             return {success: false, error: error.message}
         }
     }
     async fetchAllProducts(options = {}, offset = 0, limit =10) {
         try {
-            return {success: true, products: await this.productRepository.getProducts(options, offset, limit)};
+            const { success, error, data } = await this.productRepository.getProducts(options, offset, limit);
+            if(!success) {
+                return {success: false, error};
+            }
+            return {success: true, products: data};
         } catch (error) {
             return {success: false, error: error.message}
         }

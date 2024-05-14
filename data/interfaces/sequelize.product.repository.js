@@ -7,32 +7,76 @@ export class SequelizeProductRepository extends ProductRepository {
         this.dataSource = ProductModel;
         this.mapToProduct = this.mapToProduct.bind(this);
     }
-    async getProductById(pid) {
-        const product = await this.dataSource.findByPk(pid);
-        return this.mapToProduct(product);
+    async getProductById(pid, type = 'fetch') {
+        try {
+            const product = await this.dataSource.findByPk(pid);
+            if (type === 'create' && product) {
+                return { error: 'Product already exist', success: false };
+            }
+            if (type === 'create' && !product) {
+                return { success: true, type };
+            }
+            if (type !== 'create' && !product) {
+                return { error: 'Product does not exist', success: false };
+            }
+            return this.mapToProduct(product);
+        } catch (error) {
+            return { error: error.message, success: false };
+        }
     }
-    async getProductByName(title, offset = 0, limit =10) {
-        const product = await this.dataSource.findAndCountAll({ where: { title },   offset, limit});
-        return this.mapToProduct(product);
+    async getProductByName(name, offset = 0, limit = 10) {
+        try {
+            const products = await this.dataSource.findAndCountAll({ where: { name }, offset: Number(offset), limit: Number(limit) });
+            if (!products) {
+                return { error: 'Product not found', success: false };
+            }
+            return { success: true, data: products};
+        } catch (error) {
+            return { error: error.message, success: false };
+        }
     }
-    async getProducts(options = {}, offset = 0, limit =10) {
-        const products = await this.dataSource.findAndCountAll({where: {
-            ...options,
-        }, offset, limit});
-        return products.map(this.mapToProduct);
+    async getProducts(options = {}, offset = 0, limit = 10) {
+        try {
+            const products = await this.dataSource.findAndCountAll({
+                where: options,
+                offset: Number(offset), 
+                limit: Number(limit),
+            });
+            if (!products) {
+                return { error: 'No products at the moment', success: false };
+            }
+            return { success: true, data: products };
+        } catch (error) {
+            return { error: error.message, success: false };
+        }
     }
     async create(product) {
-        const newProduct = await this.dataSource.create(product);
-        return this.mapToProduct(newProduct);
+        try {
+            const newProduct = await this.dataSource.create(product);
+            return this.mapToProduct(newProduct);
+        } catch (error) {
+            return { error: error.message, success: false };
+        }
     }
     async update(product) {
-        await this.dataSource.update(product, { where: { pid: product.pid } });
-        return this.mapToProduct(product);
+        try {
+            const updatedProduct = await this.dataSource.update(product, { where: { pid: product.pid } });
+            if (!updatedProduct) {
+                return { success: false, error: 'Can not find this product' };
+            }
+            return this.mapToProduct(updatedProduct);
+        } catch (error) {
+            return { error: error.message, success: false };
+        }
     }
     async delete(pid) {
-        await this.dataSource.destroy({ where: { pid } });
+        try {
+            await this.dataSource.destroy({ where: { pid } });
+        } catch (error) {
+            return { error: error.message, success: false };
+        }
     }
     mapToProduct(product) {
-        return new Product(product['dataValues']);
+        return { success: true, data: new Product(product['dataValues']) };
     }
 }

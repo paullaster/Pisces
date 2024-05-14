@@ -44,7 +44,8 @@ export class FetchProductController {
             if (!req.params.name) {
                 return res.ApiResponse.error(428, 'The product name is required');
             }
-            const {success, product, error } = await this.fetchProductService.fetchProductByName(req.params.name);
+            const { page, limit } = req.query;
+            const {success, product, error } = await this.fetchProductService.fetchProductByName(req.params.name, page, limit);
 
             if (!success) {
                 return res.ApiResponse.error(404, error);

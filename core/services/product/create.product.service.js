@@ -1,3 +1,4 @@
+import { ValidateObjectPayload } from "../../validation/validate.object.payload.js";
 export class CreateProductService {
     constructor(productRepository) {
         this.productRepository = productRepository;
@@ -5,12 +6,19 @@ export class CreateProductService {
     }
     async createProduct(product) {
         try {
-            const productExists = await this.productRepository.getProductById(product.pid);
-            if (productExists) {
-                return { success: false, product: "Product already exists"};
+            const productObj = new ValidateObjectPayload(product);
+            const {error, success, type } = await this.productRepository.getProductById(productObj.object.pid, 'create');
+            if (!success) {
+                return { success: false, error: error};
             }
-            const newProduct = await this.productRepository.create(product);
-            return {success: true, product:newProduct};
+            if (success && type === 'create') {
+                const {error, success, data } = await this.productRepository.create(product);
+                if(!success) {
+                    return {success: false, error};
+                }
+                return {success: true, data};
+            }
+            return {success: false, error};
         } catch (error) {
             return {success: false, error: error.message};
         }
