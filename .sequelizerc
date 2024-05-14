@@ -1,0 +1,7 @@
+const path  = require("path");
+require('babel-register');
+module.exports = {
+    config: path.resolve('data', 'integrations', 'database', 'migrations', 'babelHook.js'),
+ 'migrations-path': path.resolve('data', 'integrations', 'database', 'migrations'),
+ 'seeders-path': path.resolve('data', 'integrations', 'database', 'seeders'),
+};

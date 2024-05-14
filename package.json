@@ -4,8 +4,11 @@
   "description": "noel online fishmart API repository",
   "main": "server.js",
   "type": "module",
+  "sequelize": "cross-env NODE_ENV=development sequelize $*",
   "scripts": {
     "start": "node  --env-file=.env.local --watch ./server.js",
+    "migrate:up": "npx sequelize-cli db:migrate",
+    "migrate:undo": "npx sequelize-cli db:migrate:undo",
     "production": "node --env-file=.env  server.js",
     "test": "test"
   },
@@ -26,5 +29,10 @@
     "mysql2": "^3.9.7",
     "nodemailer": "^6.9.13",
     "sequelize": "^6.37.3"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.24.5",
+    "babel-register": "^6.26.0",
+    "sequelize-cli": "^6.6.2"
   }
 }
