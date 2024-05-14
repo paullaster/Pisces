@@ -6,23 +6,45 @@ export class SequelizeUserRespository extends UserRepository {
         super();
         this.dataSource = UserModel;
         this.mapToUser = this.mapToUser.bind(this);
-        this.password =  null;
+        this.password = null;
     }
     async getUserById(id) {
-        const user = await this.dataSource.findByPk(id);
-        return user? this.mapToUser(user) : null;
+        try {
+            const user = await this.dataSource.findByPk(id);
+            if (!user) {
+                return { success: false, error: 'User not found' };
+            }
+            return user ? this.mapToUser(user) : null;
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
     }
     async getUserByUsername(username) {
-        const user = await this.dataSource.findOne({ where: { username } });
-        this.password = user['dataValues'].password;
-        return user? this.mapToUser(user) : null;
+        try {
+            const user = await this.dataSource.findOne({ where: { username } });
+            if (!user) {
+                return { sucess: false, error: 'Invalid username' };
+            }
+            this.password = user['dataValues'].password;
+            return user ? this.mapToUser(user) : null;
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
     }
     async getUserByEmail(email) {
-        const user = await this.dataSource.findOne({ where: { email } });
-        return user? this.mapToUser(user) : null;
+        try {
+            const user = await this.dataSource.findOne({ where: { email } });
+            if (!user) {
+                return { success: false, error: 'Invalid email or username' };
+            }
+            this.password = user['dataValues'].password;
+            return user ? this.mapToUser(user) : null;
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
     }
     async create(email, username, password) {
-        const user = await this.dataSource.create( {email, username, password});
+        const user = await this.dataSource.create({ email, username, password });
         return this.mapToUser(user);
     }
     async update(user) {
@@ -35,5 +57,5 @@ export class SequelizeUserRespository extends UserRepository {
     mapToUser(user) {
         const { email, username } = user;
         return new User(username, email);
-    }  
+    }
 }

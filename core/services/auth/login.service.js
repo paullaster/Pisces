@@ -7,12 +7,13 @@ class LoginUseCase {
     }
     async handle(username, password) {
        try {
-        let user = await this.userRespository.getUserByUsername(username);
-        if (!user) {
-            user = await this.userRespository.getUserByEmail(username);
-            if (!user) {
-                return { error: "User not found", success: false};
+        let {user, success } = await this.userRespository.getUserByUsername(username);
+        if (!success) {
+            const userByEmail = await this.userRespository.getUserByEmail(username);
+            if (!userByEmail) {
+                return { error: error, success: false};
             }
+            user = userByEmail;
         }
         const isPasswordMatch  = await bcrypt.compare(password, this.userRespository.password)
         if (isPasswordMatch !== true) {
