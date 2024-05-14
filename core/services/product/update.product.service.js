@@ -3,16 +3,15 @@ export class UpdateProductService {
         this.productRepository = productRepository;
         this.updateProduct = this.updateProduct.bind(this);
     }
-    async updateProduct(product) {
+    async updateProduct(product, payload) {
         try {
-            const productExists = await this.productRepository.getProductById(product.pid);
-            if (!productExists) {
-                return { success: false, product: "Product not found" };
+            const { success, error, data } = await this.productRepository.update(product, payload);
+            if (!success) {
+                return { success: false, error };
             }
-            const updatedProduct = await this.productRepository.update(product);
-            return {success: true, product: updatedProduct};
+            return { success: true, data };
         } catch (error) {
-            return {success: false, error: error.message};
+            return { success: false, error: error.message };
         }
     }
 }

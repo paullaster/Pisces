@@ -58,9 +58,20 @@ export class SequelizeProductRepository extends ProductRepository {
             return { error: error.message, success: false };
         }
     }
-    async update(product) {
+    async update(product, payload) {
         try {
-            const updatedProduct = await this.dataSource.update(product, { where: { pid: product.pid } });
+            const {data, success, error } = await this.getProductById(product);
+            if (!success) {
+                return { success: false, error };
+            }
+            for (const key in data) {
+                if (payload[key]) {
+                    data[key] = payload[key];
+                }
+            }
+            const item = await this.dataSource.findByPk(product);
+            const updatedProduct = await item.update(data);
+
             if (!updatedProduct) {
                 return { success: false, error: 'Can not find this product' };
             }
