@@ -31,4 +31,4 @@ prodcutRoutes.get('/:pid', fetchProductController.fetchProductByID);
 prodcutRoutes.get('/name/:name', fetchProductController.fetchProductByName);
 prodcutRoutes.put('/:pid', updateProductController.updateProduct);
 
-export { prodcutRoutes};
+export { prodcutRoutes };
