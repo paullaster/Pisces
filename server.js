@@ -16,5 +16,5 @@ app.use('/pisces', routeServiceProvider);
 
 const port = process.env.PORT || 3500;
 app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`)
+    console.log(`app listening at http://localhost:${port}`)
   });
