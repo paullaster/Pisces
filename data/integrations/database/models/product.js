@@ -1,5 +1,6 @@
 import { sequelize } from "../connection.js";
 import { DataTypes } from "sequelize";
+import Category from "./category.js";
 
 const Products = sequelize.define('Product',{
     pid: {
@@ -31,7 +32,11 @@ const Products = sequelize.define('Product',{
     category: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: false
+        unique: false,
+        references: {
+            model: Category,
+            key: 'cid'
+        }
     },
     quantity: {
         type: DataTypes.STRING,
