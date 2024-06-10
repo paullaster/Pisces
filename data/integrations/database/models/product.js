@@ -33,10 +33,6 @@ const Products = sequelize.define('Product',{
         type: DataTypes.STRING,
         allowNull: false,
         unique: false,
-        references: {
-            model: Category,
-            key: 'cid'
-        }
     },
     quantity: {
         type: DataTypes.STRING,
@@ -52,6 +48,11 @@ const Products = sequelize.define('Product',{
         type: DataTypes.STRING,
         allowNull: false,
         unique: false
+    },
+    lastPid: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: false,
     }
 },
 {

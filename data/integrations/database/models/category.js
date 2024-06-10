@@ -17,7 +17,12 @@ const Category  = sequelize.define('Category',{
         type: DataTypes.STRING,
         allowNull: false,
         unique: false
-    }
+    },
+    lastCid: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: false,
+    },
 }, {
     tableName: 'categories',
     timestamps: true,
