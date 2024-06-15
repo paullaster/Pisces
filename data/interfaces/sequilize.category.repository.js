@@ -7,24 +7,44 @@ export class SequelizeCategoryRepository extends CategoryRepository {
         this.dataSource = CategoryModel;
         this.mapToCategory = this.mapToCategory.bind(this);
     }
-    async getCategoryById(id) {
+    async getCategoryById(cid, type = 'fetch') {
         try {
-            const category = await this.dataSource.findByPk(id);
+            const category = await this.dataSource.findByPk(cid);
+            if( type === 'create' && category) {
+                return { error: 'Category already exist', success: false };
+            }
+            if (type === 'create' && !category) {
+                return { success: true };
+            }
+            if (type !== 'create' && !category) {
+                return { error: 'Category does not exist', success: false };
+            }
             return this.mapToCategory(category);
         } catch (error) {
             return { error: error.message, success: false };
         }
     }
-    async getCategoryByName(name) {
+    async getCategorys(options = {}, offset = 0, limit =10) {
         try {
-            const category = await this.dataSource.findOne({ where: { name } });
-            return this.mapToCategory(category);
+            const category = await this.dataSource.findAndCountAll({
+                where: options,
+                offset: Number(offset),
+                limit: Number(limit)
+            });
+            if (!category) {
+                return { error: 'No category at the moment!', success: false };
+            }
+            return { success: true, data: category };
         } catch (error) {
             return { error: error.message, success: false };
         }
     }
     async create(category) {
         try {
+            const {success, error } =  await this.getCategoryById(category.cid, 'create');
+            if (!success) {
+                return { error, success };
+            }
             const newCategory = await this.dataSource.create(category);
             return this.mapToCategory(newCategory);
         } catch (error) {
@@ -53,9 +73,9 @@ export class SequelizeCategoryRepository extends CategoryRepository {
             return { error: error.message, success: false };
         }
     }
-    async delete(id) {
+    async delete(cid) {
         try {
-            await this.dataSource.destroy({ where: { id } });
+            await this.dataSource.destroy({ where: { cid } });
         } catch (error) {
             return { error: error.message, success: false };
         }

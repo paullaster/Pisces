@@ -1,4 +1,4 @@
-class CreateCategoryController {
+export class CreateCategoryController {
     constructor (createCategoryService) {
         this.createCategoryService = createCategoryService;
         this.createCategory = this.createCategory.bind(this);

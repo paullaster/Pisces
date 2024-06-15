@@ -8,20 +8,10 @@ const Category  = sequelize.define('Category',{
         unique: true,
         primaryKey: true,
     },
-    name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false,
-    },
     description: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: false
-    },
-    lastCid: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false,
     },
 }, {
     tableName: 'categories',

@@ -7,6 +7,8 @@ import { FetchProductController } from '../app/controllers/products/fetch.produc
 import { FetchProductService } from '../core/services/product/fetch.product.service.js';
 import { UpdateProductController } from '../app/controllers/products/update.product.js';
 import { UpdateProductService } from '../core/services/product/update.product.service.js';
+import { DeleteProductService } from '../core/services/product/delete.product.service.js';
+import { DeleteProductController } from '../app/controllers/products/delete.product.js';
 
 
 const prodcutRoutes = express.Router();
@@ -24,11 +26,16 @@ const fetchProductController = new FetchProductController(fetchProductService);
 const updateProductService = new UpdateProductService(productRepository);
 const updateProductController = new UpdateProductController(updateProductService);
 
+// delete product
+const deleteProductService  = new DeleteProductService(productRepository);
+const deleteProductController = new DeleteProductController(deleteProductService);
+
 
 prodcutRoutes.post('/', createProductController.createProduct);
 prodcutRoutes.get('/', fetchProductController.fetchAllProduct);
 prodcutRoutes.get('/:pid', fetchProductController.fetchProductByID);
 prodcutRoutes.get('/name/:name', fetchProductController.fetchProductByName);
 prodcutRoutes.put('/:pid', updateProductController.updateProduct);
+prodcutRoutes.delete('/:pid', deleteProductController.deleteProduct);
 
 export { prodcutRoutes };

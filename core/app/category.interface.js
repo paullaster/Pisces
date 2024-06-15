@@ -12,14 +12,17 @@ export class CategoryRepository {
     async getCategoryById(id) {
         throw new Error('Not implemented');
     }
+
     /**
      * @abstract
-     * @param { name } 
-     * @returns { Promise<Category | null>}
+     * @param {{}} [options={}] 
+     * @return { Promise<Category | null>}
      */
-    async getCategoryByName(name) {
+    async getCategorys(options = {}) {
         throw new Error('Not implemented');
     }
+
+
     /**
      * @abstract
      * @param { Category} 
