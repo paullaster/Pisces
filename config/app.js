@@ -7,5 +7,6 @@ export default {
     license: process.env.APP_LICENSE,
     key: process.env.APP_KEY,
     environment: process.env.APP_ENV,
-    timezone: process.env.APP_TIMEZONE
+    timezone: process.env.APP_TIMEZONE,
+    defaultCurrency: process.env.DEFUALT_CURRENCY
 };

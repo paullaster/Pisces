@@ -14,7 +14,7 @@ export class SequelizeProductRepository extends ProductRepository {
                 return { error: 'Product already exist', success: false };
             }
             if (type === 'create' && !product) {
-                return { success: true, type };
+                return { success: true };
             }
             if (type !== 'create' && !product) {
                 return { error: 'Product does not exist', success: false };
@@ -52,6 +52,10 @@ export class SequelizeProductRepository extends ProductRepository {
     }
     async create(product) {
         try {
+            const { success, error } = await this.getProductById(product.pid, 'create');
+            if (!success) {
+                return { success, error };
+            }
             const newProduct = await this.dataSource.create(product);
             return this.mapToProduct(newProduct);
         } catch (error) {

@@ -7,10 +7,7 @@ export class ValidateObjectPayload {
     }
     isValidPayload(object) {
         for( let prop in object ) {
-            if(!object[prop]) {
-                return false;
-            }
-            return true;
+            return !(!object[prop]);
         }
     }
 }
