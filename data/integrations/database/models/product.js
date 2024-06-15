@@ -1,6 +1,5 @@
 import { sequelize } from "../connection.js";
 import { DataTypes } from "sequelize";
-import Category from "./category.js";
 
 const Products = sequelize.define('Product',{
     pid: {
@@ -15,6 +14,11 @@ const Products = sequelize.define('Product',{
         unique: false,
     },
     price: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        unique: false,
+    },
+    defaultCurrency: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: false,
@@ -64,7 +68,7 @@ const Products = sequelize.define('Product',{
     collate: 'utf8mb4_unicode_ci'
 });
 
-Products.sync();
+Products.sync({force: true});
 
 
 export default Products;
