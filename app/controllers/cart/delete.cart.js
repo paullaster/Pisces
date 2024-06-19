@@ -8,7 +8,7 @@ export class DeleteCartController {
             if (!req.params.cartItemId) {
                 return res.ApiResponse.error(400, 'The cart ID is required');
             }
-            const {success, cart, error } = await this.deleteCartService.deleteCart(req.params.userId, req.params.cartItemId);
+            const {success, cart, error } = await this.deleteCartService.deleteCart(req.params.cartItemId);
             if (!success) {
                 return res.ApiResponse.error(400, error);
             }

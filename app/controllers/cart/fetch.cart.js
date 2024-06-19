@@ -2,6 +2,7 @@ export class FetchCartController {
     constructor(fetchCartService) {
         this.fetchCartService = fetchCartService;
         this.fetchCart = this.fetchCart.bind(this);
+        this.fetchUserCartItems = this.fetchUserCartItems.bind(this);
     }
     async fetchCart(req, res) {
         try {
