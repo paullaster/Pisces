@@ -17,6 +17,6 @@ const accountCreationService = new CreateUserService(userRepository)
 const createAccount = new CreateAccount(accountCreationService);
 
 userRoutes.post('/register', createAccount.createAccount);
-userRoutes.post('/login', loginController.login)
+userRoutes.post('/login', loginController.login);
 
 export { userRoutes};

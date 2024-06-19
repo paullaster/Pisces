@@ -16,9 +16,6 @@ export class FetchProductService {
             if (pid.trim().length===0) {
                 return {success: false, error: 'Product ID cannot be empty'};
             }
-            if (pid.trim().length>10) {
-                return {success: false, error: 'Product ID cannot be more than 10 characters'};
-            }
             const {success, data, error } = await this.productRepository.getProductById(pid);
             if (!success) {
                 return {success: false, error};

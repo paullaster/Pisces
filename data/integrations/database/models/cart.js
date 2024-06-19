@@ -1,68 +1,82 @@
 import { sequelize } from "../connection.js";
 import { DataTypes } from "sequelize";
-import Category from "./category.js";
+import Products from "./product.js";
+import User from "./users.js";
 
-const Products = sequelize.define('Product',{
-    pid: {
+const Cart = sequelize.define('Cart',{
+    cartId: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
         primaryKey: true,
     },
-    name: {
+    itemName: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: false,
     },
-    price: {
+    itemPrice: {
         type: DataTypes.INTEGER,
         allowNull: false,
         unique: false,
     },
-    description: {
+    itemDescription: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: false
     },
-    image: {
+    itemImage: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: false,
+        unique: true,
     },
-    category: {
+    itemId: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: false,
         references: {
-            model: Category,
-            key: 'cid',
+            model: Products,
+            key: 'pid',
             onDelete: 'CASCADE',
             onUpdate: 'CASCADE'
         },
     },
-    quantity: {
+    userId: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: false,
+        references: {
+            model: User,
+            key: 'email',
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE'
+        },
+    },
+    itemQuantity: {
         type: DataTypes.INTEGER,
         allowNull: false,
         unique: false
     },
-    color: {
+    itemColor: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: false
     },
-    size: {
+    itemSize: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: false
     },
-    lastPid: {
+    itemCheckoutStatus: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: false,
+        defaultValue: 'New',
+        values: ['New', 'Paid', 'Pending Processing','Processed', 'Pending Delivery', 'Delivered',],
     }
 },
 {
-    tableName: 'products',
+    tableName: 'carts',
     timestamps: true,
     underscored: true,
     freezeTableName: true,
@@ -70,7 +84,7 @@ const Products = sequelize.define('Product',{
     collate: 'utf8mb4_unicode_ci'
 });
 
-Products.sync();
+Cart.sync();
 
 
-export default Products;
+export default Cart;
