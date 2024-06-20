@@ -86,12 +86,16 @@ export class SequelizeProductRepository extends ProductRepository {
     }
     async delete(pid) {
         try {
-            await this.dataSource.destroy({ where: { pid } });
+            return {succuess: true, data: await this.dataSource.destroy({ where: { pid } }), };
         } catch (error) {
             return { error: error.message, success: false };
         }
     }
     mapToProduct(product) {
-        return { success: true, data: new Product(product['dataValues']) };
+        try {
+            return { success: true, data: new Product(product['dataValues']) };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
     }
 }

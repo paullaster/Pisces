@@ -1,4 +1,4 @@
-import { ValidateObjectPayload } from "../../validation/validate.object.payload";
+import { ValidateObjectPayload } from "../../validation/validate.object.payload.js";
 
 export class UpdateCartService {
     constructor(cartRespository) {

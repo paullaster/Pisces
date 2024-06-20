@@ -3,7 +3,7 @@
  * @param { id }
  * @returns { Promise<Cart | null> }
  */
-export class CartRespository {
+export class CartRepository {
     /**
      * @abstract
      * @param { id }

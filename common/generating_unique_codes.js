@@ -1,7 +1,7 @@
 
-export const RandomCodeGenerator = (remainingChars) => {
+export const RandomCodeGenerator = (remainingChars, argPrefix = 'aaa') => {
     const generatedCodes = new Set();
-    let prefix = 'aaa';
+    let prefix = argPrefix;
     const letters = "abcdefghijklmnopqrstuvwxyz";
     const digits = "0123456789";
 

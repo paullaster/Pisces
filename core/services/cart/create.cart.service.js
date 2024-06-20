@@ -1,4 +1,5 @@
-import { ValidateObjectPayload } from "../../validation/validate.object.payload";
+import { RandomCodeGenerator } from "../../../common/generating_unique_codes.js";
+import { ValidateObjectPayload } from "../../validation/validate.object.payload.js";
 
 export class CreateCartService {
     constructor(cartRepository) {
@@ -19,8 +20,10 @@ export class CreateCartService {
             if (Object.keys(payload).length===0) {
                 return { success: false, error: "Can't add empty item to cart!" };
             }
+            payload.cartId = RandomCodeGenerator(5, 'cart');
+            payload.userId = userId;
             new ValidateObjectPayload(payload);
-            const { success, error, data:cart } = await this.cartRepository.create(userId, payload);
+            const { success, error, data:cart } = await this.cartRepository.create(payload);
             if (!success) {
                 return { success: false, error };
             }

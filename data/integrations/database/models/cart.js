@@ -72,7 +72,8 @@ const Cart = sequelize.define('Cart',{
         allowNull: false,
         unique: false,
         defaultValue: 'New',
-        values: ['New', 'Paid', 'Pending Processing','Processed', 'Pending Delivery', 'Delivered',],
+        values: ['New', 'Paid'],
+        // , 'Pending Processing','Processed', 'Pending Delivery', 'Delivered',
     }
 },
 {
