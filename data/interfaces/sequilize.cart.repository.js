@@ -47,13 +47,21 @@ export class SequilizeCartRepository extends CartRepository {
             return { error: error.message, success: false };
         }
     }
-    async create(cartItem) {
+    async create(cart) {
         try {
-            const { success, error } = await this.getCartById(cartItem, 'create');
+            const { success, error } = await this.getCartById(cart.cartId, 'create');
             if (!success) {
                 return { success: false, error };
             }
-            const newCart = await this.dataSource.create(cartItem);
+            const { items, ...rest} = cart;
+            // Create a new cart
+            const newCart = await this.dataSource.create(rest);
+
+            // Create associated items
+            items.forEach(async(item) => {
+                await newCart.createItem(item);
+            });
+
             return this.mapToCart(newCart);
         }catch(error) {
             return { error: error.message, success: false };
