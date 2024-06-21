@@ -2,14 +2,21 @@ import { Cart } from "../../core/types/cart.js";
 import { CartRepository } from "../../core/app/cart.interface.js";
 
 export class SequilizeCartRepository extends CartRepository {
-    constructor(CartModel) {
+    constructor(CartModel, relatedModels = []) {
         super();
         this.dataSource = CartModel;
+        this.relatedModels = relatedModels;
         this.mapToCart = this.mapToCart.bind(this);
+        this.getCart = this.getCart.bind(this);
     }
-    async getCartById(cartItemId, type = 'fetch') {
+    async getCart(cartId, type = 'fetch') {
         try {
-            const cart = await this.dataSource.findByPk(cartItemId);
+            const cart = await this.dataSource.findOne({
+                where: {
+                    cartId
+                },
+                include: this.relatedModels
+            });
             if (type === 'create' && cart) {
                 return { error: 'Cart already exist', success: false };
             }
@@ -42,7 +49,7 @@ export class SequilizeCartRepository extends CartRepository {
     }
     async create(cartItem) {
         try {
-            const { success, error } = await this.getCartById(cartItemId, 'create');
+            const { success, error } = await this.getCart(cartItem, 'create');
             if (!success) {
                 return { success: false, error };
             }
@@ -54,7 +61,7 @@ export class SequilizeCartRepository extends CartRepository {
     }
     async update(cartItem, payload) {
         try {
-            const { success, error}  = await this.getCartById(cartItem);
+            const { success, error}  = await this.getCart(cartItem);
             if (!success) {
                 return { success: false, error };
             }
