@@ -22,6 +22,7 @@ export class CreateCartService {
             }
             payload.cartId = RandomCodeGenerator(5, 'cart');
             payload.userId = userId;
+            payload.items.forEach(item => item.itemId = RandomCodeGenerator(5, 'item'));
             new ValidateObjectPayload(payload);
             const { success, error, data:cart } = await this.cartRepository.create(payload);
             if (!success) {

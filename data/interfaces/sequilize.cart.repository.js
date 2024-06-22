@@ -9,14 +9,19 @@ export class SequilizeCartRepository extends CartRepository {
         this.mapToCart = this.mapToCart.bind(this);
         this.getCartById = this.getCartById.bind(this);
     }
-    async getCartById(cartId, type = 'fetch') {
+    async getCartById(cartId, type = 'fetch', eagerLoad = false) {
         try {
-            const cart = await this.dataSource.findOne({
-                where: {
-                    cartId
-                },
-                include: this.relatedModels,
-            });
+            let cart;
+            if (eagerLoad) {
+                cart = await this.dataSource.findByPk(cartId, {
+                    where: {
+                        cartId
+                    },
+                    include: this.relatedModels,
+                });
+            }else {
+                cart = await this.dataSource.findByPk(cartId);
+            }
             if (type === 'create' && cart) {
                 return { error: 'Cart already exist', success: false };
             }
@@ -69,21 +74,20 @@ export class SequilizeCartRepository extends CartRepository {
     }
     async update(cartItem, payload) {
         try {
-            const { success, error}  = await this.getCartById(cartItem);
+            const {data, success, error}  = await this.getCartById(cartItem, 'fetch', true);
             if (!success) {
                 return { success: false, error };
             }
-            const data = {};
-            for (const key in data) {
-                if (payload[key]) {
-                    data[key] = payload[key];
-                }
-            }
             const cart = await this.dataSource.findByPk(cartItem);
-            const updatedCart = await cart.update(data);
-            if (!updatedCart) {
-                return { success: false, error: 'Can not find this cart' };
-            }
+            payload.items.forEach(item => {
+                const itemToUpdate = data.items.findIndex(dataItem => dataItem.itemId === item.itemId);
+                if (itemToUpdate!== -1) {
+                    data.items[itemToUpdate] = item;
+                }
+            });
+            const {items, ...rest } = data;
+            const updatedCart = await cart.update(rest);
+            await updatedCart.setItems(items);
             return this.mapToCart(updatedCart);
         }catch(error) {
             return { error: error.message, success: false };
@@ -91,11 +95,16 @@ export class SequilizeCartRepository extends CartRepository {
     }
     async delete(item) {
         try {
+            const {data, success, error } = await this.getCartById(item, 'fetch', true);
+            if (!success) {
+                return { success: false, error };
+            }
             const deletedCart = await this.dataSource.destroy({
                 where: {
                     cartId: item,
                 }
             });
+            data.removeItems(data.items);
             return { success: true, data: deletedCart };
         }catch (error) {
             return { error: error.message, success: false };
