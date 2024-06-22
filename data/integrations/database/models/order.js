@@ -10,17 +10,6 @@ const Order = sequelize.define('Order',{
         unique: true,
         primaryKey: true,
     },
-    userId: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false,
-        references: {
-            model: User,
-            key: 'email',
-            onDelete: 'CASCADE',
-            onUpdate: 'CASCADE'
-        },
-    },
     cartCheckoutStatus: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -44,6 +33,13 @@ Order.hasMany(Item, {
     onUpdate: 'CASCADE'
 });
 Item.belongsTo(Order);
+
+User.hasMany(Order, {
+    foreignKey: 'userId',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+});
+Order.belongsTo(User);
 
 Order.sync();
 

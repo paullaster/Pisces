@@ -6,15 +6,21 @@ export class SequelizeUserRespository extends UserRepository {
         super();
         this.dataSource = UserModel;
         this.mapToUser = this.mapToUser.bind(this);
+        this.getUserById = this.getUserById.bind(this);
         this.password = null;
     }
-    async getUserById(id) {
+    async getUserById(id, associatedModels = [], eagerLoad = false) {
         try {
-            const user = await this.dataSource.findByPk(id);
+            let user;
+            if (eagerLoad) {
+                user = await this.dataSource.findByPk(id, {include: associatedModels});
+            }else {
+                user = await this.dataSource.findByPk(id);
+            }
             if (!user) {
                 return { success: false, error: 'User not found' };
             }
-            return user ? this.mapToUser(user) : null;
+            return this.mapToUser(user);
         } catch (error) {
             return { success: false, error: error.message };
         }
@@ -39,6 +45,17 @@ export class SequelizeUserRespository extends UserRepository {
             }
             this.password = user['dataValues'].password;
             return user ? this.mapToUser(user) : null;
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    }
+    async getUserAssociations(user, model) {
+        try {
+            const {data, success, error} = await this.getUserById(user, model, true);
+            if (!success) {
+                return { success: false, error };
+            }
+            return this.mapToUser(data);
         } catch (error) {
             return { success: false, error: error.message };
         }
