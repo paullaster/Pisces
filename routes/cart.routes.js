@@ -1,5 +1,6 @@
 import express from "express";
 import Cart from "../data/integrations/database/models/cart.js";
+import Item from "../data/integrations/database/models/items.js";
 import { SequilizeCartRepository } from "../data/interfaces/sequilize.cart.repository.js";
 import { CreateCartController } from "../app/controllers/cart/create.cart.js";
 import { CreateCartService } from "../core/services/cart/create.cart.service.js";
@@ -13,7 +14,7 @@ import { DeleteCartService } from "../core/services/cart/delete.cart.service.js"
 
 const cartRoutes = express.Router();
 // CREATE CART ITEM
-const cartRepository = new SequilizeCartRepository(Cart);
+const cartRepository = new SequilizeCartRepository(Cart,Item);
 const createCartService = new CreateCartService(cartRepository);
 const createCartController = new CreateCartController(createCartService);
 
