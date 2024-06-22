@@ -2,19 +2,19 @@ import { Cart } from "../../core/types/cart.js";
 import { CartRepository } from "../../core/app/cart.interface.js";
 
 export class SequilizeCartRepository extends CartRepository {
-    constructor(CartModel, relatedModels = []) {
+    constructor(CartModel) {
         super();
         this.dataSource = CartModel;
-        this.relatedModels = relatedModels;
         this.mapToCart = this.mapToCart.bind(this);
         this.getCartById = this.getCartById.bind(this);
+        this.update = this.update.bind(this);
     }
-    async getCartById(cartId, type = 'fetch', eagerLoad = false) {
+    async getCartById(cartId, associatedModel = [], type = 'fetch', eagerLoad = false) {
         try {
             let cart;
             if (eagerLoad) {
                 cart = await this.dataSource.findByPk(cartId, {
-                    include: this.relatedModels,
+                    include: associatedModel,
                 });
             }else {
                 cart = await this.dataSource.findByPk(cartId);
@@ -33,29 +33,25 @@ export class SequilizeCartRepository extends CartRepository {
             return { error: error.message, success: false };
         }
     }
-    async getUserCartItems(user) {
-        try {
-            const userCart = await this.dataSource.findAll({
-                where: {
-                    userId: user,
-                    status: 'New',
-                }
-            });
-            if (!userCart) {
-                return { success: false, error: 'Cart does not exist' };
-            }
-            return this.mapToCart(userCart);
-        } catch (error) {
-            return { error: error.message, success: false };
-        }
-    }
     async create(cart) {
         try {
             const { success, error } = await this.getCartById(cart.cartId, 'create');
             if (!success) {
                 return { success: false, error };
             }
+            const  userHasNewCart = await this.dataSource.findAndCountAll({
+                where: {
+                    userId: cart.userId,
+                    cartCheckoutStatus: 'New',
+                },
+            });
             const { items, ...rest} = cart;
+            if (userHasNewCart.count > 0) {
+                const payload = {
+                    items,
+                }
+                return await this.update(userHasNewCart.rows[0]['dataValues']['cartId'], payload);
+            }
             // Create a new cart
             const newCart = await this.dataSource.create(rest);
 
@@ -82,10 +78,8 @@ export class SequilizeCartRepository extends CartRepository {
                     data.items[itemToUpdate] = item;
                 }
             });
-            const {items, ...rest } = data;
-            const updatedCart = await cart.update(rest);
-            await updatedCart.setItems(items);
-            return this.mapToCart(updatedCart);
+            await cart.setItems(data.items);
+            return this.mapToCart(cart);
         }catch(error) {
             return { error: error.message, success: false };
         }

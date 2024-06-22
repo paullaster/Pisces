@@ -14,7 +14,7 @@ import { DeleteCartService } from "../core/services/cart/delete.cart.service.js"
 
 const cartRoutes = express.Router();
 // CREATE CART ITEM
-const cartRepository = new SequilizeCartRepository(Cart,Item);
+const cartRepository = new SequilizeCartRepository(Cart);
 const createCartService = new CreateCartService(cartRepository);
 const createCartController = new CreateCartController(createCartService);
 

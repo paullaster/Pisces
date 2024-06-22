@@ -1,6 +1,7 @@
 import { RandomCodeGenerator } from "../../../common/generating_unique_codes.js";
 import { ValidateObjectPayload } from "../../validation/validate.object.payload.js";
 
+
 export class CreateCartService {
     constructor(cartRepository) {
         this.cartRepository = cartRepository;
@@ -20,6 +21,7 @@ export class CreateCartService {
             if (Object.keys(payload).length===0) {
                 return { success: false, error: "Can't add empty item to cart!" };
             }
+
             payload.cartId = RandomCodeGenerator(5, 'cart');
             payload.userId = userId;
             payload.items.forEach(item => item.itemId = RandomCodeGenerator(5, 'item'));
