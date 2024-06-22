@@ -7,6 +7,7 @@ export class SequilizeOrderRepository extends CartRepository {
         this.dataSource = OrderModel;
         this.mapToOrder = this.mapToOrder.bind(this);
         this.getOrderById = this.getOrderById.bind(this);
+        this.update = this.update.bind(this);
     }
     async getOrderById(orderId,  associatedModel = [], type = 'fetch', eagerLoad = false) {
         try {
@@ -19,13 +20,13 @@ export class SequilizeOrderRepository extends CartRepository {
                 order = await this.dataSource.findByPk(orderId);
             }
             if (type === 'create' && order) {
-                return { error: 'Cart already exist', success: false };
+                return { error: 'Order already exist', success: false };
             }
             if (type === 'create' &&!order) {
                 return { success: true };
             }
             if (type!== 'create' &&!order) {
-                return { error: 'Cart does not exist', success: false };
+                return { error: 'Order does not exist', success: false };
             }
             return this.mapToOrder(order);
         }catch (error) {
@@ -38,7 +39,19 @@ export class SequilizeOrderRepository extends CartRepository {
             if (!success) {
                 return { success: false, error };
             }
+            const  userHasNewCart = await this.dataSource.findAndCountAll({
+                where: {
+                    userId: cart.userId,
+                    cartCheckoutStatus: 'New',
+                },
+            });
             const { items, ...rest} = cart;
+            if (userHasNewCart.count > 0) {
+                const payload = {
+                    items,
+                }
+                return await this.update(userHasNewCart.rows[0]['dataValues']['cartId'], payload);
+            }
             // Create a new cart
             const newCart = await this.dataSource.create(rest);
 
@@ -47,7 +60,7 @@ export class SequilizeOrderRepository extends CartRepository {
                 await newCart.createItem(item);
             });
 
-            return this.mapToOrder(newCart);
+            return this.mapToCart(newCart);
         }catch(error) {
             return { error: error.message, success: false };
         }
