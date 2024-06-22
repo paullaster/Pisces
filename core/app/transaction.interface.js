@@ -1,21 +1,21 @@
 /**
- * @class ProductRepository
+ * @class TransactionRepository
  * @abstract
  */
 
-export class ProductRepository {
+export class TransactionRepository {
     /**
      * @param {string}
      * @abstract
-     * @returns { <Product | null}
+     * @returns { <Transaction | null}
      */
-    async getProductById(pid) { 
+    async getTransactionById(transId) { 
         throw new Error('Not implemented');
     }
     /**
      * @param {{}} [options={}] 
      * @abstract
-     * @returns { <Products | null}
+     * @returns { <Transaction | null}
      */
     async getProducts(options = {}) { 
         throw new Error('Not implemented');
@@ -23,33 +23,30 @@ export class ProductRepository {
     /**
      * @param {string}
      * @abstract
-     * @returns { <Product | null}
-     */
-    async getProductByName(title) { 
-        throw new Error('Not implemented');
-    }
+     * @returns { <Transaction | null}
+   
     /**
      * @param {Product}
      * @abstract
-     * @returns { <Product | null}
+     * @returns { <Transaction | null}
      */
-    async create(product) { 
+    async create(transaction) { 
         throw new Error('Not implemented');
     }
     /**
-     * @param {Product}
+     * @param {Transaction}
      * @abstract
-     * @returns { <Product | null}
+     * @returns { <Transaction | null}
      */
-    async update(product) { 
+    async update(transaction) { 
         throw new Error('Not implemented');
     }
     /**
      * @param {string}
      * @abstract
-     * @returns { <Product | null}
+     * @returns { <Transaction | null}
      */
-    async delete(pid) { 
+    async delete(transId) { 
         throw new Error('Not implemented');
     }
 }
