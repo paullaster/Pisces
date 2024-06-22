@@ -9,7 +9,7 @@ export class TransactionRepository {
      * @abstract
      * @returns { <Transaction | null}
      */
-    async getTransactionById(transId) { 
+    async getTransById(transId) { 
         throw new Error('Not implemented');
     }
     /**
@@ -17,7 +17,7 @@ export class TransactionRepository {
      * @abstract
      * @returns { <Transaction | null}
      */
-    async getProducts(options = {}) { 
+    async getTrans(options = {}) { 
         throw new Error('Not implemented');
     }
     /**
