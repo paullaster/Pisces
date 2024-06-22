@@ -10,12 +10,12 @@ const Order = sequelize.define('Order',{
         unique: true,
         primaryKey: true,
     },
-    cartCheckoutStatus: {
+    orderStatus: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: false,
         defaultValue: 'New',
-        values: ['Pending Processing','Processed', 'Pending Delivery', 'Delivered'],
+        values: ['New','Pending Processing','Processed', 'Pending Delivery', 'Delivered'],
     }
 },
 {

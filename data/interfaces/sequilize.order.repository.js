@@ -1,7 +1,7 @@
 import { Order } from "../../core/types/order.js";
-import { CartRepository } from "../../core/app/cart.interface.js";
+import { OrderRepository } from "../../core/app/order.interface.js";
 
-export class SequilizeOrderRepository extends CartRepository {
+export class SequilizeOrderRepository extends OrderRepository {
     constructor(OrderModel) {
         super();
         this.dataSource = OrderModel;
@@ -33,72 +33,55 @@ export class SequilizeOrderRepository extends CartRepository {
             return { error: error.message, success: false };
         }
     }
-    async create(cart) {
+    async create(order) {
         try {
-            const { success, error } = await this.getOrderById(cart.cartId, 'create');
+            const { success, error } = await this.getOrderById(order.orderId, 'create');
             if (!success) {
                 return { success: false, error };
             }
-            const  userHasNewCart = await this.dataSource.findAndCountAll({
-                where: {
-                    userId: cart.userId,
-                    cartCheckoutStatus: 'New',
-                },
-            });
-            const { items, ...rest} = cart;
-            if (userHasNewCart.count > 0) {
-                const payload = {
-                    items,
-                }
-                return await this.update(userHasNewCart.rows[0]['dataValues']['cartId'], payload);
-            }
-            // Create a new cart
-            const newCart = await this.dataSource.create(rest);
+            const { items, ...rest} = order;
+            // Create a new order
+            const newOrder = await this.dataSource.create(rest);
 
             // Create associated items
             items.forEach(async(item) => {
-                await newCart.createItem(item);
+                await newOrder.createItem(item);
             });
 
-            return this.mapToCart(newCart);
+            return this.mapToCart(newOrder);
         }catch(error) {
             return { error: error.message, success: false };
         }
     }
-    async update(cartItem, payload) {
+    async update(order, payload) {
         try {
-            const {data, success, error}  = await this.getOrderById(cartItem, 'fetch', true);
+            const {data, success, error}  = await this.getOrderById(order, 'fetch', true);
             if (!success) {
                 return { success: false, error };
             }
-            const cart = await this.dataSource.findByPk(cartItem);
-            payload.items.forEach(item => {
-                const itemToUpdate = data.items.findIndex(dataItem => dataItem.itemId === item.itemId);
-                if (itemToUpdate!== -1) {
-                    data.items[itemToUpdate] = item;
-                }
-            });
+            const orderItem = await this.dataSource.findByPk(order);
+            data['orderStatus'] = payload['orderStatus']
             const {items, ...rest } = data;
-            const updatedCart = await cart.update(rest);
-            await updatedCart.setItems(items);
+            const updatedCart = await orderItem.update(rest);
             return this.mapToOrder(updatedCart);
         }catch(error) {
             return { error: error.message, success: false };
         }
     }
-    async delete(item) {
+    async delete(order, model) {
         try {
-            const {data, success, error } = await this.getOrderById(item, 'fetch', true);
+            const {data, success, error } = await this.getOrderById(order, model, 'fetch', true);
             if (!success) {
                 return { success: false, error };
             }
-            const deletedCart = await this.dataSource.destroy({
+            const deletedOrder = await this.dataSource.destroy({
                 where: {
-                    cartId: item,
+                    orderId: order,
                 }
             });
-            data.removeItems(data.items);
-            return { success: true, data: deletedCart };
+            const removeSuffix = `remove${model}s`
+            data[removeSuffix](data.items);
+            return { success: true, data: deletedOrder };
         }catch (error) {
             return { error: error.message, success: false };
         }

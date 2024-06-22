@@ -65,9 +65,9 @@ export class SequilizeCartRepository extends CartRepository {
             return { error: error.message, success: false };
         }
     }
-    async update(cartItem, payload) {
+    async update(cartItem, payload, model) {
         try {
-            const {data, success, error}  = await this.getCartById(cartItem, 'fetch', true);
+            const {data, success, error}  = await this.getCartById(cartItem, model, 'fetch', true);
             if (!success) {
                 return { success: false, error };
             }
@@ -78,7 +78,8 @@ export class SequilizeCartRepository extends CartRepository {
                     data.items[itemToUpdate] = item;
                 }
             });
-            await cart.setItems(data.items);
+            const createSuffix = `set${model}s`;
+            await cart[createSuffix](data.items);
             return this.mapToCart(cart);
         }catch(error) {
             return { error: error.message, success: false };
