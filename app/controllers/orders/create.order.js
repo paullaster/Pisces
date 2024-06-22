@@ -8,11 +8,11 @@ export class CreateOrderController {
             if (!req.body) {
                 return res.ApiResponse.error(400, 'Missing order body');
             }
-            const { success, order, error } = await this.createOrderService.createOrder(req.params.userId, req.body);
+            const { success, order, error } = await this.createOrderService.createOrder(req.params.userId, req.model, req.body);
             if (!success) {
                 return res.ApiResponse.error(400, error);
             }
-            return res.ApiResponse.success(201, order);
+            return res.ApiResponse.success(order, 201, 'Order placed!');
         } catch (error) {
             return res.ApiResponse.error(500, error.message);
         }
