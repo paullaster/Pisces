@@ -9,14 +9,11 @@ export class InitiateCheckoutController {
                 return res.ApiResponse.error(400, 'Missing item body');
             }
             const { success, data, error } = await this.initiateCheckoutService.initiateCheckout(req.body);
-            if (!success && error) {
-                return res.ApiResponse.error(400, error);
-            }
-            if (!success && data) {
-                return res.ApiResponse.error(400, data.ResponseDescription);
+            if (!success) {
+                return res.ApiResponse.error(500, error);
             }
             
-            return res.ApiResponse.success(checkout, 200, data.ResponseDescription);
+            return res.ApiResponse.success(checkout, 200, data.transactionMessage);
         } catch (error) {
             return res.ApiResponse.error(400, error);
         }

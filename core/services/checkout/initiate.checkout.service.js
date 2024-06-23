@@ -1,5 +1,4 @@
 import ValidateObjectPayload from "../../validation/validate.object.payload.js"; 
-import { RandomCodeGenerator } from "../../../common/generating_unique_codes.js";
 
 export class InitiatePaymentRequestService {
     constructor(paymentRequestRepository, paymentGateway) {
@@ -21,23 +20,27 @@ export class InitiatePaymentRequestService {
             new ValidateObjectPayload(payload);
             const { checkoutId, ...rest} = payload;
             const { success, transaction, error } = this.paymentGateway.NIPush(rest);
-            if (success) {
-                if (transaction.ResponseCode < 1 && checkoutId) {
-                    await this.transactionRepository.create({
-                        transId: transaction.transId,
-                        phoneNumber: rest.phoneNumber,
-                        amount: rest.amount,
-                        status: 'Pending',
-                        checkoutRequestID: transaction.CheckoutRequestID,
-                        merchantRequestID: transaction.MerchantRequestID,
-                        transactionMessage: transaction.ResponseDescription,
-                        checkoutId: checkoutId,
-                    });
-                    return {success: true, data: response.data};
-                }
+            if (!success) {
                 return { success, error };
             }
-            return { success, data };
+            if (transaction.ResponseCode !== 0) {
+                return {success: false, error: transaction.ResponseDescription};
+            }
+            const { success: failed, data, error:err } = await this.paymentRequestRepository.create({
+                transId: transaction.transId,
+                phoneNumber: rest.phoneNumber,
+                amount: rest.amount,
+                status: 'Pending',
+                checkoutRequestID: transaction.CheckoutRequestID,
+                merchantRequestID: transaction.MerchantRequestID,
+                transactionMessage: transaction.ResponseDescription,
+                checkoutId: checkoutId,
+            });
+            if (!failed) {
+                return { success: failed, error: err };
+            }
+
+            return { success: failed, data };
         } catch (error) {
             return { success: false, error: error.message };
         }
