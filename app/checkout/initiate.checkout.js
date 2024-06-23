@@ -8,7 +8,7 @@ export class InitiateCheckoutController {
             if (!req.body) {
                 return res.ApiResponse.error(400, 'Missing item body');
             }
-            const { success, checkout, error } = await this.initiateCheckoutService.initiateCheckout(req.params.userId, req.body);
+            const { success, checkout, error } = await this.initiateCheckoutService.initiateCheckout(req.user.userId, req.body);
             if (!success) {
                 return res.ApiResponse.error(400, error);
             }
