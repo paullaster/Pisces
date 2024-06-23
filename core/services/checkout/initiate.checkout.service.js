@@ -6,11 +6,8 @@ export class InitiatePaymentRequestService {
         this.paymentGateway = paymentGateway;
         this.initiatePaymentRequest = this.initiatePaymentRequest.bind(this);
     }
-    async initiatePaymentRequest(userId, payload) {
+    async initiatePaymentRequest(payload) {
         try {
-            if (!userId) {
-                return { success: false, error: "Invalid user!" };
-            }
             if (!payload) {
                 return { success: false, error: "Invalid payload!" };
             }
