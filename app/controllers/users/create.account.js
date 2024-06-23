@@ -8,8 +8,7 @@ export class CreateAccount {
         if (!req.body) {
             return res.ApiResponse.error(400);
         }
-        const { username, email, password } = req.body;
-        const { error, success, user } = await this.createAccountService.handle({ email, username, password });
+        const { error, success, user } = await this.createAccountService.handle(req.body);
         if (!success) {
             return res.ApiResponse.error(401, error);
         }

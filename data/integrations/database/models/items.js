@@ -2,6 +2,7 @@ import { sequelize } from "../connection.js";
 import { DataTypes } from "sequelize";
 import Products from "./product.js";
 import Cart from "./cart.js";
+import Order from "./order.js";
 
 const Item = sequelize.define('Item',{
     itemId: {
@@ -50,14 +51,34 @@ Cart.hasMany(Item, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
 });
-Item.belongsTo(Cart);
-
-Products.hasMany(Item, {
-    foreignKey: 'pid',
+Item.belongsTo(Cart, {
+    foreignKey: 'cartId',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
 });
-Item.belongsTo(Products);
+
+Products.hasMany(Item, {
+    foreignKey: 'productId',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+});
+Item.belongsTo(Products, {
+    foreignKey: 'productId',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+});
+
+Order.hasMany(Item, {
+    foreignKey: 'orderId',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+});
+Item.belongsTo(Order, {
+    foreignKey: 'orderId',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+});
+
 
 Item.sync();
 

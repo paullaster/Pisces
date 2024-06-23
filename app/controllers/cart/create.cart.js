@@ -8,7 +8,7 @@ export class CreateCartController {
             if (!req.body) {
                 return res.ApiResponse.error(400, 'Missing item body');
             }
-            const { success, cart, error } = await this.createCartService.createCart(req.params.userId, req.body);
+            const { success, cart, error } = await this.createCartService.createCart(req.user.userId, req.body, req.model);
             if (!success) {
                 return res.ApiResponse.error(400, error);
             }

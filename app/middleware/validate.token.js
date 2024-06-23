@@ -3,8 +3,8 @@ import app from '../../config/app.js';
 
 export const validateUserToken = (req, res, next) => {
     try {
-        if (req.headers.Authorization) {
-            const token = req.headers.Authorization.split(' ')[1];
+        if (req.headers.authorization) {
+            const token = req.headers.authorization.split(' ')[1];
             if (!token) {
                 return res.ApiResponse.error(401);
             }
@@ -14,8 +14,8 @@ export const validateUserToken = (req, res, next) => {
         }else {
             return res.ApiResponse.error(401);
         }
-        next(req);
+        next();
     } catch (error) {
-        return next(error);
+        return res.ApiResponse.error(401, error.message);
     }
 };

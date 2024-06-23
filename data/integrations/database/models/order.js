@@ -27,13 +27,6 @@ const Order = sequelize.define('Order',{
     collate: 'utf8mb4_unicode_ci'
 });
 
-Order.hasMany(Item, {
-    foreignKey: 'orderId',
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
-});
-Item.belongsTo(Order);
-
 User.hasMany(Order, {
     foreignKey: 'userId',
     onDelete: 'CASCADE',

@@ -17,10 +17,11 @@ export class CartRepository {
     }
     /**
      * @abstract
-     * @param { Cart }
+     * @param { cart }
+     * @param { model }
      * @returns { Promise<Cart | null> }
      */
-    async create(cart) {
+    async create(cart, model) {
         throw new Error('Not implemented');
     }
     /**

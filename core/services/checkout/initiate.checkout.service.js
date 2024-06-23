@@ -1,4 +1,4 @@
-import ValidateObjectPayload from "../../validation/validate.object.payload.js"; 
+import {ValidateObjectPayload} from "../../validation/validate.object.payload.js"; 
 
 export class InitiatePaymentRequestService {
     constructor(paymentRequestRepository, paymentGateway) {

@@ -15,8 +15,7 @@ class LoginController {
             if (!success) {
                 return res.ApiResponse.error(401, error);
             }
-            console.log();
-            const token = jwt.sign({username: user.username, email: user.email}, app.key, {algorithm: 'HS512', expiresIn: '1h' });
+            const token = jwt.sign({userId: user.email, username: user.username, email: user.email}, app.key, {algorithm: 'HS512', expiresIn: '1h' });
             return res.ApiResponse.success(token, 200, "Login successful");
         } catch (error) {
             res.ApiResponse.error(500, error.message);

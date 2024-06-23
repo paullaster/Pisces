@@ -1,7 +1,7 @@
 import { TransactionRepository } from "../../core/app/transaction.interface.js";
 import { Product } from "../../core/types/product.js";
 
-export class SequelizeProductRepository extends TransactionRepository {
+export class SequelizeTransactionRepository extends TransactionRepository {
     constructor(TransactionModel) {
         super();
         this.dataSource = TransactionModel;

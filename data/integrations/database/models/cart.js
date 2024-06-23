@@ -9,17 +9,6 @@ const Cart = sequelize.define('Cart',{
         unique: true,
         primaryKey: true,
     },
-    userId: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false,
-        references: {
-            model: User,
-            key: 'email',
-            onDelete: 'CASCADE',
-            onUpdate: 'CASCADE'
-        },
-    },
     cartCheckoutStatus: {
         type: DataTypes.STRING,
         allowNull: false,

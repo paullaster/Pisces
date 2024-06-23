@@ -1,5 +1,6 @@
 import { UserRepository } from "../../core/app/user.interface.js";
 import { User } from "../../core/types/user.js";
+import { Op } from "sequelize";
 
 export class SequelizeUserRespository extends UserRepository {
     constructor(UserModel) {
@@ -13,8 +14,8 @@ export class SequelizeUserRespository extends UserRepository {
         try {
             let user;
             if (eagerLoad) {
-                user = await this.dataSource.findByPk(id, {include: associatedModels});
-            }else {
+                user = await this.dataSource.findByPk(id, { include: associatedModels });
+            } else {
                 user = await this.dataSource.findByPk(id);
             }
             if (!user) {
@@ -27,31 +28,33 @@ export class SequelizeUserRespository extends UserRepository {
     }
     async getUserByUsername(username) {
         try {
-            const user = await this.dataSource.findOne({ where: { username } });
+            const user = await this.dataSource.findOne({ where: { [Op.or]: [{username: username}, {email: username}, {phoneNumber: username}] } });
             if (!user) {
                 return { sucess: false, error: 'Invalid username' };
             }
-            this.password = user['dataValues'].password;
-            return user ? this.mapToUser(user) : null;
+            const { password, ...rest } = user['dataValues']
+            this.password = password;
+            return this.mapToUser(rest);
         } catch (error) {
             return { success: false, error: error.message };
         }
     }
     async getUserByEmail(email) {
         try {
-            const user = await this.dataSource.findOne({ where: { email } });
+            let user = await this.dataSource.findOne({ where: { email } });
             if (!user) {
                 return { success: false, error: 'Invalid email or username' };
             }
-            this.password = user['dataValues'].password;
-            return user ? this.mapToUser(user) : null;
+            const { password, ...rest } = user['dataValues']
+            this.password = password;
+            return this.mapToUser(rest);
         } catch (error) {
             return { success: false, error: error.message };
         }
     }
     async getUserAssociations(user, model) {
         try {
-            const {data, success, error} = await this.getUserById(user, model, true);
+            const { data, success, error } = await this.getUserById(user, model, true);
             if (!success) {
                 return { success: false, error };
             }
@@ -60,10 +63,10 @@ export class SequelizeUserRespository extends UserRepository {
             return { success: false, error: error.message };
         }
     }
-    async create(email, username, password) {
+    async create(payload) {
         try {
-            const user = await this.dataSource.create({ email, username, password });
-        return this.mapToUser(user);
+            const user = await this.dataSource.create(payload);
+            return this.mapToUser(user);
         } catch (error) {
             return { sucess: false, error: error.message };
         }
@@ -71,7 +74,7 @@ export class SequelizeUserRespository extends UserRepository {
     async update(user) {
         try {
             await this.dataSource.update(user, { where: { email: user.email } });
-        return this.mapToUser(user);
+            return this.mapToUser(user);
         } catch (error) {
             return { sucess: false, error: error.message };
         }
@@ -85,7 +88,11 @@ export class SequelizeUserRespository extends UserRepository {
         }
     }
     mapToUser(user) {
-        const { email, username } = user;
-        return { success: true, user: new User(username, email)};
+        try {
+            const { email, username, ...rest } = user;
+            return { success: true, user: new User(username, email, rest) };
+        } catch (error) {
+            return { success: false, error: error.message}
+        }
     }
 }

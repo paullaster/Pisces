@@ -1,6 +1,5 @@
 import express from "express";
 import Cart from "../data/integrations/database/models/cart.js";
-import Item from "../data/integrations/database/models/items.js";
 import { SequilizeCartRepository } from "../data/interfaces/sequilize.cart.repository.js";
 import { CreateCartController } from "../app/controllers/cart/create.cart.js";
 import { CreateCartService } from "../core/services/cart/create.cart.service.js";
@@ -10,6 +9,8 @@ import { UpdateCartController } from "../app/controllers/cart/update.cart.js";
 import { UpdateCartService } from "../core/services/cart/update.cart.service.js";
 import { DeleteCartController } from "../app/controllers/cart/delete.cart.js";
 import { DeleteCartService } from "../core/services/cart/delete.cart.service.js";
+import { validateUserToken } from "../app/middleware/validate.token.js";
+import { itemModelMiddleware } from "../app/middleware/pass.item.model.js";
 
 
 const cartRoutes = express.Router();
@@ -32,11 +33,11 @@ const deleteCartController = new DeleteCartController(deleteCartService);
 
 
 // ROUTES   --------------------------------
-cartRoutes.get('/', fetchCartController.fetchCart);
-cartRoutes.get('/:userId', fetchCartController.fetchUserCartItems);
-cartRoutes.post('/', createCartController.createCart);
-cartRoutes.put('/:cartItemId', updateCartController.updateCart);
-cartRoutes.delete('/:cartItemId', deleteCartController.deleteCart);
+cartRoutes.get('/', validateUserToken, fetchCartController.fetchCart);
+cartRoutes.get('/:userId', validateUserToken, fetchCartController.fetchUserCartItems);
+cartRoutes.post('/', validateUserToken, itemModelMiddleware, createCartController.createCart);
+cartRoutes.put('/:cartItemId', validateUserToken, updateCartController.updateCart);
+cartRoutes.delete('/:cartItemId', validateUserToken, deleteCartController.deleteCart);
 
 
 export { cartRoutes };

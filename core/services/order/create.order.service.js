@@ -1,4 +1,4 @@
-import { ValidateObjectPayload } from "../../validation/validate.object.payload";
+import { ValidateObjectPayload } from "../../validation/validate.object.payload.js";
 import { RandomCodeGenerator } from "../../../common/generating_unique_codes.js";
 export class CreateOrderService {
     constructor(orderRepository) {

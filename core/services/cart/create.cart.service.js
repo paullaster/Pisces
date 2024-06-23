@@ -7,7 +7,7 @@ export class CreateCartService {
         this.cartRepository = cartRepository;
         this.createCart = this.createCart.bind(this);
     }
-    async createCart(userId, payload) {
+    async createCart(userId, payload, model) {
         try {
             if (!userId) {
                 return { success: false, error: "Invalid user!" };
@@ -21,12 +21,12 @@ export class CreateCartService {
             if (Object.keys(payload).length===0) {
                 return { success: false, error: "Can't add empty item to cart!" };
             }
-
             payload.cartId = RandomCodeGenerator(5, 'cart');
             payload.userId = userId;
-            payload.items.forEach(item => item.itemId = RandomCodeGenerator(5, 'item'));
+            payload.item.itemId = RandomCodeGenerator(5, 'item');
+            payload.item.cartId = payload.cartId;
             new ValidateObjectPayload(payload);
-            const { success, error, data:cart } = await this.cartRepository.create(payload);
+            const { success, error, data:cart } = await this.cartRepository.create(payload, model);
             if (!success) {
                 return { success: false, error };
             }
