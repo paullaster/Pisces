@@ -15,6 +15,19 @@ export class FetchCartController {
             return res.ApiResponse.error(500, error.message);
         }
     }
+    async fetchCartMiddleware(req, res, next) {
+        try {
+            const { success, cart, error } = await this.fetchCartService.fetchCart(req.transaction.checkoutId, req.cartModels);
+            if (!success) {
+                next(error);
+            } else {
+                req.orderItems = cart.items;
+                next(req, res);
+            }
+        } catch (error) {
+            next(error);
+        }
+    }
     async fetchUserCartItems(req, res) {
         try {
             const { success, cart, error } = await this.fetchCartService.fetchUserCartItems(req.params.userId, { ...req.query });

@@ -14,4 +14,20 @@ export class FetchPaymentRequestController {
             return res.ApiResponse.error(400, error);
         }
     }
+    async fetchPaymentRequestWithUniqueKeys(req, res, next) {
+        try {
+            if (!Object.keys(req.query).length) {
+                return res.ApiResponse.error(400, 'Keys are required');
+            }
+            const { success, data, error } = await this.fetchPaymentRequestService.fetchPaymentRequestWithUniqueKeys(req.query);
+            if (!success) {
+                next(error);
+            }else {
+                req.transaction = data;
+                next(req, res);
+            }
+        } catch (error) {
+            return res.ApiResponse.error(400, error);
+        }
+    }
 }

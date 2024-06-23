@@ -24,6 +24,21 @@ export class SequelizeProductRepository extends TransactionRepository {
             return { error: error.message, success: false };
         }
     }
+    async getTransactionByUniqueProperty(query){
+        try {
+            const transaction = await this.dataSource.findOne({
+                where: {
+                    ...query,
+                },
+            });
+            if (!transaction) {
+                return { error: 'This transaction does no exist!', success: false };
+            }
+            return this.mapTransaction(transaction);
+        } catch (error) {
+            return { error: error.message, success: false };
+        }
+    }
     async getTrans(options = {}, offset = 0, limit = 10) {
         try {
             const products = await this.dataSource.findAndCountAll({
@@ -51,31 +66,21 @@ export class SequelizeProductRepository extends TransactionRepository {
             return { error: error.message, success: false };
         }
     }
-    async update(transId, payload) {
+    async update(transaction, payload) {
         try {
-            const {data, success, error } = await this.getTransById(transId);
-            if (!success) {
-                return { success: false, error };
-            }
-            for (const key in data) {
+            for (const key in transaction) {
                 if (payload[key]) {
-                    data[key] = payload[key];
+                    transaction[key] = payload[key];
                 }
             }
-            const item = await this.dataSource.findByPk(transId);
-            const updatedProduct = await item.update(data);
-
-            if (!updatedProduct) {
-                return { success: false, error: '' };
-            }
-            return this.mapTransaction(updatedProduct);
+            await transaction.update(transaction);
         } catch (error) {
             return { error: error.message, success: false };
         }
     }
-    async delete(transId) {
+    async delete(query) {
         try {
-            return {succuess: true, data: await this.dataSource.destroy({ where: { transId } }), };
+            return {succuess: true, data: await this.dataSource.destroy({ where: { ...query } }), };
         } catch (error) {
             return { error: error.message, success: false };
         }

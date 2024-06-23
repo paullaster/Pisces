@@ -4,12 +4,12 @@ export class FetchCartService {
         this.fetchCart = this.fetchCart.bind(this);
         this.fetchUserCartItems = this.fetchUserCartItems.bind(this);
     }
-    async fetchCart(userId) {
+    async fetchCart(cartId, model) {
         try {
-            if (!userId) {
-                return { success: false, error: "Invalid user!" };
+            if (!cartId) {
+                return { success: false, error: "Invalid!" };
             }
-            const { success, error, data:cart } = await this.cartRepository.fetch(userId);
+            const { success, error, data:cart } = await this.cartRepository.getCartById(cartId, model, 'fetch', true);
             if (!success) {
                 return { success: false, error };
             }

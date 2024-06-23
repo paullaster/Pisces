@@ -17,4 +17,18 @@ export class FetchPaymentRequestService {
             return { success: false, error: error.message };
         }
     }
+    async fetchPaymentRequestWithUniqueKeys(keys) { 
+        try {
+            if (!Object.keys(keys).length) {
+                return { success: false, error: 'Keys are required' };
+            }
+            const { success, data, error } = await this.paymentRequestRepository.getTransactionByUniqueProperty(keys);
+            if (!success) {
+                return { success, error };
+            }
+            return { success, data };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    }
 }

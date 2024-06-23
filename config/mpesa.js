@@ -7,6 +7,6 @@ export default {
     consumer_secret: process.env.MPESA_CONSUMER_SECRET,
     business_shortcode: process.env.MPESA_BUSSINESS_SHORTCODE,
     mpesa_passkey: process.env.MPESA_PASSKEY,
-    mpesa_callback: `${app.url}/pay/callback`,
+    mpesa_callback: `${app.url}/pisces/api/v1/checkout/callback`,
     transactiontype: process.env.MPESA_TRANSACTIONTYPE
 }

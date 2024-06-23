@@ -7,9 +7,12 @@ export class CartRepository {
     /**
      * @abstract
      * @param { id }
+     * @param {model}  
+     * @param {type} 
+     * @param {eager}
      * @returns { Promise<Cart | null> }
      */
-    async getCartById(id) {
+    async getCartById(id, model, type, eager) {
         throw new Error('Not implemented');
     }
     /**
