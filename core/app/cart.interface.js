@@ -35,9 +35,10 @@ export class CartRepository {
     /**
      * @abstract
      * @param { id }
+     * @param { model}
      * @returns { Promise<Cart | null> }
      */
-    async delete(id) {
+    async delete(id, model) {
         throw new Error('Not implemented');
     }
 }

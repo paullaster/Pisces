@@ -18,7 +18,7 @@ const Transaction = sequelize.define('Transaction',{
         unique: true,
     },
     amount: {
-        type: DataTypes.FLOAT,
+        type: DataTypes.INTEGER,
         allowNull: false,
     },
     transactionID: {
@@ -28,6 +28,7 @@ const Transaction = sequelize.define('Transaction',{
     },
     status: {
         type: DataTypes.STRING,
+        defaultValue: 'Pending',
         values: ['Pending', 'Settled'],
         allowNull: false,
     },

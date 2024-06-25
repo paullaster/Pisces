@@ -3,8 +3,8 @@ export const CheckoutHandler = (req, res, next) => {
     try {
         const response = req.body.Body.stkCallback;
         const query = {
-            merchantRequestID: response.merchantRequestID,
-            checkoutRequestID: response.checkoutRequestID,
+            merchantRequestID: response.MerchantRequestID,
+            checkoutRequestID: response.CheckoutRequestID,
         };
         req.query = query;
         req.body = response;

@@ -2,6 +2,7 @@ export class FetchPaymentRequestController {
     constructor(fetchPaymentRequestService) {
         this.fetchPaymentRequestService = fetchPaymentRequestService;
         this.fetchPaymentRequest = this.fetchPaymentRequest.bind(this);
+        this.fetchPaymentRequestWithUniqueKeys = this.fetchPaymentRequestWithUniqueKeys.bind(this);
     }
     async fetchPaymentRequest(req, res) {
         try {
@@ -21,13 +22,13 @@ export class FetchPaymentRequestController {
             }
             const { success, data, error } = await this.fetchPaymentRequestService.fetchPaymentRequestWithUniqueKeys(req.query);
             if (!success) {
-                next(error);
+                return res.ApiResponse.error(500, error);
             }else {
                 req.transaction = data;
-                next(req, res);
+                next();
             }
         } catch (error) {
-            return res.ApiResponse.error(400, error);
+            return res.ApiResponse.error(500, error.message);
         }
     }
 }

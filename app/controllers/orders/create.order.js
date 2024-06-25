@@ -6,14 +6,14 @@ export class CreateOrderController {
     async createOrder(req, res, next) {
         try {
             const orderObject = {
-                items: req.orderItems,
+                items: req.cart.Items,
             }
-            const { success, order, error } = await this.createOrderService.createOrder(req.user.userId, req.orderModels, orderObject);
+            const { success, order, error } = await this.createOrderService.createOrder(req.cart.userId, req.orderModels, orderObject);
             if (!success) {
-                next(error);
+                return res.ApiResponse.error(500, error);
             }else {
                 req.order = order;
-                next(req, res);
+                next();
             }
         } catch (error) {
             return res.ApiResponse.error(500, error.message);

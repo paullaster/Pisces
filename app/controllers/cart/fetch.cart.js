@@ -3,6 +3,7 @@ export class FetchCartController {
         this.fetchCartService = fetchCartService;
         this.fetchCart = this.fetchCart.bind(this);
         this.fetchUserCartItems = this.fetchUserCartItems.bind(this);
+        this.fetchCartMiddleware = this.fetchCartMiddleware.bind(this);
     }
     async fetchCart(req, res) {
         try {
@@ -19,13 +20,13 @@ export class FetchCartController {
         try {
             const { success, cart, error } = await this.fetchCartService.fetchCart(req.transaction.checkoutId, req.cartModels);
             if (!success) {
-                next(error);
+                return res.ApiResponse.error(500, error);
             } else {
-                req.orderItems = cart.items;
-                next(req, res);
+                req.cart = cart;
+                next();
             }
         } catch (error) {
-            next(error);
+            return res.ApiResponse.error(500, error.message);
         }
     }
     async fetchUserCartItems(req, res) {

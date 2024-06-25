@@ -1,5 +1,6 @@
 import { TransactionRepository } from "../../core/app/transaction.interface.js";
-import { Product } from "../../core/types/product.js";
+import { Transaction } from "../../core/types/transaction.js";
+import { RandomCodeGenerator } from "../../common/generating_unique_codes.js";
 
 export class SequelizeTransactionRepository extends TransactionRepository {
     constructor(TransactionModel) {
@@ -9,17 +10,17 @@ export class SequelizeTransactionRepository extends TransactionRepository {
     }
     async getTransById(transId, type = 'fetch') {
         try {
-            const product = await this.dataSource.findByPk(transId);
-            if (type === 'create' && product) {
+            const transaction = await this.dataSource.findByPk(transId);
+            if (type === 'create' && transaction) {
                 return { error: '', success: false };
             }
-            if (type === 'create' && !product) {
+            if (type === 'create' && !transaction) {
                 return { success: true };
             }
-            if (type !== 'create' && !product) {
+            if (type !== 'create' && !transaction) {
                 return { error: '', success: false };
             }
-            return this.mapTransaction(product);
+            return this.mapTransaction(transaction);
         } catch (error) {
             return { error: error.message, success: false };
         }
@@ -56,9 +57,13 @@ export class SequelizeTransactionRepository extends TransactionRepository {
     }
     async create(transaction) {
         try {
-            const { success, error } = await this.getTransById(transaction.transId, 'create');
+            const { success:failed, data } = await this.getTransactionByUniqueProperty({checkoutId: transaction.checkoutId});
+            if (failed) {
+                await this.delete({transId: data.transId});
+            }
+            const { success } = await this.getTransById(transaction.transId, 'create');
             if (!success) {
-                return { success, error };
+                transaction.transId = RandomCodeGenerator(10);
             }
             const newTrans = await this.dataSource.create(transaction);
             return this.mapTransaction(newTrans);
@@ -68,12 +73,22 @@ export class SequelizeTransactionRepository extends TransactionRepository {
     }
     async update(transaction, payload) {
         try {
-            for (const key in transaction) {
-                if (payload[key]) {
-                    transaction[key] = payload[key];
+            transaction.phoneNumber = payload.CallbackMetadata.Item[3].Value;
+            transaction.checkoutId = payload.orderId;
+            transaction.status = 'Settled';
+            transaction.amount = payload.CallbackMetadata.Item[0].Value;
+            transaction.transactionID = payload.CallbackMetadata.Item[1].Value;
+            transaction.transactionDate = payload.CallbackMetadata.Item[2].Value; 
+            transaction.transactionMessage = payload.ResultDesc;
+            const tranToUpdate = await this.dataSource.findByPk(transaction.transId);
+
+            for (let prop in tranToUpdate['dataValues']) {
+                if (transaction[prop]) {
+                    tranToUpdate[prop] = transaction[prop];
                 }
             }
-            await transaction.update(transaction);
+            return await tranToUpdate.save();
+            
         } catch (error) {
             return { error: error.message, success: false };
         }
@@ -85,9 +100,9 @@ export class SequelizeTransactionRepository extends TransactionRepository {
             return { error: error.message, success: false };
         }
     }
-    mapTransaction(product) {
+    mapTransaction(transaction) {
         try {
-            return { success: true, data: new Product(product['dataValues']) };
+            return { success: true, data: new Transaction(transaction['dataValues']) };
         } catch (error) {
             return { success: false, error: error.message };
         }

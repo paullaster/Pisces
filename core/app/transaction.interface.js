@@ -42,11 +42,11 @@ export class TransactionRepository {
         throw new Error('Not implemented');
     }
     /**
-     * @param {string}
+     * @param {query}
      * @abstract
      * @returns { <Transaction | null}
      */
-    async delete(transId) { 
+    async delete(query) { 
         throw new Error('Not implemented');
     }
 }

@@ -9,13 +9,9 @@ export class CheckoutCallbackController {
                 ...req.body,
                 orderId: req.order.orderId,
             }
-            const { success, checkout, error } = await this.checkoutCallbackService.checkoutCallback(req.transaction, payload);
-            if (!success) {
-                return res.ApiResponse.error(400, error);
-            }
-            return res.ApiResponse.success(checkout, 200, "Checkout initiated");
+            res.ApiResponse.success(await this.checkoutCallbackService.updatePaymentRequest(req.transaction, payload));
         } catch (error) {
-            return res.ApiResponse.error(400, error);
+            return res.ApiResponse.error(500, error.message);
         }
     }
     async updateTransaction(req, res) {

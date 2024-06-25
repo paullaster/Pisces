@@ -2,6 +2,7 @@ export class FetchPaymentRequestService {
     constructor(paymentRequestRepository) {
         this.paymentRequestRepository = paymentRequestRepository;
         this.fetchPaymentRequest = this.fetchPaymentRequest.bind(this);
+        this.fetchPaymentRequestWithUniqueKeys = this.fetchPaymentRequestWithUniqueKeys.bind(this);
     }
     async fetchPaymentRequest(paymentRequestId) {
         try {

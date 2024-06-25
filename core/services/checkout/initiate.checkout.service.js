@@ -19,14 +19,14 @@ export class InitiatePaymentRequestService {
             }
             new ValidateObjectPayload(payload);
             const { checkoutId, ...rest} = payload;
-            const { success, transaction, error } = this.paymentGateway.NIPush(rest);
+            const { success, transaction, error } = await this.paymentGateway.NIPush(rest);
             if (!success) {
                 return { success, error };
             }
-            if (transaction.ResponseCode !== 0) {
+            if (transaction.ResponseCode !== '0') {
                 return {success: false, error: transaction.ResponseDescription};
             }
-            const { success: failed, data, error:err } = await this.paymentRequestRepository.create({
+            const transBody = {
                 transId: transaction.transId,
                 phoneNumber: rest.phoneNumber,
                 amount: rest.amount,
@@ -35,7 +35,8 @@ export class InitiatePaymentRequestService {
                 merchantRequestID: transaction.MerchantRequestID,
                 transactionMessage: transaction.ResponseDescription,
                 checkoutId: checkoutId,
-            });
+            }
+            const { success: failed, data, error:err } = await this.paymentRequestRepository.create(transBody);
             if (!failed) {
                 return { success: failed, error: err };
             }

@@ -17,6 +17,12 @@ import { SequilizeOrderRepository } from "../data/interfaces/sequilize.order.rep
 import { CheckoutCallbackController } from "../app/controllers/checkout/checkout.callback.js";
 import { UpdatePaymentRequestService } from "../core/services/checkout/update.payment.service.js";
 import { validateUserToken } from "../app/middleware/validate.token.js";
+import { Mpesa } from "../lib/mpesa/mpesa.lib.js";
+import { DeleteCartController } from "../app/controllers/cart/delete.cart.js";
+import { DeleteCartService } from "../core/services/cart/delete.cart.service.js";
+
+// LIB
+const mpesa = new Mpesa();
 
 // Repositories
 const transactionRepository = new SequelizeTransactionRepository(Transaction);
@@ -24,29 +30,31 @@ const cartRepository = new SequilizeCartRepository(Cart);
 const orderRepository = new SequilizeOrderRepository(Order);
 
 // Services
-const iniatePaymentRequestService = new InitiatePaymentRequestService(transactionRepository);
+const iniatePaymentRequestService = new InitiatePaymentRequestService(transactionRepository, mpesa);
 const fetchPaymentReuestService = new FetchPaymentRequestService(transactionRepository);
 const fetchCartService = new FetchCartService(cartRepository);
 const createOrderService = new CreateOrderService(orderRepository);
 const updatePaymentRequestService = new UpdatePaymentRequestService(transactionRepository);
+const deleteCartService = new DeleteCartService(cartRepository);
 
 // Controllers and Middleware
 const iniateCheckoutRequest = new InitiateCheckoutController(iniatePaymentRequestService);
 const fetchPaymentRequest = new FetchPaymentRequestController(fetchPaymentReuestService);
-const fetchCartcontroller = new FetchCartController(fetchCartService);
+const fetchCartController = new FetchCartController(fetchCartService);
 const createOrder = new CreateOrderController(createOrderService);
 const checkoutCallback = new CheckoutCallbackController(updatePaymentRequestService);
+const deleteCartController = new DeleteCartController(deleteCartService);
 
 
 // Routes
 const checkoutRoutes = express.Router();
 
-checkoutRoutes.post('/', iniateCheckoutRequest.initiateCheckout);
-checkoutRoutes.post('/callback', 
-    validateUserToken,
+checkoutRoutes.post('/', validateUserToken, iniateCheckoutRequest.initiateCheckout);
+checkoutRoutes.post('/callback',
     CheckoutHandler, 
     fetchPaymentRequest.fetchPaymentRequestWithUniqueKeys, 
-    fetchCartcontroller.fetchCartMiddleware, 
+    fetchCartController.fetchCartMiddleware, 
+    deleteCartController.deleteCartMiddleware,
     createOrder.createOrder,
     checkoutCallback.checkoutCallback
 );

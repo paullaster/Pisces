@@ -88,18 +88,17 @@ export class SequilizeCartRepository extends CartRepository {
             return { error: error.message, success: false };
         }
     }
-    async delete(id) {
+    async delete(id, model) {
         try {
-            const { data, success, error } = await this.getCartById(id, 'fetch', true);
+            const { data, success, error } = await this.getCartById(id, model, 'fetch', true);
             if (!success) {
                 return { success: false, error };
             }
             const deletedCart = await this.dataSource.destroy({
                 where: {
-                    cartId: item,
+                    cartId: id,
                 }
             });
-            data.removeItems(data.items);
             return { success: true, data: deletedCart };
         } catch (error) {
             return { error: error.message, success: false };

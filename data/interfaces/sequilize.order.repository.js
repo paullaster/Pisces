@@ -35,21 +35,25 @@ export class SequilizeOrderRepository extends OrderRepository {
     }
     async create(order, model) {
         try {
-            const { success, error } = await this.getOrderById(order.orderId, 'create');
+            const { success, error } = await this.getOrderById(order.orderId, model, 'create');
             if (!success) {
                 return { success: false, error };
             }
             const { items, ...rest} = order;
             // Create a new order
             const newOrder = await this.dataSource.create(rest);
-
             // Create associated items
-            const createSuffix = `create${model}`;
+            const createSuffix = `create${model[0].name}`;
             items.forEach(async(item) => {
-                await newOrder[createSuffix](item);
+                const data = item['dataValues'];
+                delete data.createdAt;
+                delete data.updatedAt;
+                delete data.cartId;
+                data.orderId = newOrder['dataValues'].orderId;
+                await newOrder[createSuffix](data);
             });
 
-            return this.mapToCart(newOrder);
+            return this.mapToOrder(newOrder);
         }catch(error) {
             return { error: error.message, success: false };
         }
