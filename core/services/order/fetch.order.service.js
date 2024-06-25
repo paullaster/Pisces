@@ -32,4 +32,21 @@ export class FetchOrderService {
             return { success: false, error: error.message };
         }
     }
+    async getOrderItems(orderId, model) {
+        try {
+            if (!orderId) {
+                return {success: false, error: 'Order ID is required'};
+            }
+            if (typeof orderId!=='string') {
+                return {success: false, error: 'Order ID must be a string'};
+            }
+            const {success, data:order, error } = await this.orderRepository.getOrderItems(orderId, model);
+            if (!success) {
+                return {success, error};
+            }
+            return {success, order};
+        } catch (error) {
+            return {success: false, error: error.message}
+        }
+    }
 }

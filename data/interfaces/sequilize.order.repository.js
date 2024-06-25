@@ -51,6 +51,17 @@ export class SequilizeOrderRepository extends OrderRepository {
             return { error: error.message, success: false };
         }
     }
+    async getOrderItems(orderId, model) {
+        try {
+            const {data, success, error } = await this.getOrderById(orderId, [model]);
+            if (!success) {
+                return { error, success };
+            }
+            return { success, data };
+        } catch (error) {
+            return { error: error.message, success: false };
+        }
+    }
     async create(order, model) {
         try {
             const { success, error } = await this.getOrderById(order.orderId, model, 'create');
@@ -78,15 +89,15 @@ export class SequilizeOrderRepository extends OrderRepository {
     }
     async update(order, payload) {
         try {
-            const {data, success, error}  = await this.getOrderById(order, 'fetch', true);
+            const {data, success, error}  = await this.getOrderById(order);
             if (!success) {
                 return { success: false, error };
             }
             const orderItem = await this.dataSource.findByPk(order);
             data['orderStatus'] = payload['orderStatus']
             const {items, ...rest } = data;
-            const updatedCart = await orderItem.update(rest);
-            return this.mapToOrder(updatedCart);
+            const updatedOrder = await orderItem.update(rest);
+            return this.mapToOrder(updatedOrder);
         }catch(error) {
             return { error: error.message, success: false };
         }
