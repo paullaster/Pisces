@@ -15,8 +15,10 @@ export class SequelizeUserRespository extends UserRepository {
             let user;
             if (eagerLoad) {
                 user = await this.dataSource.findByPk(id, { include: associatedModels });
+                user = user['dataValues'];
             } else {
                 user = await this.dataSource.findByPk(id);
+                user = user['dataValues'];
             }
             if (!user) {
                 return { success: false, error: 'User not found' };
@@ -54,11 +56,11 @@ export class SequelizeUserRespository extends UserRepository {
     }
     async getUserAssociations(user, model) {
         try {
-            const { data, success, error } = await this.getUserById(user, model, true);
+            const { user:data, success, error } = await this.getUserById(user, model, true);
             if (!success) {
                 return { success: false, error };
             }
-            return this.mapToUser(data);
+            return { data, success };
         } catch (error) {
             return { success: false, error: error.message };
         }

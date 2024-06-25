@@ -90,7 +90,7 @@ export class SequilizeCartRepository extends CartRepository {
     }
     async delete(id, model) {
         try {
-            const { data, success, error } = await this.getCartById(id, model, 'fetch', true);
+            const { success, error } = await this.getCartById(id, model, 'fetch', true);
             if (!success) {
                 return { success: false, error };
             }

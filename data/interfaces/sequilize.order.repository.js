@@ -33,6 +33,24 @@ export class SequilizeOrderRepository extends OrderRepository {
             return { error: error.message, success: false };
         }
     }
+    async fetchOrders(model, options = {}, offset = 0, limit = 10) {
+        try {
+            const orders = await this.dataSource.findAndCountAll(
+                {
+                    where: options,
+                    include: [model],
+                    offset: Number(offset), 
+                    limit: Number(limit),
+                }
+            );
+            if (!orders) {
+                return { error: 'No orders at the moment', success: false };
+            }
+            return {success: true, orders: {count: orders.count, rows: orders.rows.map(order => this.mapToOrder(order)?.data)}};
+        } catch (error) {
+            return { error: error.message, success: false };
+        }
+    }
     async create(order, model) {
         try {
             const { success, error } = await this.getOrderById(order.orderId, model, 'create');

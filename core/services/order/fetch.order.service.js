@@ -2,6 +2,7 @@ export class FetchOrderService {
     constructor(orderRepository) {
         this.orderRepository = orderRepository;
         this.fetchOrder = this.fetchOrder.bind(this);
+        this.fetchOrders = this.fetchOrders.bind(this);
     }
     async fetchOrder(orderId, model) {
         try {
@@ -18,6 +19,17 @@ export class FetchOrderService {
             return {success, order};
         } catch (error) {
             return {success: false, error: error.message}
+        }
+    }
+    async fetchOrders(model, options = {}, offset = 0, limit = 10){
+        try {
+            const {success, error, orders } = await this.orderRepository.fetchOrders(model, options, offset, limit);
+            if (!success) {
+                return  { success, error };
+            }
+            return { success, orders };
+        } catch (error) {
+            return { success: false, error: error.message };
         }
     }
 }
