@@ -1,5 +1,7 @@
 import { sequelize } from "../connection.js";
 import { DataTypes } from "sequelize";
+import Image from "./images.js";
+
 
 const Category  = sequelize.define('Category',{
     cid: {
@@ -13,6 +15,17 @@ const Category  = sequelize.define('Category',{
         allowNull: false,
         unique: false
     },
+    image: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: false,
+        references: {
+            model: Image,
+            key: 'imgid',
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+    }
 }, {
     tableName: 'categories',
     timestamps: true,
