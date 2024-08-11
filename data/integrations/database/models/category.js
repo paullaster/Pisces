@@ -15,17 +15,6 @@ const Category  = sequelize.define('Category',{
         allowNull: false,
         unique: false
     },
-    image: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false,
-        references: {
-            model: Image,
-            key: 'imgid',
-        },
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
-    }
 }, {
     tableName: 'categories',
     timestamps: true,
@@ -34,6 +23,21 @@ const Category  = sequelize.define('Category',{
     charset: 'utf8mb4',
     collate: 'utf8mb4_unicode_ci'
 });
+
+
+Category.hasMany(Image, {
+    foreignKey: 'imagableId',
+    constraints: false,
+    scope: {
+        imagableType: 'category'
+    }
+});
+
+
+Image.belongsTo(Category, {
+    foreignKey: 'imagableId',
+    constraints: false,
+})
 
 Category.sync();
 

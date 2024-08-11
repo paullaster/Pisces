@@ -1,8 +1,9 @@
 import { sequelize } from "../connection.js";
 import { DataTypes } from "sequelize";
 import Category from "./category.js";
+import Image from "./images.js";
 
-const Products = sequelize.define('Product',{
+const Product = sequelize.define('Product',{
     pid: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -23,11 +24,6 @@ const Products = sequelize.define('Product',{
         type: DataTypes.STRING,
         allowNull: false,
         unique: false
-    },
-    image: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false,
     },
     category: {
         type: DataTypes.STRING,
@@ -70,7 +66,20 @@ const Products = sequelize.define('Product',{
     collate: 'utf8mb4_unicode_ci'
 });
 
-Products.sync();
+Product.hasMany(Image, {
+    foreignKey: 'imagableId',
+    constraints: false,
+    scope: {
+        imagableType: 'product'
+    }
+});
+
+Image.belongsTo(Product, {
+    foreignKey: 'imagableId',
+    constraints: false,
+});
+
+Product.sync();
 
 
-export default Products;
+export default Product;

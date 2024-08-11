@@ -1,6 +1,6 @@
 import { sequelize } from "../connection.js";
 import { DataTypes } from "sequelize";
-import Products from "./product.js";
+import Product from "./product.js";
 import Cart from "./cart.js";
 import Order from "./order.js";
 
@@ -57,12 +57,12 @@ Item.belongsTo(Cart, {
     onUpdate: 'CASCADE'
 });
 
-Products.hasMany(Item, {
+Product.hasMany(Item, {
     foreignKey: 'productId',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
 });
-Item.belongsTo(Products, {
+Item.belongsTo(Product, {
     foreignKey: 'productId',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
