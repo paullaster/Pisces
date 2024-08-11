@@ -29,7 +29,7 @@ Category.hasMany(Image, {
     foreignKey: 'imagableId',
     constraints: false,
     scope: {
-        imagableType: 'category'
+        imagableType: 'Category'
     }
 });
 

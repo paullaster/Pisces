@@ -70,7 +70,7 @@ Product.hasMany(Image, {
     foreignKey: 'imagableId',
     constraints: false,
     scope: {
-        imagableType: 'product'
+        imagableType: 'Product'
     }
 });
 
