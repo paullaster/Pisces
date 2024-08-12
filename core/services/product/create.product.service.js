@@ -20,16 +20,10 @@ export class CreateProductService {
             if (Object.keys(product).length === 0) {
                 return { success: false, error: 'Product cannot be empty' };
             }
-            product.pid = RandomCodeGenerator(10);
+            product.pid = RandomCodeGenerator(10, 'prod');
             product.lastPid = product.pid;
-            if (!product.defaultCurrency) {
-                product.defaultCurrency = defaultCurrency;
-            }
             new ValidateObjectPayload(product);
-            const { image, ...item } = product;
-            image.pid = product.pid;
-            item.image = await new ImageProcessorService(image).url;
-            const { error, success, data } = await this.productRepository.create(item);
+            const { error, success, data } = await this.productRepository.create(product);
             return { error, success, data };
         } catch (error) {
             return { success: false, error: error.message };

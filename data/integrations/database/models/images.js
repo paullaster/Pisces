@@ -32,7 +32,7 @@ const Image = sequelize.define('Image',{
     collate: 'utf8mb4_unicode_ci'
 }
 );
-Image.prototype.getImagable = function(options){
+Image.prototype.getImagable = async function(options){
     if(!this.imagableType) return Promise.resolve(null);
     const mixinMethodName = `get${uppercasefirst(this.imagableType)}`;
     return this[mixinMethodName](options);

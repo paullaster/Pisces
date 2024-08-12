@@ -81,5 +81,4 @@ Image.belongsTo(Product, {
 
 Product.sync();
 
-
 export default Product;

@@ -7,9 +7,12 @@ export class SequelizeProductRepository extends ProductRepository {
         this.dataSource = ProductModel;
         this.mapToProduct = this.mapToProduct.bind(this);
     }
-    async getProductById(pid, type = 'fetch') {
+    async getProductById(pid, type = 'fetch', eager = false, model = []) {
         try {
-            const product = await this.dataSource.findByPk(pid);
+            let product = await this.dataSource.findByPk(pid);
+            if (eager) {
+                product = await product.reload({ include: model });
+            }
             if (type === 'create' && product) {
                 return { error: 'Product already exist', success: false };
             }
@@ -24,9 +27,14 @@ export class SequelizeProductRepository extends ProductRepository {
             return { error: error.message, success: false };
         }
     }
-    async getProductByName(name, offset = 0, limit = 10) {
+    async getProductByName(name, offset = 0, limit = 10, eager = false, model = []) {
         try {
-            const products = await this.dataSource.findAndCountAll({ where: { name }, offset: Number(offset), limit: Number(limit) });
+            let products;
+            if (eager) {
+                products = await this.dataSource.findAndCountAll({ where: { name }, offset: Number(offset), limit: Number(limit), include: model });
+            }else {
+                products = await this.dataSource.findAndCountAll({ where: { name }, offset: Number(offset), limit: Number(limit) });
+            }
             if (!products) {
                 return { error: 'Product not found', success: false };
             }
@@ -35,13 +43,23 @@ export class SequelizeProductRepository extends ProductRepository {
             return { error: error.message, success: false };
         }
     }
-    async getProducts(options = {}, offset = 0, limit = 10) {
+    async getProducts(options = {}, offset = 0, limit = 10, eager = false, model = []) {
         try {
-            const products = await this.dataSource.findAndCountAll({
-                where: options,
-                offset: Number(offset), 
-                limit: Number(limit),
-            });
+            let products;
+            if (eager) {
+                products = await this.dataSource.findAndCountAll({
+                    where: options,
+                    offset: Number(offset), 
+                    limit: Number(limit),
+                    include: model,
+                });
+            }else {
+                products = await this.dataSource.findAndCountAll({
+                    where: options,
+                    offset: Number(offset), 
+                    limit: Number(limit),
+                });
+            }
             if (!products) {
                 return { error: 'No products at the moment', success: false };
             }
