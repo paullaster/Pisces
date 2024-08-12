@@ -7,10 +7,13 @@ export class SequelizeCategoryRepository extends CategoryRepository {
         this.dataSource = CategoryModel;
         this.mapToCategory = this.mapToCategory.bind(this);
     }
-    async getCategoryById(cid, type = 'fetch') {
+    async getCategoryById(cid, type = 'fetch', eager = false, model = []) {
         try {
-            const category = await this.dataSource.findByPk(cid);
-            if( type === 'create' && category) {
+            let category = await this.dataSource.findByPk(cid);
+            if (eager) {
+                category = await category.reload({ include: model });
+            }
+            if (type === 'create' && category) {
                 return { error: 'Category already exist', success: false };
             }
             if (type === 'create' && !category) {
@@ -24,13 +27,23 @@ export class SequelizeCategoryRepository extends CategoryRepository {
             return { error: error.message, success: false };
         }
     }
-    async getCategorys(options = {}, offset = 0, limit =10) {
+    async getCategorys(options = {}, offset = 0, limit = 10, eager = false, model = []) {
         try {
-            const category = await this.dataSource.findAndCountAll({
-                where: options,
-                offset: Number(offset),
-                limit: Number(limit)
-            });
+            let category;
+            if (eager) {
+                category = await this.dataSource.findAndCountAll({
+                    where: options,
+                    offset: Number(offset),
+                    limit: Number(limit),
+                    include: model,
+                });
+            } else {
+                category = await this.dataSource.findAndCountAll({
+                    where: options,
+                    offset: Number(offset),
+                    limit: Number(limit)
+                });
+            }
             if (!category) {
                 return { error: 'No category at the moment!', success: false };
             }
@@ -41,7 +54,7 @@ export class SequelizeCategoryRepository extends CategoryRepository {
     }
     async create(category) {
         try {
-            const {success, error } =  await this.getCategoryById(category.cid, 'create');
+            const { success, error } = await this.getCategoryById(category.cid, 'create');
             if (!success) {
                 return { error, success };
             }
@@ -53,7 +66,7 @@ export class SequelizeCategoryRepository extends CategoryRepository {
     }
     async update(category, payload) {
         try {
-            const {data, success, error } = await this.getCategoryById(category);
+            const { data, success, error } = await this.getCategoryById(category);
             if (!success) {
                 return { success: false, error };
             }

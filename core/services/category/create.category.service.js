@@ -1,3 +1,5 @@
+import { RandomCodeGenerator } from "../../../common/generating_unique_codes.js";
+
 export class CreateCategoryService {
     constructor(categoryRepository) {
         this.categoryRepository = categoryRepository;
@@ -14,6 +16,7 @@ export class CreateCategoryService {
             if (Object.keys(payload).length===0) {
                 return {success: false, error: 'Category cannot be empty'};
             }
+            payload.cid = RandomCodeGenerator(10, 'cat');
             const {success, error, data } = await this.categoryRepository.create(payload);
             return {success, error,  data};
         } catch (error) {
