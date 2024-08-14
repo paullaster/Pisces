@@ -1,6 +1,5 @@
 import { RandomCodeGenerator } from "../../../common/generating_unique_codes.js";
 import { ValidateObjectPayload } from "../../validation/validate.object.payload.js";
-import { ImageProcessorService } from "../assets/image.processor.service.js";
 import app from "../../../config/app.js";
 
 const { defaultCurrency } = app;

@@ -3,16 +3,11 @@ import { sequelize } from "../connection.js";
 import { DataTypes } from "sequelize";
 
 const Image = sequelize.define('Image',{
-    imgid: {
+    imgId: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
         primaryKey: true,
-    },
-    url: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false,
     },
     imagableId: {
         type: DataTypes.STRING,
