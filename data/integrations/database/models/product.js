@@ -69,9 +69,9 @@ const Product = sequelize.define('Product',{
 Product.hasMany(Image, {
     foreignKey: 'imagableId',
     constraints: false,
-    scope: {
-        imagableType: 'Product'
-    }
+    // scope: {
+    //     imagableType: 'Product'
+    // }
 });
 
 Image.belongsTo(Product, {

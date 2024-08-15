@@ -9,7 +9,7 @@ export class FetchProductController {
         try {
             if (req.query) {
                 const {page, limit, ...options} = req.query;
-                const {success, products, error } = await this.fetchProductService.fetchAllProducts(options, page, limit);
+                const {success, products, error } = await this.fetchProductService.fetchAllProducts(options, page, limit, true, req.model);
                 if (!success) {
                     return res.ApiResponse.error(404, error);
                 }

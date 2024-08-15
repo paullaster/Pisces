@@ -17,6 +17,10 @@ const Image = sequelize.define('Image',{
         allowNull: true,
         unique: false,
     },
+    mimetype: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    }
 },
 {
     tableName: 'images',

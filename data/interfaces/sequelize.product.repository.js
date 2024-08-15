@@ -63,7 +63,7 @@ export class SequelizeProductRepository extends ProductRepository {
             if (!products) {
                 return { error: 'No products at the moment', success: false };
             }
-            return { success: true, data: products };
+            return { success: true, data: {count: products.count, rows: products.rows.map(product => this.mapToProduct(product)?.data)} };
         } catch (error) {
             return { error: error.message, success: false };
         }
@@ -77,6 +77,7 @@ export class SequelizeProductRepository extends ProductRepository {
             const newProduct = await this.dataSource.create(product);
             return this.mapToProduct(newProduct);
         } catch (error) {
+            console.log(error);
             return { error: error.message, success: false };
         }
     }

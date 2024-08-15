@@ -33,9 +33,9 @@ const Category  = sequelize.define('Category',{
 Category.hasMany(Image, {
     foreignKey: 'imagableId',
     constraints: false,
-    scope: {
-        imagableType: 'Category'
-    }
+    // scope: {
+    //     imagableType: 'Category'
+    // }
 });
 
 

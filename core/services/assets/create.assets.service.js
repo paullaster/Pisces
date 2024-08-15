@@ -17,11 +17,12 @@ export class CreateAssetService {
                     const buffer = await sharp(item.buffer).resize({width:1920, height:1920, fit: 'contain'}).toBuffer();
                     fs.writeFile(localFileName, buffer, async(err, dt) => {
                         if(err) return {success: false, error: err};
-                        const {success} = await this.assetsRepository.create(
+                        const {success, error} = await this.assetsRepository.create(
                             {
                                 imgId: fileName,
                                 imagableId: body.id,
                                 imagableType: body.type,
+                                mimetype: item.mimetype
                             }
                         )
                         if (!success) {
@@ -29,6 +30,7 @@ export class CreateAssetService {
                                 if(err) console.error(err);
                                 console.log(`Deleted file: ${localFileName}`);
                             })
+                            console.log(error)
                            throw new Error("Could not insert into assets respository");
                         }
                     });

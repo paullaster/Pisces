@@ -1,3 +1,6 @@
+import app from "../../../config/app.js";
+import * as fs from "fs";
+
 export class FetchProductService {
     constructor(productRepository) {
         this.productRepository = productRepository;
@@ -45,12 +48,18 @@ export class FetchProductService {
             return {success: false, error: error.message}
         }
     }
-    async fetchAllProducts(options = {}, offset = 0, limit =10) {
+    async fetchAllProducts(options = {}, offset = 0, limit =10, eager = false, model = []) {
         try {
-            const { success, error, data } = await this.productRepository.getProducts(options, offset, limit);
+            const { success, error, data } = await this.productRepository.getProducts(options, offset, limit, eager, model);
             if(!success) {
                 return {success: false, error};
             }
+            data.rows.forEach(row => {
+                row.Images.forEach(image =>{
+                    // fs.readFileSync()
+                    image['dataValues'].url = `${app.url}/public/image/${image.imgId}.${image.mimetype.split('/')[1]}`;
+                });
+            });
             return {success: true, products: data};
         } catch (error) {
             return {success: false, error: error.message}

@@ -9,6 +9,7 @@ import { UpdateProductController } from '../app/controllers/products/update.prod
 import { UpdateProductService } from '../core/services/product/update.product.service.js';
 import { DeleteProductService } from '../core/services/product/delete.product.service.js';
 import { DeleteProductController } from '../app/controllers/products/delete.product.js';
+import { productImageMiddleware } from '../app/middleware/fetch.product.with.image.js';
 
 
 const prodcutRoutes = express.Router();
@@ -32,7 +33,7 @@ const deleteProductController = new DeleteProductController(deleteProductService
 
 
 prodcutRoutes.post('/', createProductController.createProduct);
-prodcutRoutes.get('/', fetchProductController.fetchAllProduct);
+prodcutRoutes.get('/', productImageMiddleware, fetchProductController.fetchAllProduct);
 prodcutRoutes.get('/:pid', fetchProductController.fetchProductByID);
 prodcutRoutes.get('/name/:name', fetchProductController.fetchProductByName);
 prodcutRoutes.put('/:pid', updateProductController.updateProduct);
