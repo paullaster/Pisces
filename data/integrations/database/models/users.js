@@ -10,17 +10,32 @@ const User = sequelize.define('User', {
     },
     phoneNumber: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
         unique: true,
-        primaryKey: true
     },
     password: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true,
     },
     type: {
         type: DataTypes.ENUM('customer', 'admin'),
         defaultValue: 'customer'
+    },
+    name: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    email_verified_at: {
+        type: DataTypes.DATE,
+        defaultValue: null,
+    },
+    veryfied: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+    },
+    completed: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
     }
 }, {
     tableName: 'users',
