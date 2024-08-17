@@ -91,8 +91,8 @@ export class SequelizeUserRespository extends UserRepository {
     }
     mapToUser(user) {
         try {
-            const { email, username, ...rest } = user;
-            return { success: true, user: new User(username, email, rest) };
+            const { password, ...rest } = user['dataValues'];
+            return { success: true, user: new User(rest) };
         } catch (error) {
             return { success: false, error: error.message}
         }

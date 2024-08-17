@@ -1,7 +1,7 @@
  export class User {
-    constructor(username, email, ...args) {
-        this.username = username;
-        this.email = email;
-        this.args = args;
+    constructor(Obj) {
+        for(const prop in Obj) {
+            this[prop] = Obj[prop];
+        }
     };
 };

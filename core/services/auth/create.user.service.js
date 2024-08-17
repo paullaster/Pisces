@@ -10,9 +10,8 @@ export class CreateUserService {
     }
     async handle(userData) {
         try {
-            const { email, username, password, phoneNumber } = userData;
+            const { email, password, ...rest } = userData;
             const emailObj = new Email(email);
-            const usernameObj = new Username(username);
             const passwordObj = new Password(password);
             const { success, error } = await this.userRepository.getUserByEmail(emailObj.email);
             if (success) {
@@ -20,7 +19,7 @@ export class CreateUserService {
             }
             const salt = await bcrypt.genSalt(10);
             passwordObj.password = await bcrypt.hash(passwordObj.password, salt);
-            const newUser = await this.userRepository.create({email: emailObj.email, username: usernameObj.username, phoneNumber: phoneNumber, password: passwordObj.password});
+            const newUser = await this.userRepository.create({email: emailObj.email, username:email , password: passwordObj.password, ...rest});
             return { success: true, user: newUser };
         } catch (error) {
             console.error(error.message);
