@@ -1,5 +1,5 @@
+import { prepareImageUrl } from "../../../common/prepare.image.url.js";
 import app from "../../../config/app.js";
-import * as fs from "fs";
 
 export class FetchProductService {
     constructor(productRepository) {
@@ -54,13 +54,14 @@ export class FetchProductService {
             if(!success) {
                 return {success: false, error};
             }
-            data.rows.forEach(row => {
-                row.Images.forEach(image =>{
-                    // fs.readFileSync()
-                    image['dataValues'].url = `${app.url}/public/image/${image.imgId}.${image.mimetype.split('/')[1]}`;
+            const products = data.rows.map(row => {
+                row.Images= row.Images.map( image =>{
+                    image['dataValues'].url = prepareImageUrl(image.imgId, image.mimetype);
+                    return image;
                 });
+                return row;
             });
-            return {success: true, products: data};
+            return {success: true, products };
         } catch (error) {
             return {success: false, error: error.message}
         }
