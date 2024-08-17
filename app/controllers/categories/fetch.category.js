@@ -9,7 +9,7 @@ export class FetchCategoryController {
         try {
             if (req.query) {
                 const { page, limit, ...options } = req.query;
-                const { success, data:categories, error } = await this.fetchCategoryService.fetchAllCategories(options, page, limit);
+                const { success, categories, error } = await this.fetchCategoryService.fetchAllCategories(options, page, limit, true, req.model);
                 if (!success) {
                     return res.ApiResponse.error(404, error);
                 }

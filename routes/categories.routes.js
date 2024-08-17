@@ -9,6 +9,7 @@ import { UpdateCategoryService } from '../core/services/category/update.category
 import { UpdateCategorycontroller } from '../app/controllers/categories/update.category.js';
 import { DeleteCategoryService } from '../core/services/category/delete.category.service.js';
 import { DeleteCategoryController } from '../app/controllers/categories/delete.category.js';
+import { categoryImageMiddleware } from '../app/middleware/fetch.category.with.image.js';
 
 
 const categoryRoutes = express.Router();
@@ -32,7 +33,7 @@ const deleteCategoryCotroller = new DeleteCategoryController(deleteCategoryServi
 
 // ROUTES
 categoryRoutes.post('/', createCategorycontroller.createCategory);
-categoryRoutes.get('/', fetchCategoryController.fetchAllCategories);
+categoryRoutes.get('/', categoryImageMiddleware, fetchCategoryController.fetchAllCategories);
 categoryRoutes.get('/:cid', fetchCategoryController.fetchCategoryByID);
 categoryRoutes.get('/name/:name', fetchCategoryController.fetchCategoryByName);
 categoryRoutes.put('/:cid', updateCategoryCotroller.updateCategory);

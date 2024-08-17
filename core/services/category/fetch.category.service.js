@@ -1,3 +1,5 @@
+import { prepareImageUrl } from "../../../common/prepare.image.url.js";
+
 export class FetchCategoryService {
     constructor(categoryRepository) {
         this.categoryRepository = categoryRepository;
@@ -24,10 +26,20 @@ export class FetchCategoryService {
             return { success: false, error: error.message }
         }
     }
-    async fetchAllCategories(options = {}, offset = 0, limit = 10) {
+    async fetchAllCategories(options = {}, offset = 0, limit = 10, eager = false, model = []) {
         try {
-            const { success, error, data } = await this.categoryRepository.getCategorys(options, offset, limit);
-            return { success, error, data };
+            const { success, error, data } = await this.categoryRepository.getCategorys(options, offset, limit, eager, model);
+            if (!success) {
+                return { success: false, error };
+            }
+            const categories = data.rows.map(row => {
+                row.Images= row.Images.map( image =>{
+                    image['dataValues'].url = prepareImageUrl(image.imgId, image.mimetype);
+                    return image;
+                });
+                return row;
+            });
+            return { success, categories };
         } catch (error) {
             return { success: false, error: error.message }
         }

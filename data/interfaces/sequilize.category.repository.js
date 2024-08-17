@@ -29,25 +29,25 @@ export class SequelizeCategoryRepository extends CategoryRepository {
     }
     async getCategorys(options = {}, offset = 0, limit = 10, eager = false, model = []) {
         try {
-            let category;
+            let categories;
             if (eager) {
-                category = await this.dataSource.findAndCountAll({
+                categories = await this.dataSource.findAndCountAll({
                     where: options,
                     offset: Number(offset),
                     limit: Number(limit),
                     include: model,
                 });
             } else {
-                category = await this.dataSource.findAndCountAll({
+                categories = await this.dataSource.findAndCountAll({
                     where: options,
                     offset: Number(offset),
                     limit: Number(limit)
                 });
             }
-            if (!category) {
+            if (!categories) {
                 return { error: 'No category at the moment!', success: false };
             }
-            return { success: true, data: category };
+            return { success: true, data:{count: categories.count, rows: categories.rows.map(category => this.mapToCategory(category)?.data)} };
         } catch (error) {
             return { error: error.message, success: false };
         }
