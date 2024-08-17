@@ -32,14 +32,18 @@ export class FetchCategoryService {
             if (!success) {
                 return { success: false, error };
             }
-            const categories = data.rows.map(row => {
+            let categories = data.rows.map(row => {
                 row.Images= row.Images.map( image =>{
                     image['dataValues'].url = prepareImageUrl(image.imgId, image.mimetype);
                     return image;
                 });
                 return row;
             });
-            return { success, categories };
+            categories = {
+                count: data.count,
+                rows: categories,
+              }
+            return { success,  categories };
         } catch (error) {
             return { success: false, error: error.message }
         }

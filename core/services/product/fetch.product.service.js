@@ -53,13 +53,17 @@ export class FetchProductService {
             if(!success) {
                 return {success: false, error};
             }
-            const products = data.rows.map(row => {
+            let products = data.rows.map(row => {
                 row.Images= row.Images.map( image =>{
                     image['dataValues'].url = prepareImageUrl(image.imgId, image.mimetype);
                     return image;
                 });
                 return row;
             });
+            products = {
+                count: data.count,
+                rows: products,
+              }
             return {success: true, products };
         } catch (error) {
             return {success: false, error: error.message}
