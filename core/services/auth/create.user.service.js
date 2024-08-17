@@ -19,7 +19,7 @@ export class CreateUserService {
             }
             const salt = await bcrypt.genSalt(10);
             passwordObj.password = await bcrypt.hash(passwordObj.password, salt);
-            const newUser = await this.userRepository.create({email: emailObj.email, username:email , password: passwordObj.password, ...rest});
+            const newUser = await this.userRepository.create({email: emailObj.email, password: passwordObj.password, ...rest});
             return { success: true, user: newUser };
         } catch (error) {
             console.error(error.message);

@@ -11,7 +11,7 @@ class LoginUseCase {
         if (!success) {
                 return { error, success};
         }
-        const isPasswordMatch  = await bcrypt.compare(password, this.userRespository.password)
+        const isPasswordMatch  = await bcrypt.compare(password, this.userRespository.userPassword)
         if (isPasswordMatch !== true) {
             return { error: "Password mismatch", success: false };
         }

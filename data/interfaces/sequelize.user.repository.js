@@ -8,7 +8,7 @@ export class SequelizeUserRespository extends UserRepository {
         this.dataSource = UserModel;
         this.mapToUser = this.mapToUser.bind(this);
         this.getUserById = this.getUserById.bind(this);
-        this.password = null;
+        this.userPassword = null;
     }
     async getUserById(id, associatedModels = [], eagerLoad = false) {
         try {
@@ -30,13 +30,12 @@ export class SequelizeUserRespository extends UserRepository {
     }
     async getUserByUsername(username) {
         try {
-            const user = await this.dataSource.findOne({ where: { [Op.or]: [{username: username}, {email: username}, {phoneNumber: username}] } });
+            const user = await this.dataSource.findOne({ where: { [Op.or]: [{email: username}, {phoneNumber: username}] } });
             if (!user) {
                 return { sucess: false, error: 'Invalid username' };
             }
-            const { password, ...rest } = user['dataValues']
-            this.password = password;
-            return this.mapToUser(rest);
+            this.userPassword = user['dataValues']['password'];
+            return this.mapToUser(user);
         } catch (error) {
             return { success: false, error: error.message };
         }
