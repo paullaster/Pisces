@@ -7,4 +7,5 @@ import app from "../config/app.js"
  * @param {*} storage - storage public/image
  * @returns 
  */
-export const prepareImageUrl =  (name,  mimeType = 'image/jpeg', storage = 'public/image') => `${app.url}/${storage}/${name}.${mimeType.split('/')[1]}`
+// .${mimeType.split('/')[1]}
+export const prepareImageUrl =  (name,  mimeType = 'image/jpeg', storage = 'public/image') => `${app.url}/${storage}/${name}`

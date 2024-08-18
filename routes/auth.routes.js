@@ -18,5 +18,6 @@ const createAccount = new CreateAccount(accountCreationService);
 
 userRoutes.post('/register', createAccount.createAccount);
 userRoutes.post('/login', loginController.login);
+userRoutes.post('/get-user', loginController.getUser);
 
 export { userRoutes};

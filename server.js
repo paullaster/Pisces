@@ -4,13 +4,13 @@ import routeServiceProvider from "./app/providers/RoutesServiceProvider.js";
 import { ApiResponder } from "./app/middleware/api.responder.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import "./app/events/listeners/send.customer.otp.js";
+import "./app/events/index.js";
 
 const app = new express();
 
 
 // Middlewares
-
-
 app.use(express.json({limit: '4096mb'}));
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());

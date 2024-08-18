@@ -8,5 +8,6 @@ export default {
     key: process.env.APP_KEY,
     environment: process.env.APP_ENV,
     timezone: process.env.APP_TIMEZONE,
-    defaultCurrency: process.env.DEFUALT_CURRENCY
+    defaultCurrency: process.env.DEFUALT_CURRENCY,
+    webUrl: process.env.WEB_URL,
 };

@@ -1,12 +1,12 @@
 import { sequelize } from "../connection.js";
 import { DataTypes } from "sequelize";
+import Otp from "./user.one.time.passwords.js";
 
 const User = sequelize.define('User', {
     email: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
         unique: true,
-        primaryKey: true
     },
     phoneNumber: {
         type: DataTypes.STRING,

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">   
+
+    <title>Noels Delivery OTP Verification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color:   
+ #fff;
+            padding: 20px;
+            border-radius:   
+ 5px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header img {
+            width: 150px;
+        }
+
+        .otp {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .content {
+            margin-bottom: 20px;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+        }
+        img {
+            width: 200px;
+            height: 200px;
+            margin-bottom: 20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">   
+
+            <img src="logo-url" alt="Noels Delivery Logo">
+        </div>
+        <div class="content">
+            <h1>Email OTP Verification</h1>
+            <p>Below is your one time passcode that you need to use to complete your authentication.</p>
+            <p>The verification code will be valid for 10 minutes. Please do not share this code with anyone.</p>
+            <div class="otp">
+                {{ otp }}
+            </div>
+            <p>If you are having any issues with your account, please don't hesitate to contact us.</p>
+            <p>Enjoy our delicacies.</p>
+        </div>
+        <div class="footer">
+            <p>If you would like to know more about our services, please also refer to <a href="https://www.example.com/helpcenter">Helpcenter</a></p>
+            <p>Noels Delivery Team</p>
+            <p id="copyright">Copyright &copy;</p>
+            <p>Consumers (users) are advised to read the Terms & Conditions carefully.</p>
+            <p>Noels Delivery | Noels Charity Group</p>
+        </div>
+    </div>
+</body>
+<script>
+const copyright = document.getElementById('copyright');
+const currentYear = new Date().getFullYear();
+copyright.textContent = `${copyright.innerText} ${currentYear}. All Rights Reserved.`;
+</script>
+</html>
