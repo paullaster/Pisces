@@ -127,9 +127,9 @@ export class SequelizeUserRespository extends UserRepository {
             return { sucess: false, error: error.message };
         }
     }
-    async delete(email) {
+    async delete(keyVal) {
         try {
-            await this.dataSource.destroy({ where: { email } });
+            await this.dataSource.findByPk(keyVal);
             return { success: true };
         } catch (error) {
             return { success: false, error: error.message };

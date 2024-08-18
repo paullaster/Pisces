@@ -17,7 +17,8 @@ eventEmmitter.on("sendOTP-newcustomer", async(payload) => {
         const OTPemailTemplate = fs.readFileSync(templateUrl, "utf8");
         const mailBody = OTPemailTemplate
             .replace('{{ otp }}', payload.notifiable.Otps[0]['dataValues'].otp)
-            .replace('logo-url', logoUrl);
+            .replace('logo-url', logoUrl)
+            .replace('2020',new Date().getFullYear());
         const notify = new Notification(subject, mailBody);
         if (payload.notificationType.type === 'email') {
             await notify.via('viaEmail', payload.notifiable.email);

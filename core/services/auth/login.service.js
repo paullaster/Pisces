@@ -8,6 +8,7 @@ class LoginUseCase {
         this.generateOTP = this.generateOTP.bind(this);
         this.getUser = this.getUser.bind(this);
         this.sendOTP = this.sendOTP.bind(this);
+        this.deleteUser = this.deleteUser.bind(this);
     }
     async handle(username, password) {
        try {
@@ -54,6 +55,17 @@ class LoginUseCase {
             }
 
             return {user, success };
+        } catch (error) {
+            return { error: error.message, success: false };
+        }
+    }
+    async deleteUser(user) {
+        try {
+            let { success, error } = await this.userRespository.delete(user);
+            if (!success) {
+                return { error, success };
+            }
+            return { success };
         } catch (error) {
             return { error: error.message, success: false };
         }
