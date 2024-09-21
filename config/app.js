@@ -10,4 +10,5 @@ export default {
     timezone: process.env.APP_TIMEZONE,
     defaultCurrency: process.env.DEFUALT_CURRENCY,
     webUrl: process.env.WEB_URL,
+    removebg: process.env.REMOVE_BG_API_KEY,
 };
