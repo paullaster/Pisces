@@ -60,7 +60,7 @@ class LoginController {
                 }
                 const {success:otpSent, error:e} = await this.LoginUseCase.sendOTP(userWithOtp, value);
                 if (otpSent) {
-                    return res.ApiResponse.success({otp : true}, 200, "We have sent One Time Password to your "+value.type);
+                    return res.ApiResponse.success({otp : true, loginType: value.type}, 200, "We have sent One Time Password to your "+value.type);
                 }else {
                     return res.ApiResponse.error(500, e);
                 }
