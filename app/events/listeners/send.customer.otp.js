@@ -11,7 +11,7 @@ const __dirname = path.dirname(_filename);
 eventEmmitter.on("sendOTP-newcustomer", async(payload) => {
     try {
         console.log("sendOTP-newcustomer");
-        const subject = "Neols Delivery OTP Code is " + payload.notifiable.Otps[0]['dataValues'].otp;
+        const subject = "Noels Delivery OTP Code is " + payload.notifiable.Otps[0]['dataValues'].otp;
         const templateUrl =  path.join(__dirname, '../../../resources/views/otp.mail.template.html');
         const logoUrl = `${app.webUrl}/public/logo.svg`;
         const OTPemailTemplate = fs.readFileSync(templateUrl, "utf8");

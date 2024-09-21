@@ -87,7 +87,7 @@ export class SequelizeUserRespository extends UserRepository {
             if (Object.keys(newUser).length) {
                 const user = await this.dataSource.create(newUser);
                 const savedOtp = await user.createOtp({
-                    otp: RandomCodeGenerator(6),
+                    otp: RandomCodeGenerator(6, ''),
                     expireAt: new Date(new Date().getTime() + 600000),
                     requestingDevice: payload.requestingDevice,
                 });
