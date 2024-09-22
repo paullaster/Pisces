@@ -12,6 +12,7 @@ export class SequelizeUserRespository extends UserRepository {
         this.createTempCustomer = this.createTempCustomer.bind(this);
         this.create = this.create.bind(this);
         this.userPassword = null;
+        this.verifyOTP = this.verifyOTP.bind(this);
     }
     async getUserById(id, associatedModels = [], eagerLoad = false) {
         try {
@@ -91,7 +92,7 @@ export class SequelizeUserRespository extends UserRepository {
                     expireAt: new Date(new Date().getTime() + 600000),
                     requestingDevice: payload.requestingDevice,
                 });
-                
+
                 const refrreshedModel = await user.reload({
                     include: {
                         model: model,
@@ -118,6 +119,32 @@ export class SequelizeUserRespository extends UserRepository {
             await user.destroy();
             return { sucess: false, error: error.message };
         }
+    }
+    async verifyOTP(options, model) {
+       try {
+         const user = await this.dataSource.findOne({
+             where: {
+                 [Op.or]: [{ email: options.username }, { phoneNumber: options.username }]
+             },
+             include: {
+                 model: model,
+                 where: {
+                     otp: options.otp,
+                     expireAt: {[Op.gte]: new Date()},
+                     used: false
+                 },
+             }
+         });
+         if (!user) {
+             return { success: false, error: 'User not found' };
+         }
+         const otpModel = user.dataValues.Otps[0];
+         await user.update( {veryfied: true, completed: true, email_verified_at: new Date()});
+         await otpModel.update({used: true, usedAt: new Date()});
+         return { success: true, user: this.mapToUser(user) };
+       } catch (error) {
+         return { success: false, error: error.message };
+       }
     }
     async update(user) {
         try {

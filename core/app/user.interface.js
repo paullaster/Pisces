@@ -44,6 +44,15 @@ class UserRepository {
     async delete(id) {
         throw new Error('Not implemented');
     }
+    /**
+     * @abstract
+     * @param { options} 
+     * @param { model }
+     * @returns { Promise<User | null>}
+     */
+    async verifyOTP(options, model) {
+        throw new Error('Not implemented');
+    }
 }
 
 export { UserRepository };

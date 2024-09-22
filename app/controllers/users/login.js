@@ -8,6 +8,7 @@ class LoginController {
         this.login = this.login.bind(this);
         this.getUser = this.getUser.bind(this);
         this.OTP = this.OTP.bind(this);
+        this.verifyOTP = this.verifyOTP.bind(this);
     }
     async login(req, res) {
         try {
@@ -67,6 +68,20 @@ class LoginController {
             }else {
                 return res.ApiResponse.error(401, error);
             }
+        } catch (error) {
+            return res.ApiResponse.error(500, error.message);
+        }
+    }
+    async verifyOTP(req, res) {
+        try {
+            const { otp, datapoint } = req.body;
+            const datapointString = Buffer.from(datapoint, 'base64').toString('utf-8') ;
+            const username = datapointString.split(':')[0];
+            const { success, user, error } = await this.LoginUseCase.verifyOTP({otp, username}, Otp);
+            if (!success) {
+                return res.ApiResponse.error(400, error);
+            }
+            return res.ApiResponse.success(user, 200, "OTP verified successfully");
         } catch (error) {
             return res.ApiResponse.error(500, error.message);
         }

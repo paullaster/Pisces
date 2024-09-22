@@ -70,6 +70,17 @@ class LoginUseCase {
             return { error: error.message, success: false };
         }
     }
+    async verifyOTP(option, model) {
+        try {
+            let { success, error, user } = await this.userRespository.verifyOTP(option, model);
+            if (!success) {
+                return { error, success };
+            }
+            return { success, user };
+        } catch (error) {
+            return { error: error.message, success: false };
+        }
+    }
 }
 
 export default LoginUseCase;
