@@ -9,6 +9,7 @@ class LoginController {
         this.getUser = this.getUser.bind(this);
         this.OTP = this.OTP.bind(this);
         this.verifyOTP = this.verifyOTP.bind(this);
+        this.updateUserProfile = this.updateUserProfile.bind(this);
     }
     async login(req, res) {
         try {
@@ -82,6 +83,18 @@ class LoginController {
                 return res.ApiResponse.error(400, error);
             }
             return res.ApiResponse.success(user, 200, "OTP verified successfully");
+        } catch (error) {
+            return res.ApiResponse.error(500, error.message);
+        }
+    }
+    async updateUserProfile (req, res) {
+        try {
+            const { username } = req.params;
+            const { success, user, error } = await this.LoginUseCase.updateUserProfile(username, req.body);
+            if (!success) {
+                return res.ApiResponse.error(400, error);
+            }
+            return res.ApiResponse.success(user, 200, "User profile updated successfully");
         } catch (error) {
             return res.ApiResponse.error(500, error.message);
         }

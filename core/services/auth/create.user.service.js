@@ -1,6 +1,6 @@
+import app from "../../../config/app.js";
 import { Email } from "../../validation/email.js";
 import { Password } from "../../validation/password.js";
-import { Username } from "../../validation/username.js";
 import bcrypt from "bcrypt";
 
 export class CreateUserService {
@@ -17,7 +17,7 @@ export class CreateUserService {
             if (success) {
                 return { error, success };
             }
-            const salt = await bcrypt.genSalt(10);
+            const salt = await bcrypt.genSalt(parseInt(app.pwdRounds));
             passwordObj.password = await bcrypt.hash(passwordObj.password, salt);
             const newUser = await this.userRepository.create({email: emailObj.email, password: passwordObj.password, ...rest});
             return { success: true, user: newUser };

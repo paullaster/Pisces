@@ -20,4 +20,5 @@ userRoutes.post('/register', createAccount.createAccount);
 userRoutes.post('/login', loginController.login);
 userRoutes.post('/get-user', loginController.getUser);
 userRoutes.post('/verify-otp', loginController.verifyOTP);
+userRoutes.patch('/update-profile/:username', loginController.updateUserProfile);
 export { userRoutes};

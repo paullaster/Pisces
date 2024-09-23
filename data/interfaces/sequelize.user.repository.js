@@ -146,10 +146,14 @@ export class SequelizeUserRespository extends UserRepository {
          return { success: false, error: error.message };
        }
     }
-    async update(user) {
+    async update(user, obj) {
         try {
-            await this.dataSource.update(user, { where: { email: user.email } });
-            return this.mapToUser(user);
+            const result = await this.dataSource.update(obj, { where: { [Op.or]:[{email: user}, {phoneNumber: user}]}});
+            console.log(result);
+            if (!result[0]) {
+                return { success: false, error: 'User not found' };
+            }
+            return {success: true, user: this.mapToUser(result)};
         } catch (error) {
             return { sucess: false, error: error.message };
         }
