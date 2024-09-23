@@ -20,7 +20,7 @@ class LoginController {
             const { error, success, user } = await this.LoginUseCase.handle(username, password);
 
             if (!success) {
-                return res.ApiResponse.error(401, error);
+                return res.ApiResponse.error(400, error);
             }
             const token = jwt.sign({userId: user.email, email: user.email, phoneNumber: user.phoneNumber, type: user.type, name: user.name}, app.key, {algorithm: 'HS512', expiresIn: '1h' });
             return res.ApiResponse.success(token, 200, "Login successful");
