@@ -29,7 +29,7 @@ export class FetchProductController {
             if (!req.params.pid) {
                 return res.ApiResponse.error(428, 'The product ID is required');
             }
-            const {success, product, error } = await this.fetchProductService.fetchProductByID(req.params.pid);
+            const {success, product, error } = await this.fetchProductService.fetchProductByID(req.params.pid, req.model);
             if (!success) {
                 return res.ApiResponse.error(404, error);
             }

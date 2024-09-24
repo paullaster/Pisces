@@ -34,7 +34,7 @@ const deleteProductController = new DeleteProductController(deleteProductService
 
 prodcutRoutes.post('/', createProductController.createProduct);
 prodcutRoutes.get('/', productImageMiddleware, fetchProductController.fetchAllProduct);
-prodcutRoutes.get('/:pid', fetchProductController.fetchProductByID);
+prodcutRoutes.get('/:pid', productImageMiddleware, fetchProductController.fetchProductByID);
 prodcutRoutes.get('/name/:name', fetchProductController.fetchProductByName);
 prodcutRoutes.put('/:pid', updateProductController.updateProduct);
 prodcutRoutes.delete('/:pid', deleteProductController.deleteProduct);
