@@ -7,7 +7,7 @@ export class FetchProductService {
         this.fetchProductByName = this.fetchProductByName.bind(this);
         this.fetchAllProducts = this.fetchAllProducts.bind(this);
     }
-    async fetchProductByID(pid) {
+    async fetchProductByID(pid, model = []) {
         try {
             if (!pid) {
                 return {success: false, error: 'Product ID is required'};
@@ -18,11 +18,19 @@ export class FetchProductService {
             if (pid.trim().length===0) {
                 return {success: false, error: 'Product ID cannot be empty'};
             }
-            const {success, data, error } = await this.productRepository.getProductById(pid);
+            const {success, data, error } = await this.productRepository.getProductById(pid, 'fetch', true, model );
             if (!success) {
                 return {success: false, error};
             }
-            return {success: true, product: data};
+            let product = {
+                ...data,
+                Images: data.Images.map( image =>{
+                    image['dataValues'].url = prepareImageUrl(image.imgId, image.mimetype);
+                    return image;
+                }),
+            }
+            
+            return {success: true, product};
         } catch (error) {
             return {success: false, error: error.message}
         }
