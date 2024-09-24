@@ -1,8 +1,6 @@
 import { sequelize } from "../connection.js";
 import { DataTypes } from "sequelize";
 import Product from "./product.js";
-import Cart from "./cart.js";
-import Order from "./order.js";
 
 const Item = sequelize.define('Item',{
     itemId: {
@@ -17,7 +15,7 @@ const Item = sequelize.define('Item',{
         unique: false,
     },
     price: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.DOUBLE,
         allowNull: false,
         unique: false,
     },
@@ -36,6 +34,11 @@ const Item = sequelize.define('Item',{
         allowNull: false,
         unique: false
     },
+    Images: {
+        type: DataTypes.JSON,
+        allowNull: false,
+        unique: false,
+    }
 },
 {
     tableName: 'items',
@@ -46,39 +49,20 @@ const Item = sequelize.define('Item',{
     collate: 'utf8mb4_unicode_ci'
 });
 
-Cart.hasMany(Item, {
-    foreignKey: 'cartId',
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
-});
-Item.belongsTo(Cart, {
-    foreignKey: 'cartId',
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
-});
+Item.prototype.getItemables = async function (options) {
+    const carts = await this.getCarts(options);
+    const orders = await this.getOrders(options);
+    return [...carts,...orders];
+}
 
 Product.hasMany(Item, {
     foreignKey: 'productId',
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    constraints: false,
 });
 Item.belongsTo(Product, {
     foreignKey: 'productId',
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    constraints: false,
 });
-
-Order.hasMany(Item, {
-    foreignKey: 'orderId',
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
-});
-Item.belongsTo(Order, {
-    foreignKey: 'orderId',
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
-});
-
 
 Item.sync();
 

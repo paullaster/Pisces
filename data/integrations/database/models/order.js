@@ -1,6 +1,8 @@
 import { sequelize } from "../connection.js";
 import { DataTypes } from "sequelize";
 import User from "./users.js";
+import Item from "./items.js";
+import ItemItemable from "./ITEM_ITEMABLE.js";
 
 const Order = sequelize.define('Order',{
     orderId: {
@@ -26,10 +28,29 @@ const Order = sequelize.define('Order',{
     collate: 'utf8mb4_unicode_ci'
 });
 
+Order.belongsToMany(Item, {
+    through: {
+        model: ItemItemable,
+        unique: false,
+        scope: {
+            itemableType: 'Order',
+        },
+    },
+    foreignKey: 'itemableId',
+    constraints: false,
+});
+
+Item.belongsToMany(Order, {
+    through: {
+        model: ItemItemable,
+        unique: false,
+    },
+    foreignKey: 'itemId',
+    constraints: false,
+});
+
 User.hasMany(Order, {
     foreignKey: 'userId',
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
 });
 Order.belongsTo(User);
 
