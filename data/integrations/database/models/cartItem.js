@@ -86,7 +86,7 @@ const CartItem = sequelize.define('CartItem',{
 //     through: CartItem,
 // });
 
-CartItem.sync({force: true});
+CartItem.sync();
 
 
 export default CartItem;

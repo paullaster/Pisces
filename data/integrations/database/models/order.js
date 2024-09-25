@@ -28,6 +28,6 @@ const Order = sequelize.define('Order', {
 
 Order.belongsTo(User, { targetKey: 'email', foreignKey: 'userEmail' });
 
-Order.sync({force: true});
+Order.sync();
 
 export default Order;

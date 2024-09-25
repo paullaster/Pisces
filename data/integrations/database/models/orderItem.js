@@ -37,7 +37,7 @@ Order.belongsToMany(Product, {
     constraints: false,
 });
 
-// OrderItem.sync({force: true});
+OrderItem.sync();
 
 
 export default OrderItem;

@@ -1,6 +1,6 @@
 import { Cart } from "../../core/types/cart.js";
 import { CartRepository } from "../../core/app/cart.interface.js";
-import { where } from "sequelize";
+import Product from "../integrations/database/models/product.js";
 
 export class SequilizeCartRepository extends CartRepository {
     constructor(CartModel) {
@@ -34,30 +34,30 @@ export class SequilizeCartRepository extends CartRepository {
     async create(user, cartObj, model) {
         try {
             const userCart = await this.getUserCart(user, model, 'create', false);
-            const newQuantity = 1;
+            let getProduct = await Product.findByPk(cartObj.item.pid);
+            getProduct = getProduct['dataValues'];
             const item = {
                 itemId: cartObj.item.itemId,
                 name: cartObj.item.name,
-                price: cartObj.item.price,
+                price: getProduct.price,
                 color: cartObj.item.color,
                 size: cartObj.item.size,
                 image: cartObj.item.image,
-                discount: cartObj.item.discount,
+                discount: getProduct.discount,
                 productPid: cartObj.item.pid,
-                quantity: newQuantity,
+                quantity: cartObj.item.quantity,
             }
             if (userCart) {
                 const cartId = userCart['dataValues'].cartId;
                 const itemExists = await model.findOne({where: {productPid: item.productPid, cartCartId: cartId}});
                 if (itemExists) {
-                    itemExists.dataValues.quantity += 1;
-                    itemExists.dataValues.price = cartObj.item.price;
-                    itemExists.dataValues.discount = cartObj.item.discount;
-                    if (itemExists.dataValues.discount) {
-                        itemExists.dataValues.price -= (itemExists.dataValues.price * itemExists.dataValues.discount) / 100;
+                    itemExists.quantity += 1;
+                    itemExists.price = getProduct.price;
+                    itemExists.discount = getProduct.discount;
+                    if (itemExists.discount) {
+                        itemExists.price -= (itemExists.price * itemExists.discount) / 100;
                     }
-                    itemExists.dataValues.totalPrice  = itemExists.dataValues.price * itemExists.dataValues.quantity;
-
+                    itemExists.totalPrice  = itemExists.price * itemExists.quantity;
                     await itemExists.save();
                     const items = await model.findAll({where: {cartCartId: cartId}});
                     userCart['dataValues'].Items = items
