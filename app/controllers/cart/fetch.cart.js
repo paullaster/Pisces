@@ -7,7 +7,7 @@ export class FetchCartController {
     }
     async fetchCart(req, res) {
         try {
-            const { success, cart, error } = await this.fetchCartService.fetchCart(req.params.userId);
+            const { success, cart, error } = await this.fetchCartService.fetchCart(req.user.userId, req.model);
             if (!success) {
                 return res.ApiResponse.error(404, error);
             }

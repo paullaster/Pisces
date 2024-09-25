@@ -1,4 +1,4 @@
-import Item from "../../data/integrations/database/models/items.js";
+import Item from "../../data/integrations/database/models/cartItem.js";
 export const CheckoutHandler = (req, res, next) => {
     try {
         const response = req.body.Body.stkCallback;

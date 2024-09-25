@@ -1,74 +1,105 @@
 import { Cart } from "../../core/types/cart.js";
 import { CartRepository } from "../../core/app/cart.interface.js";
+import { where } from "sequelize";
 
 export class SequilizeCartRepository extends CartRepository {
     constructor(CartModel) {
         super();
         this.dataSource = CartModel;
         this.mapToCart = this.mapToCart.bind(this);
-        this.getCartById = this.getCartById.bind(this);
+        this.getUserCart = this.getUserCart.bind(this);
         this.update = this.update.bind(this);
     }
-    async getCartById(cartId, associatedModel = [], type = 'fetch', eagerLoad = false) {
+    async getUserCart(user, associatedModel = [], type = 'fetch', eagerLoad = false) {
         try {
             let cart;
             if (eagerLoad) {
-                cart = await this.dataSource.findByPk(cartId, {
-                    include: associatedModel,
+                cart = await this.dataSource.findOne({
+                    where: { userEmail: user },
+                    // include: associatedModel,
                 });
+                const items = await associatedModel.findAll({ where: { cartCartId: cart['dataValues'].cartId }});
+                cart['dataValues'].Items  = items;
             } else {
-                cart = await this.dataSource.findByPk(cartId);
+                cart = await this.dataSource.findOne({ where: { userEmail: user } });
             }
-            if (type === 'create' && cart) {
-                return { error: 'Cart already exist', success: false };
+            if (type === 'fetch') {
+                return this.mapToCart(cart);
             }
-            if (type === 'create' && !cart) {
-                return { success: true };
-            }
-            if (type !== 'create' && !cart) {
-                return { error: 'Cart does not exist', success: false };
-            }
-            return this.mapToCart(cart);
+            return cart;
         } catch (error) {
             return { error: error.message, success: false };
         }
     }
-    async create(cart, model) {
+    async create(user, cartObj, model) {
         try {
-            const { success, error } = await this.getCartById(cart.cartId, [], 'create');
-            if (!success) {
-                return { success: false, error };
+            const userCart = await this.getUserCart(user, model, 'create', false);
+            const newQuantity = 1;
+            const item = {
+                itemId: cartObj.item.itemId,
+                name: cartObj.item.name,
+                price: cartObj.item.price,
+                color: cartObj.item.color,
+                size: cartObj.item.size,
+                image: cartObj.item.image,
+                discount: cartObj.item.discount,
+                productPid: cartObj.item.pid,
+                quantity: newQuantity,
             }
-            const userHasNewCart = await this.dataSource.findAndCountAll({
-                where: {
-                    userId: cart.userId,
-                    cartCheckoutStatus: 'New',
-                },
-            });
-            const { item, ...rest } = cart;
-            if (userHasNewCart.count > 0) {
-                const payload = {
-                    item,
+            if (userCart) {
+                const cartId = userCart['dataValues'].cartId;
+                const itemExists = await model.findOne({where: {productPid: item.productPid, cartCartId: cartId}});
+                if (itemExists) {
+                    itemExists.dataValues.quantity += 1;
+                    itemExists.dataValues.price = cartObj.item.price;
+                    itemExists.dataValues.discount = cartObj.item.discount;
+                    if (itemExists.dataValues.discount) {
+                        itemExists.dataValues.price -= (itemExists.dataValues.price * itemExists.dataValues.discount) / 100;
+                    }
+                    itemExists.dataValues.totalPrice  = itemExists.dataValues.price * itemExists.dataValues.quantity;
+
+                    await itemExists.save();
+                    const items = await model.findAll({where: {cartCartId: cartId}});
+                    userCart['dataValues'].Items = items
+                    return this.mapToCart(userCart);
+                } else {
+                    if (item.discount) {
+                        item.price -= (item.price * item.discount) / 100;
+                    }
+                    item.totalPrice  = item.price * item.quantity;
+                    item.cartCartId = cartId;
+                    await model.create(item);
+                    const items = await model.findAll({where: {cartCartId: cartId}});
+                    userCart['dataValues'].Items = items; 
+                    return this.mapToCart(userCart);
                 }
-                return await this.update(userHasNewCart.rows[0]['dataValues']['cartId'], payload, model);
+            } else {
+                const cart = await this.dataSource.create({
+                    userEmail: user,
+                    cartId: cartObj.cartId,
+                },
+            );
+                if (cart) {
+                    if (item.discount) {
+                        item.price -= (item.price * item.discount) / 100;
+                    }
+                    item.totalPrice  = item.price * item.quantity;
+                    item.cartCartId = cart.dataValues.cartId;
+                    await model.create(item);
+                    const items = await model.findAll({where: {cartCartId: cart.dataValues.cartId}});
+                    cart['dataValues'].Items = items;
+                    return this.mapToCart(cart);
+                }
+                return {success: false, error: 'Error'};
             }
-            // Create a new cart
-            const newCart = await this.dataSource.create(rest);
-
-            // Create associated items
-            const createSuffix = `create${model.name}`;
-            await newCart[createSuffix](item);
-
-            return this.mapToCart(newCart);
         } catch (error) {
-            console.log(error.message);
-            await this.delete(cart.cartId);
+            console.log(error)
             return { error: error.message, success: false };
         }
     }
     async update(cartItem, payload, model) {
         try {
-            const { data, success, error } = await this.getCartById(cartItem, model, 'fetch', true);
+            const { data, success, error } = await this.getUserCart(cartItem, model, 'fetch', true);
             if (!success) {
                 return { success: false, error };
             }
@@ -81,7 +112,7 @@ export class SequilizeCartRepository extends CartRepository {
                 data.Items[itemToUpdate]['dataValues'].size = payload.item.size;
 
             }
-            const passedModel = await model.findByPk(data.Items[itemToUpdate]['dataValues'].itemId); 
+            const passedModel = await model.findByPk(data.Items[itemToUpdate]['dataValues'].itemId);
             await passedModel.update(data.Items[itemToUpdate]['dataValues']);
             return this.mapToCart(cart);
         } catch (error) {
@@ -90,7 +121,7 @@ export class SequilizeCartRepository extends CartRepository {
     }
     async delete(id, model) {
         try {
-            const { success, error } = await this.getCartById(id, model, 'fetch', true);
+            const { success, error } = await this.getUserCart(id, model, 'fetch', true);
             if (!success) {
                 return { success: false, error };
             }
@@ -106,7 +137,8 @@ export class SequilizeCartRepository extends CartRepository {
     }
     mapToCart(cart) {
         try {
-            return { success: true, data: new Cart(cart['dataValues']) };
+            cart = cart ? cart['dataValues'] : {}
+            return { success: true, data: new Cart(cart) };
         } catch (error) {
             return { error: error.message, success: false };
         }

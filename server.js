@@ -6,6 +6,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import "./app/events/listeners/send.customer.otp.js";
 import "./app/events/index.js";
+import "./data/integrations/database/associations.js";
 
 const app = new express();
 

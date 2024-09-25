@@ -33,8 +33,7 @@ const deleteCartController = new DeleteCartController(deleteCartService);
 
 
 // ROUTES   --------------------------------
-cartRoutes.get('/', validateUserToken, fetchCartController.fetchCart);
-cartRoutes.get('/:userId', validateUserToken, fetchCartController.fetchUserCartItems);
+cartRoutes.get('/', validateUserToken, itemModelMiddleware, fetchCartController.fetchCart);
 cartRoutes.post('/', validateUserToken, itemModelMiddleware, createCartController.createCart);
 cartRoutes.put('/:cartItemId', validateUserToken, updateCartController.updateCart);
 cartRoutes.delete('/:cartItemId', validateUserToken, deleteCartController.deleteCart);

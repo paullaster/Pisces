@@ -26,7 +26,7 @@ export class CreateCartService {
             payload.item.itemId = RandomCodeGenerator(5, 'item');
             payload.item.cartId = payload.cartId;
             new ValidateObjectPayload(payload);
-            const { success, error, data:cart } = await this.cartRepository.create(payload, model);
+            const { success, error, data:cart } = await this.cartRepository.create(userId, payload, model);
             if (!success) {
                 return { success: false, error };
             }

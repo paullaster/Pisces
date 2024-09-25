@@ -16,9 +16,10 @@ const Product = sequelize.define('Product',{
         unique: false,
     },
     price: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
         unique: false,
+        defaultValue: 0,
     },
     description: {
         type: DataTypes.STRING,
@@ -51,6 +52,12 @@ const Product = sequelize.define('Product',{
         allowNull: false,
         unique: false
     },
+    discount: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: false,
+        unique: false,
+        defaultValue: 0,
+    },
     lastPid: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -78,6 +85,7 @@ Image.belongsTo(Product, {
     foreignKey: 'imagableId',
     constraints: false,
 });
+
 
 Product.sync();
 

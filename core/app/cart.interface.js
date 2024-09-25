@@ -12,16 +12,16 @@ export class CartRepository {
      * @param {eager}
      * @returns { Promise<Cart | null> }
      */
-    async getCartById(id, model, type, eager) {
+    async getUserCart(user, model, type, eager) {
         throw new Error('Not implemented');
     }
     /**
      * @abstract
      * @param { cart }
-     * @param { model }
+     * @param { user }
      * @returns { Promise<Cart | null> }
      */
-    async create(cart, model) {
+    async create(user, cart) {
         throw new Error('Not implemented');
     }
     /**

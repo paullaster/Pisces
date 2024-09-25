@@ -1,5 +1,5 @@
 import Order from "../../data/integrations/database/models/order.js";
-import Item from "../../data/integrations/database/models/items.js";
+import Item from "../../data/integrations/database/models/cartItem.js";
 export const eagerLoadUserOrdersAndRelated = (req, res, next) => {
     try {
         req.model = [
