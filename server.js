@@ -17,6 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(ApiResponder);
 
+
 // Static files middleware
 const _filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(_filename);
@@ -26,6 +27,8 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 // APP ROUTER PROVIDER
 app.use('/pisces', routeServiceProvider);
 
+// APP SETTINGS
+app.set('name', 'noelsdeliveries app service');
 
 const port = process.env.PORT || 3500;
 app.listen(port, () => {

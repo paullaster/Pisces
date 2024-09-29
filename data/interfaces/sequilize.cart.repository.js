@@ -18,8 +18,10 @@ export class SequilizeCartRepository extends CartRepository {
                     where: { userEmail: user },
                     // include: associatedModel,
                 });
-                const items = await associatedModel.findAll({ where: { cartCartId: cart['dataValues'].cartId }});
-                cart['dataValues'].Items  = items;
+                if (cart) {
+                    const items = await associatedModel.findAll({ where: { cartCartId: cart['dataValues'].cartId } });
+                    cart['dataValues'].Items = items;
+                }
             } else {
                 cart = await this.dataSource.findOne({ where: { userEmail: user } });
             }
@@ -49,7 +51,7 @@ export class SequilizeCartRepository extends CartRepository {
             }
             if (userCart) {
                 const cartId = userCart['dataValues'].cartId;
-                const itemExists = await model.findOne({where: {productPid: item.productPid, cartCartId: cartId}});
+                const itemExists = await model.findOne({ where: { productPid: item.productPid, cartCartId: cartId } });
                 if (itemExists) {
                     itemExists.quantity += 1;
                     itemExists.price = getProduct.price;
@@ -57,20 +59,20 @@ export class SequilizeCartRepository extends CartRepository {
                     if (itemExists.discount) {
                         itemExists.price -= (itemExists.price * itemExists.discount) / 100;
                     }
-                    itemExists.totalPrice  = itemExists.price * itemExists.quantity;
+                    itemExists.totalPrice = itemExists.price * itemExists.quantity;
                     await itemExists.save();
-                    const items = await model.findAll({where: {cartCartId: cartId}});
+                    const items = await model.findAll({ where: { cartCartId: cartId } });
                     userCart['dataValues'].Items = items
                     return this.mapToCart(userCart);
                 } else {
                     if (item.discount) {
                         item.price -= (item.price * item.discount) / 100;
                     }
-                    item.totalPrice  = item.price * item.quantity;
+                    item.totalPrice = item.price * item.quantity;
                     item.cartCartId = cartId;
                     await model.create(item);
-                    const items = await model.findAll({where: {cartCartId: cartId}});
-                    userCart['dataValues'].Items = items; 
+                    const items = await model.findAll({ where: { cartCartId: cartId } });
+                    userCart['dataValues'].Items = items;
                     return this.mapToCart(userCart);
                 }
             } else {
@@ -78,19 +80,19 @@ export class SequilizeCartRepository extends CartRepository {
                     userEmail: user,
                     cartId: cartObj.cartId,
                 },
-            );
+                );
                 if (cart) {
                     if (item.discount) {
                         item.price -= (item.price * item.discount) / 100;
                     }
-                    item.totalPrice  = item.price * item.quantity;
+                    item.totalPrice = item.price * item.quantity;
                     item.cartCartId = cart.dataValues.cartId;
                     await model.create(item);
-                    const items = await model.findAll({where: {cartCartId: cart.dataValues.cartId}});
+                    const items = await model.findAll({ where: { cartCartId: cart.dataValues.cartId } });
                     cart['dataValues'].Items = items;
                     return this.mapToCart(cart);
                 }
-                return {success: false, error: 'Error'};
+                return { success: false, error: 'Error' };
             }
         } catch (error) {
             console.log(error)

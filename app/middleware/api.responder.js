@@ -2,6 +2,7 @@ export const  ApiResponder = (req, res, next) => {
     res.ApiResponse = {
         success(data = {}, statusCode = 200, message = 'Success') {
             try {
+                res.setHeader('Document-Policy', 'js-profiling');
                 res.status(statusCode).json({ message, data });
             } catch (error) {
                 return this.error(error, error.message, 500);
