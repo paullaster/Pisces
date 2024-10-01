@@ -45,13 +45,12 @@ export class InitiateCheckoutController {
     async getTransactionAmount(req, res) {
         try {
             const cartService = new FetchCartService(new SequilizeCartRepository(Cart));
-            console.log("initiated call")
             const {success, cart, error} = await cartService.fetchCart(req.user.userId, req.model)
             if (!success) {
                 return { success: false, error: error}
             }
             let amount = cart.Items.reduce((sum, current) => sum + parseFloat(current.totalPrice), 0);
-            amount += cart.shippingRate;
+            amount += parseFloat(cart.shippingRate);
             return {success: true, amount};
         } catch (error) {
             console.log("error", error);
