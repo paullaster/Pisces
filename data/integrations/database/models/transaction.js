@@ -29,7 +29,7 @@ const Transaction = sequelize.define('Transaction',{
     status: {
         type: DataTypes.STRING,
         defaultValue: 'Pending',
-        values: ['Pending', 'Settled'],
+        values: ['Pending', 'Completed', 'Failed'],
         allowNull: false,
     },
     transactionDate: {
@@ -49,7 +49,14 @@ const Transaction = sequelize.define('Transaction',{
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
-    }
+    },
+    paymentMethod: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'Mpesa',
+        values: ['Mpesa', 'Bank Card'],
+        unique: false,
+    },
 },
 {
     tableName: 'transactions',

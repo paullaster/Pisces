@@ -35,6 +35,7 @@ export class InitiatePaymentRequestService {
                 merchantRequestID: transaction.MerchantRequestID,
                 transactionMessage: transaction.ResponseDescription,
                 checkoutId: checkoutId,
+                paymentMethod: 'Mpesa',
             }
             const { success: failed, data, error:err } = await this.paymentRequestRepository.create(transBody);
             if (!failed) {
