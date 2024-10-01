@@ -15,7 +15,7 @@ export class SequilizeCartRepository extends CartRepository {
             let cart;
             if (eagerLoad) {
                 cart = await this.dataSource.findOne({
-                    where: { userEmail: user },
+                    where: { userEmail: user, cartCheckoutStatus: 'New' },
                     // include: associatedModel,
                 });
                 if (cart) {
@@ -23,7 +23,7 @@ export class SequilizeCartRepository extends CartRepository {
                     cart['dataValues'].Items = items;
                 }
             } else {
-                cart = await this.dataSource.findOne({ where: { userEmail: user } });
+                cart = await this.dataSource.findOne({ where: { userEmail: user, cartCheckoutStatus: 'New' } });
             }
             if (type === 'fetch') {
                 return this.mapToCart(cart);

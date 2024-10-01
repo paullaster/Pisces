@@ -9,6 +9,17 @@ const Cart = sequelize.define('Cart',{
         unique: true,
         primaryKey: true,
     },
+    shippingRate: {
+        type: DataTypes.DECIMAL,
+        allowNull: false,
+        defaultValue: 0
+    },
+    paymentMethod: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: false,
+        defaultValue: 'Cash On Delivery'
+    },
     cartCheckoutStatus: {
         type: DataTypes.STRING,
         allowNull: false,
