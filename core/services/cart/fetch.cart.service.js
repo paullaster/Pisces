@@ -15,6 +15,7 @@ export class FetchCartService {
             }
             return { success: true, cart };
         } catch (error) {
+            console.log(error);
             return { success: false, error: error.message };
         }
     }

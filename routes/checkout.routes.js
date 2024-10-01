@@ -20,6 +20,7 @@ import { validateUserToken } from "../app/middleware/validate.token.js";
 import { Mpesa } from "../lib/mpesa/mpesa.lib.js";
 import { DeleteCartController } from "../app/controllers/cart/delete.cart.js";
 import { DeleteCartService } from "../core/services/cart/delete.cart.service.js";
+import { itemModelMiddleware } from "../app/middleware/pass.item.model.js";
 
 // LIB
 const mpesa = new Mpesa();
@@ -49,7 +50,7 @@ const deleteCartController = new DeleteCartController(deleteCartService);
 // Routes
 const checkoutRoutes = express.Router();
 
-checkoutRoutes.post('/', validateUserToken, iniateCheckoutRequest.initiateCheckout);
+checkoutRoutes.post('/', validateUserToken, itemModelMiddleware, iniateCheckoutRequest.initiateCheckout);
 checkoutRoutes.post('/callback',
     CheckoutHandler, 
     fetchPaymentRequest.fetchPaymentRequestWithUniqueKeys, 
