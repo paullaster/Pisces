@@ -7,7 +7,7 @@ import { CreateAccount } from '../app/controllers/users/create.account.js';
 import { CreateUserService } from '../core/services/auth/create.user.service.js';
 
 
-const userRoutes = express.Router();
+const authRoutes = express.Router();
 const userRepository = new SequelizeUserRespository(User);
 const loginUseCase = new LoginUseCase(userRepository);
 const loginController = new LoginController(loginUseCase);
@@ -16,9 +16,9 @@ const loginController = new LoginController(loginUseCase);
 const accountCreationService = new CreateUserService(userRepository)
 const createAccount = new CreateAccount(accountCreationService);
 
-userRoutes.post('/register', createAccount.createAccount);
-userRoutes.post('/login', loginController.login);
-userRoutes.post('/get-user', loginController.getUser);
-userRoutes.post('/verify-otp', loginController.verifyOTP);
-userRoutes.patch('/update-profile/:username', loginController.updateUserProfile);
-export { userRoutes};
+authRoutes.post('/register', createAccount.createAccount);
+authRoutes.post('/login', loginController.login);
+authRoutes.post('/get-user', loginController.getUser);
+authRoutes.post('/verify-otp', loginController.verifyOTP);
+authRoutes.patch('/update-profile/:username', loginController.updateUserProfile);
+export { authRoutes};

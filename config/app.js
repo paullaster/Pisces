@@ -13,4 +13,5 @@ export default {
     removebg: process.env.REMOVE_BG_API_KEY,
     pwdRounds: process.env.PWD_ROUNDS,
     cartUrl: `${process.env.APP_URL}${process.env.CART_URL}`,
+    
 };
