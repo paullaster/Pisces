@@ -3,12 +3,12 @@ export class DeleteCartService {
         this.cartRepository = cartRepository;
         this.deleteCart = this.deleteCart.bind(this);
     }
-    async deleteCart(cartItemId, model) {
+    async deleteCart(user, cartItemId, model = []) {
         try {
             if (!cartItemId) {
                 return { success: false, error: "Invalid cart item!" };
             }
-            const { success, error, data:cart } = await this.cartRepository.delete(cartItemId);
+            const { success, error, data:cart } = await this.cartRepository.delete(user, cartItemId, model);
             if (!success) {
                 return { success: false, error };
             }

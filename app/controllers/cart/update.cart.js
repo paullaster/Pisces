@@ -6,9 +6,9 @@ export class UpdateCartController {
     async updateCart(req, res) {
         try {
             if (!req.body) {
-                return res.ApiResponse.error(400, 'You missed record to updte');
+                return res.ApiResponse.error(400, 'You missed record to update');
             }
-            const { success, cart, error } = await this.updateCartService.updateCart(req.params.userId, req.params.cartItemId, req.body);
+            const { success, cart, error } = await this.updateCartService.updateCart(req.user.userId, req.params.cartItemId, req.body, req.model);
             if (!success) {
                 return res.ApiResponse.error(400, error);
             }

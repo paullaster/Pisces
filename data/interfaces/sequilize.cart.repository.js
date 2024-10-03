@@ -99,40 +99,81 @@ export class SequilizeCartRepository extends CartRepository {
             return { error: error.message, success: false };
         }
     }
-    async update(cartItem, payload, model) {
+    async update(user, cartItem, payload, model = []) {
         try {
-            const { data, success, error } = await this.getUserCart(cartItem, model, 'fetch', true);
-            if (!success) {
-                return { success: false, error };
+            const userCart = await this.getUserCart(user, model, '', false);
+            if (!userCart) {
+                return { success: false, error: "You do not have cart to update!" };
             }
-            const cart = await this.dataSource.findByPk(cartItem);
-            const itemToUpdate = data.Items.findIndex(dataItem => dataItem['dataValues'].productId === payload.item.productId);
-            if (itemToUpdate !== -1) {
-                data.Items[itemToUpdate]['dataValues'].price = payload.item.price;
-                data.Items[itemToUpdate]['dataValues'].quantity = payload.item.quantity;
-                data.Items[itemToUpdate]['dataValues'].color = payload.item.color;
-                data.Items[itemToUpdate]['dataValues'].size = payload.item.size;
-
+            const item = await model.findByPk(cartItem);
+            if (!item) {
+                return { success: false, error: "Item not found!" };
             }
-            const passedModel = await model.findByPk(data.Items[itemToUpdate]['dataValues'].itemId);
-            await passedModel.update(data.Items[itemToUpdate]['dataValues']);
-            return this.mapToCart(cart);
+            switch (payload.quantity) {
+                case -1:
+                    if (item['dataValues'].quantity === 1) {
+                        await this.delete(user, item['dataValues'].itemId, model);
+                        return await this.getUserCart(user, model, 'fetch', true);
+                    } else {
+                        item.quantity = item['dataValues'].quantity - 1;
+                        item.totalPrice = (item['dataValues'].price * item.quantity);
+                        await item.save();
+                    }
+                    break;
+                case 1:
+                    item.quantity = item['dataValues'].quantity + 1;
+                    item.totalPrice = (item['dataValues'].price * item.quantity);
+                    await item.save();
+                    break;
+                default:
+                    return { success: false, error: "Invalid Cart Item quantity!" };
+            }
+            return await this.getUserCart(user, model, 'fetch', true);
         } catch (error) {
             return { error: error.message, success: false };
         }
     }
-    async delete(id, model) {
+    async delete(user, item, model) {
         try {
-            const { success, error } = await this.getUserCart(id, model, 'fetch', true);
-            if (!success) {
-                return { success: false, error };
+            const userCart = await this.getUserCart(user, model, '', false);
+            if (!userCart) {
+                return { success: false, error: "User do not have active cart to update!" };
             }
-            const deletedCart = await this.dataSource.destroy({
+            const cartItems = await model.findAll({
                 where: {
-                    cartId: id,
+                    cartCartId: userCart['dataValues'].cartId,
                 }
             });
-            return { success: true, data: deletedCart };
+            if (!cartItems || cartItems.length === 0) {
+                const deletedCart = await this.dataSource.destroy({
+                    where: {
+                        cartId: userCart['dataValues'].cartId,
+                    }
+                });
+                return { success: true, data: deletedCart };
+            }
+            if (cartItems.length === 1) {
+                const sameItemInDeleteReq = cartItems[0].dataValues.itemId === item;
+                if (sameItemInDeleteReq) {
+                    await cartItems[0].destroy()
+                    const deletedCart = await this.dataSource.destroy({
+                        where: {
+                            cartId: userCart['dataValues'].cartId,
+                        }
+                    });
+                    return { success: true, data: deletedCart };
+                } else {
+                    return { success: false, error: 'Invalid item' };
+                }
+            } else {
+                const itemToDelete = cartItems.find(it => it['dataValues'].itemId === item);
+                if (!itemToDelete) {
+                    return { success: false, error: "Item not found in cart!" };
+                }
+                await itemToDelete.destroy();
+                return await this.getUserCart(user, model, 'fetch', true);
+            }
+
         } catch (error) {
             return { error: error.message, success: false };
         }
