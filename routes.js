@@ -7,6 +7,7 @@ import { cartRoutes } from './routes/cart.routes.js';
 import { checkoutRoutes } from './routes/checkout.routes.js';
 import { orderRoutes } from './routes/order.routes.js';
 import { assetRoutes } from './routes/asset.routes.js';
+import { setupsRouter } from './routes/setup.routes.js';
 
 appRouter.use('/v1/auth', userRoutes);
 appRouter.use('/v1/categories', categoryRoutes);
@@ -15,6 +16,5 @@ appRouter.use('/v1/cart', cartRoutes);
 appRouter.use('/v1/checkout', checkoutRoutes);
 appRouter.use('/v1/orders', orderRoutes);
 appRouter.use('/v1/assets', assetRoutes);
-
-
+appRouter.use('/v1/setups', setupsRouter);
 export default appRouter;
