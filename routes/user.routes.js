@@ -12,5 +12,25 @@ userRoutes.post("/address",
     validateUserToken,
     new AddressController(new AddressService(new SequelizeAddressRepository(Address))).createAddress
 );
+userRoutes.get("/address", 
+    validateUserToken,
+    new AddressController(new AddressService(new SequelizeAddressRepository(Address))).fetchAddresses
+);
+userRoutes.get("/address/:addressId", 
+    validateUserToken,
+    new AddressController(new AddressService(new SequelizeAddressRepository(Address))).fetchAddressById
+);
+userRoutes.patch("/address/:addressId", 
+    validateUserToken,
+    new AddressController(new AddressService(new SequelizeAddressRepository(Address))).updateAddress
+);
+userRoutes.patch("/address/default/:addressId", 
+    validateUserToken,
+    new AddressController(new AddressService(new SequelizeAddressRepository(Address))).setDefaultAddress
+);
+userRoutes.delete("/address/:addressId", 
+    validateUserToken,
+    new AddressController(new AddressService(new SequelizeAddressRepository(Address))).deleteAddress
+);
 
 export { userRoutes };

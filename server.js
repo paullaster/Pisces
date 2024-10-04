@@ -8,7 +8,6 @@ import "./app/events/listeners/send.customer.otp.js";
 import "./app/events/index.js";
 import "./data/integrations/database/associations.js";
 import appConfig from "./config/app.js";
-import expressIp from "express-ip";
 
 const app = new express();
 
@@ -28,7 +27,6 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // APP ROUTER PROVIDER
 app.use('/pisces', routeServiceProvider);
-app.use(expressIp().getIpInfoMiddleware)
 
 // APP SETTINGS
 app.set('name', 'noelsdeliveries app service');

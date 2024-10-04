@@ -58,7 +58,11 @@ const Address = sequelize.define('Address',{
     appartment: {
         type: DataTypes.STRING,
         allowNull: true,
-    }
+    },
+    town: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
 },
 {
     tableName: 'addresses',
