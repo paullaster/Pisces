@@ -1,0 +1,43 @@
+services:
+  webapp:
+    build: .
+    ports:
+      - "3500:3500"
+    environment:
+      - NODE_ENV=${APP_ENV}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_DATABASE}
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - db
+    networks:
+      - pisces-network
+    env_file:
+      - .env
+
+  db:
+    image: mysql:8.3
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - pisces-network
+    env_file:
+      - .env
+
+volumes:
+  mysql-data:
+
+networks:
+  pisces-network:
