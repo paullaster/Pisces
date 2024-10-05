@@ -16,7 +16,7 @@ RUN npm install --production
 COPY . .
 
 # Expose the port
-EXPOSE 3500
+EXPOSE 3501
 
 # Start the application using PM2
 CMD ["pm2-runtime", "production", "ecosystem.config.js"]
