@@ -18,7 +18,7 @@ export class JoiSanitizer {
       country: Joi.string().required(),
       zip: Joi.string().required(),
       appartment: Joi.string().required(),
-      streetCode: Joi.string().optional(),
+      streetCode: Joi.string().allow('').optional(),
       address: Joi.string().optional(),
       town: Joi.string().required(),
     });
