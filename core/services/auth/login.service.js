@@ -15,7 +15,6 @@ class LoginUseCase {
     async handle(username, password) {
        try {
         let {user, success, error } = await this.userRespository.getUserByUsername(username);
-        console.log(user);
         if (!success) {
                 return { error, success};
         }
