@@ -19,4 +19,4 @@ COPY . .
 EXPOSE 3501
 
 # Start the application using PM2
-CMD ["pm2-runtime", "production", "ecosystem.config.js"]
+CMD ["pm2-runtime", "server.js", "ecosystem.config.js"]
