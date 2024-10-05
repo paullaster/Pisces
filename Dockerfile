@@ -10,7 +10,7 @@ RUN npm install -g pm2
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install --production
+RUN npm install
 
 # Copy the rest of your app
 COPY . .
