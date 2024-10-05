@@ -2,7 +2,7 @@ services:
   webapp:
     build: .
     ports:
-      - "3501:3501"
+      - "3500:3501"
     environment:
       - NODE_ENV=${APP_ENV}
       - DB_HOST=${DB_HOST}
