@@ -1,6 +1,8 @@
 services:
   webapp:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "3501:3501"
     environment:
@@ -14,6 +16,7 @@ services:
       - .:/usr/src/app
     depends_on:
       - db
+    restart: always
     networks:
       - pisces-network
     env_file:
