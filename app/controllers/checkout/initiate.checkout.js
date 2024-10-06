@@ -17,8 +17,6 @@ export class InitiateCheckoutController {
             }
             const joiSanitizer = new JoiSanitizer();
             const validationResult = joiSanitizer.cleanMpesaCheckout(req.body);
-            // return res.ApiResponse.success(validationResult, 200, "data.transactionMessage");
-            console.log(validationResult)
             if (validationResult.error){
                 return res.ApiResponse.error(400, validationResult.error.details[0].message);
             }

@@ -4,6 +4,7 @@ import Product from "./product.js";
 import Cart from "./cart.js";
 
 
+
 const CartItem = sequelize.define('CartItem',{
     itemId: {
         type: DataTypes.STRING,
@@ -63,11 +64,11 @@ const CartItem = sequelize.define('CartItem',{
             key: 'pid',
         },
     },
-    cartCartId: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false,
-    }
+    // cartCartId: {
+    //     type: DataTypes.STRING,
+    //     allowNull: false,
+    //     unique: false,
+    // }
 
 
 },
@@ -79,13 +80,14 @@ const CartItem = sequelize.define('CartItem',{
     charset: 'utf8mb4',
     collate: 'utf8mb4_unicode_ci'
 });
-// Product.belongsToMany(Cart, {
-//     through: CartItem,
-// });
-// Cart.belongsToMany(Product, {
-//     through: CartItem,
-// });
 
+Cart.hasMany(CartItem, {
+    foreignKey: 'cartId',
+    as: 'Items',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+})
+CartItem.belongsTo(Cart, {foreignKey: 'cartId', onDelete: 'CASECADE', onUpdate: 'CASECADE', constraints: false})
 CartItem.sync();
 
 
