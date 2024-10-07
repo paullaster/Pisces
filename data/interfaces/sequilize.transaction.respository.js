@@ -71,23 +71,19 @@ export class SequelizeTransactionRepository extends TransactionRepository {
             return { error: error.message, success: false };
         }
     }
-    async update(transaction, payload) {
+    async update(payload) {
         try {
-            transaction.phoneNumber = payload.CallbackMetadata.Item[3].Value;
-            transaction.checkoutId = payload.orderId;
-            transaction.status = 'Settled';
+            const transaction = await this.dataSource.findOne({where : {
+                merchantRequestID: payload.merchantRequestID,
+                checkoutRequestID: payload.checkoutRequestID,
+            }});
+            transaction.phoneNumber = payload.CallbackMetadata.Item[4].Value;
+            transaction.status = payload.ResultCode === 0  || payload.ResultCode === "0" ? 'Completed' : 'Failed';
             transaction.amount = payload.CallbackMetadata.Item[0].Value;
             transaction.transactionID = payload.CallbackMetadata.Item[1].Value;
-            transaction.transactionDate = payload.CallbackMetadata.Item[2].Value; 
+            transaction.transactionDate = payload.CallbackMetadata.Item[3].Value; 
             transaction.transactionMessage = payload.ResultDesc;
-            const tranToUpdate = await this.dataSource.findByPk(transaction.transId);
-
-            for (let prop in tranToUpdate['dataValues']) {
-                if (transaction[prop]) {
-                    tranToUpdate[prop] = transaction[prop];
-                }
-            }
-            return await tranToUpdate.save();
+            return await transaction.save();
             
         } catch (error) {
             return { error: error.message, success: false };

@@ -51,13 +51,6 @@ const deleteCartController = new DeleteCartController(deleteCartService);
 const checkoutRoutes = express.Router();
 
 checkoutRoutes.post('/', validateUserToken, itemModelMiddleware, iniateCheckoutRequest.initiateCheckout);
-checkoutRoutes.post('/callback',
-    CheckoutHandler, 
-    fetchPaymentRequest.fetchPaymentRequestWithUniqueKeys, 
-    fetchCartController.fetchCartMiddleware, 
-    deleteCartController.deleteCartMiddleware,
-    createOrder.createOrder,
-    checkoutCallback.checkoutCallback
-);
+checkoutRoutes.post('/callback', checkoutCallback.checkoutCallback);
 
 export { checkoutRoutes };

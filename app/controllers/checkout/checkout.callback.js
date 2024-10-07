@@ -5,11 +5,10 @@ export class CheckoutCallbackController {
     }
     async checkoutCallback(req, res) {
         try {
-            const payload = {
-                ...req.body,
-                orderId: req.order.orderId,
-            }
-            res.ApiResponse.success(await this.checkoutCallbackService.updatePaymentRequest(req.transaction, payload));
+            //LOGG TO FILE SYSTEM ASYNCHRONOUS
+            const payload = req.body.Body.stkCallback
+            await this.checkoutCallbackService.updatePaymentRequest(payload)
+            return res.ApiResponse.success();
         } catch (error) {
             return res.ApiResponse.error(500, error.message);
         }
