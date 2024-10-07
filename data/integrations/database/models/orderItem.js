@@ -11,11 +11,60 @@ const OrderItem = sequelize.define('OrderItem',{
         unique: true,
         primaryKey: true,
     },
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: false
+    },
     quantity: {
         type: DataTypes.INTEGER,
         allowNull: false,
         unique: false
     },
+    size: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: false
+    },
+    color: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: false
+    },
+    image: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+        unique: false
+    },
+    price: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: false,
+        unique: false,
+        defaultValue: 0,
+    },
+    totalPrice: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: false,
+        unique: false,
+        defaultValue: 0,
+    },
+    discount: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: false,
+        unique: false,
+        defaultValue: 0,
+    },
+    productId: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: false,
+        references: {
+            model: Product,
+            key: 'pid',
+        },
+    },
+
+
 },
 {
     tableName: 'order_items',
@@ -26,17 +75,13 @@ const OrderItem = sequelize.define('OrderItem',{
     collate: 'utf8mb4_unicode_ci'
 });
 
-Product.belongsToMany(Order, {
-    through: OrderItem,
+Order.hasMany(OrderItem, {
     foreignKey: 'orderId',
-    constraints: false,
-});
-Order.belongsToMany(Product, {
-    through: OrderItem,
-    foreignKey: 'productId',
-    constraints: false,
-});
-
+    as: 'Items',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+})
+OrderItem.belongsTo(Cart, {foreignKey: 'orderId', onDelete: 'CASECADE', onUpdate: 'CASECADE', constraints: false})
 OrderItem.sync();
 
 

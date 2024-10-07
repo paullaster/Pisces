@@ -18,6 +18,7 @@ const Order = sequelize.define('Order', {
         type: DataTypes.STRING,
         allowNull: false,
         unique: false,
+        values: ['Cash On Delivery', 'Mpesa', 'Bank Card'],
         defaultValue: 'Cash On Delivery'
     },
     orderStatus: {
@@ -29,7 +30,7 @@ const Order = sequelize.define('Order', {
     },
     originCart: {
         type: DataTypes.STRING,
-        allowNull: true,
+        allowNull: false,
     },
 },
     {

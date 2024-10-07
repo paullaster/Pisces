@@ -62,6 +62,11 @@ const Product = sequelize.define('Product',{
         type: DataTypes.STRING,
         allowNull: false,
         unique: false,
+    },
+    recipeTips: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        unique: false,
     }
 },
 {

@@ -30,7 +30,7 @@ const Address = sequelize.define('Address',{
         allowNull: false,
     },
     country: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false,
     },
     zip: {
