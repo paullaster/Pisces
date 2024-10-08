@@ -3,10 +3,18 @@ import { Transaction } from "../../core/types/transaction.js";
 import { RandomCodeGenerator } from "../../common/generating_unique_codes.js";
 
 export class SequelizeTransactionRepository extends TransactionRepository {
-    constructor(TransactionModel) {
+    constructor(TransactionModel, FailedTransactionModel = null) {
         super();
         this.dataSource = TransactionModel;
+        this.failedTransactionModel = FailedTransactionModel;
         this.mapTransaction = this.mapTransaction.bind(this);
+        this.getTrans = this.getTrans.bind(this);
+        this.getTransactionByUniqueProperty = this.getTransactionByUniqueProperty.bind(this);
+        this.create = this.create.bind(this);
+        this.createFailedTransaction = this.createFailedTransaction.bind(this);
+        this.update = this.update.bind(this);
+        this.delete = this.delete.bind(this);
+
     }
     async getTransById(transId, type = 'fetch') {
         try {
@@ -25,12 +33,13 @@ export class SequelizeTransactionRepository extends TransactionRepository {
             return { error: error.message, success: false };
         }
     }
-    async getTransactionByUniqueProperty(query){
+    async getTransactionByUniqueProperty(query, options = {}){
         try {
             const transaction = await this.dataSource.findOne({
                 where: {
                     ...query,
                 },
+                ...options,
             });
             if (!transaction) {
                 return { error: 'This transaction does no exist!', success: false };
@@ -57,14 +66,6 @@ export class SequelizeTransactionRepository extends TransactionRepository {
     }
     async create(transaction) {
         try {
-            const { success:failed, data } = await this.getTransactionByUniqueProperty({checkoutId: transaction.checkoutId});
-            if (failed) {
-                await this.delete({transId: data.transId});
-            }
-            const { success } = await this.getTransById(transaction.transId, 'create');
-            if (!success) {
-                transaction.transId = RandomCodeGenerator(10);
-            }
             const newTrans = await this.dataSource.create(transaction);
             return this.mapTransaction(newTrans);
         } catch (error) {
@@ -77,14 +78,94 @@ export class SequelizeTransactionRepository extends TransactionRepository {
                 merchantRequestID: payload.merchantRequestID,
                 checkoutRequestID: payload.checkoutRequestID,
             }});
-            transaction.phoneNumber = payload.CallbackMetadata.Item[4].Value;
-            transaction.status = payload.ResultCode === 0  || payload.ResultCode === "0" ? 'Completed' : 'Failed';
-            transaction.amount = payload.CallbackMetadata.Item[0].Value;
-            transaction.transactionID = payload.CallbackMetadata.Item[1].Value;
-            transaction.transactionDate = payload.CallbackMetadata.Item[3].Value; 
-            transaction.transactionMessage = payload.ResultDesc;
-            return await transaction.save();
+            if (!transaction) {
+                switch (payload.ResultCode) {
+                    case '0':
+                        transaction.status = 'Completed';
+                        break;
+                    case 0:
+                        transaction.status = 'Completed';
+                        break;
+                    default:
+                        transaction.status = 'Failed';
+                        break;
+                }
+                if (transaction.status === 'Completed') {
+                    transaction.transactionMessage = payload.ResultDesc;
+                    transaction.phoneNumber = payload.CallbackMetadata.Item[4].Value;
+                    transaction.amount = payload.CallbackMetadata.Item[0].Value;
+                    transaction.transactionID = payload.CallbackMetadata.Item[1].Value;
+                    transaction.transactionDate = payload.CallbackMetadata.Item[3].Value;
+                    transaction.transId = RandomCodeGenerator(10);
+                    transaction.checkoutId = RandomCodeGenerator(12, 'CT');
+                    transaction.paymentMethod = 'Mpesa';
+                    transaction.checkoutRequestID = payload.checkoutRequestID,
+                    transaction.merchantRequestID = payload.merchantRequestID;
+                    return await transaction.save();
+                }else {
+                    return transaction;
+                }
+            }
+            switch (payload.ResultCode){
+                case '0':
+                    transaction.status = 'Completed';
+                    break;
+                case 0:
+                    transaction.status = 'Completed';
+                    break;
+                default:
+                    transaction.status = 'Failed';
+                    break;
+
+            }
+            switch (transaction.status) {
+                case 'Completed':
+                    transaction.transactionMessage = payload.ResultDesc;
+                    transaction.phoneNumber = payload.CallbackMetadata.Item[4].Value;
+                    transaction.amount = payload.CallbackMetadata.Item[0].Value;
+                    transaction.transactionID = payload.CallbackMetadata.Item[1].Value;
+                    transaction.transactionDate = payload.CallbackMetadata.Item[3].Value; 
+                    return await transaction.save();
+                case 'Failed':
+                    transaction.transactionMessage = 'Transaction failed';
+                    const t = {
+                        checkoutId: transaction['dataValues'].checkoutId,
+                        merchantRequestID: payload.merchantRequestID,
+                        checkoutRequestID: payload.checkoutRequestID,
+                        phoneNumber: transaction['dataValues'].phoneNumber,
+                        amount: transaction['dataValues'].amount,
+                        transId: transaction['dataValues'].transId,
+                        status: transaction.status,
+                        transactionMessage: transaction.transactionMessage,
+                        transactionDate: new Date(),
+                    }
+
+                    return await this.createFailedTransaction(t);
+                default:
+                    transaction.transactionMessage = 'Transaction status unknown';
+                    const unkwn = {
+                        checkoutId: transaction['dataValues'].checkoutId,
+                        merchantRequestID: payload.merchantRequestID,
+                        checkoutRequestID: payload.checkoutRequestID,
+                        phoneNumber: transaction['dataValues'].phoneNumber,
+                        amount: transaction['dataValues'].amount,
+                        transId: transaction['dataValues'].transId,
+                        status: transaction.status,
+                        transactionMessage: transaction.transactionMessage,
+                        transactionDate: new Date(),
+                    }
+
+                    return await this.createFailedTransaction(unkwn);
+            }
             
+        } catch (error) {
+            return { error: error.message, success: false };
+        }
+    }
+    async createFailedTransaction(transaction) {
+        try {
+            const failedTransaction = await this.failedTransactionModel.create(transaction);
+            return this.mapTransaction(failedTransaction);
         } catch (error) {
             return { error: error.message, success: false };
         }

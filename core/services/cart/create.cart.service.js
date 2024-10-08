@@ -21,9 +21,9 @@ export class CreateCartService {
             if (Object.keys(payload).length===0) {
                 return { success: false, error: "Can't add empty item to cart!" };
             }
-            payload.cartId = RandomCodeGenerator(5, 'CRT');
+            payload.cartId = RandomCodeGenerator(12, 'CT');
             payload.userId = userId;
-            payload.item.itemId = RandomCodeGenerator(5, 'CI');
+            payload.item.itemId = RandomCodeGenerator(10, 'CI');
             payload.item.cartId = payload.cartId;
             new ValidateObjectPayload(payload);
             const { success, error, data:cart } = await this.cartRepository.create(userId, payload, model);

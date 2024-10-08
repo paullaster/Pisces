@@ -18,12 +18,13 @@ export class FetchPaymentRequestService {
             return { success: false, error: error.message };
         }
     }
-    async fetchPaymentRequestWithUniqueKeys(keys) { 
+    async fetchPaymentRequestWithUniqueKeys(keys, options = {}) { 
         try {
             if (!Object.keys(keys).length) {
                 return { success: false, error: 'Keys are required' };
             }
-            const { success, data, error } = await this.paymentRequestRepository.getTransactionByUniqueProperty(keys);
+            console.log(keys)
+            const { success, data, error } = await this.paymentRequestRepository.getTransactionByUniqueProperty(keys, options);
             if (!success) {
                 return { success, error };
             }

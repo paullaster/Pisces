@@ -1,7 +1,7 @@
 import { sequelize } from "../connection.js";
 import { DataTypes } from "sequelize";
 
-const Transaction = sequelize.define('Transaction',{
+const FailedTransaction = sequelize.define('FailedTransaction',{
     transId: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -15,22 +15,15 @@ const Transaction = sequelize.define('Transaction',{
     checkoutId: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: false,
     },
     amount: {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
-    transactionID: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        unique: true,
-
-    },
     status: {
         type: DataTypes.STRING,
-        defaultValue: 'Pending',
-        values: ['Pending', 'Completed'],
+        defaultValue: 'Failed',
+        values: ['Failed'],
         allowNull: false,
     },
     transactionDate: {
@@ -60,7 +53,7 @@ const Transaction = sequelize.define('Transaction',{
     },
 },
 {
-    tableName: 'transactions',
+    tableName: 'failed_transaction',
     timestamps: true,
     underscored: true,
     freezeTableName: true,
@@ -68,7 +61,7 @@ const Transaction = sequelize.define('Transaction',{
     collate: 'utf8mb4_unicode_ci'
 });
 
-Transaction.sync();
+FailedTransaction.sync();
 
 
-export default Transaction;
+export default FailedTransaction;
