@@ -21,12 +21,13 @@ import { Mpesa } from "../lib/mpesa/mpesa.lib.js";
 import { DeleteCartController } from "../app/controllers/cart/delete.cart.js";
 import { DeleteCartService } from "../core/services/cart/delete.cart.service.js";
 import { itemModelMiddleware } from "../app/middleware/pass.item.model.js";
+import FailedTransaction from "../data/integrations/database/models/failedTransaction.js";
 
 // LIB
 const mpesa = new Mpesa();
 
 // Repositories
-const transactionRepository = new SequelizeTransactionRepository(Transaction);
+const transactionRepository = new SequelizeTransactionRepository(Transaction, FailedTransaction);
 const cartRepository = new SequilizeCartRepository(Cart);
 const orderRepository = new SequilizeOrderRepository(Order);
 
