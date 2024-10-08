@@ -4,6 +4,7 @@ export class UpdateCartService {
     constructor(cartRespository) {
         this.cartRespository = cartRespository;
         this.updateCart = this.updateCart.bind(this);
+        this.updateCartShippingRate = this.updateCartShippingRate.bind(this);
     }
     async updateCart(userId, cartItemId, payload, model = []) {
         try {
@@ -30,6 +31,20 @@ export class UpdateCartService {
             return { success: true, cart };
         } catch (error) {
             return { success: false, error: error.message };
+        }
+    }
+    async updateCartShippingRate (user, obj) {
+        try {
+            if (!user || !obj) {
+                return { success:false, error: "Could be having invalid data" };
+            }
+            const { success, error, data } = await this.cartRespository.updateCartShippingRate(user, obj);
+            if (!success) {
+                return { success: false, error };
+            }
+            return { success: true, cart: data };
+        } catch (error) {
+            return { success: true, error: error.message };
         }
     }
 }

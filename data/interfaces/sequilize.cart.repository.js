@@ -9,6 +9,7 @@ export class SequilizeCartRepository extends CartRepository {
         this.mapToCart = this.mapToCart.bind(this);
         this.getUserCart = this.getUserCart.bind(this);
         this.update = this.update.bind(this);
+        this.updateCartShippingRate = this.updateCartShippingRate.bind(this);
     }
     async getUserCart(user, associatedModel = [], type = 'fetch', eagerLoad = false) {
         try {
@@ -132,6 +133,20 @@ export class SequilizeCartRepository extends CartRepository {
             return await this.getUserCart(user, model, 'fetch', true);
         } catch (error) {
             return { error: error.message, success: false };
+        }
+    }
+    async updateCartShippingRate (user, obj) {
+        try {
+            const cart = await this.dataSource.findOne({userId: user, status: 'New'});
+            if (!cart) {
+                return { success: false, error: "User do not have active cart to update!" };
+            }
+            cart.shippingRate = obj.shippingRate;
+            await cart.save();
+            return { success: true, data: cart };                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+        } catch (error) {
+            console.log(error);
+            return { success: false, error: error.message };
         }
     }
     async delete(user, item, model) {
