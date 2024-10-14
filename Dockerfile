@@ -1,7 +1,7 @@
 FROM node:21.6.2-alpine
 
 # Set the working directory
-WORKDIR /usr/src/app
+WORKDIR /usr/src/noelsdeliveries
 
 # Install PM2 globally
 RUN npm install -g pm2
@@ -19,4 +19,4 @@ COPY . .
 EXPOSE 3501
 
 # Start the application using PM2
-CMD ["pm2-runtime", "server.js", "ecosystem.config.js"]
+CMD ["pm2-runtime","ecosystem.config.cjs"]

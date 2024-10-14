@@ -2,7 +2,6 @@ services:
   webapp:
     build:
       context: .
-      dockerfile: Dockerfile
     ports:
       - "3501:3501"
     environment:
@@ -13,7 +12,7 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=${DB_DATABASE}
     volumes:
-      - .:/usr/src/app
+      - .:/usr/src/noelsdeliveries
     depends_on:
       - db
     restart: always

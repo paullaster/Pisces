@@ -6,10 +6,16 @@
   "type": "module",
   "sequelize": "cross-env NODE_ENV=development sequelize $*",
   "scripts": {
-    "start": "node  --env-file=.env.local --watch ./server.js",
+    "start": "NODE_ENV=development node  --env-file=.env.local --watch ./server.js",
     "migrate:up": "npx sequelize-cli db:migrate",
     "migrate:undo": "npx sequelize-cli db:migrate:undo",
-    "production": "node --env-file=.env  server.js",
+    "production": "NODE_ENV=production node --env-file=.env  server.js",
+    "pm2-start-dev": "NODE_ENV=development && pm2 start ecosystem.config.cjs --env development",
+    "pm2-start-prod": "NODE_ENV=production && pm2 start ecosystem.config.cjs --env production",
+    "pm2-stop-dev": "pm2 stop ecosystem.config.cjs",
+    "pm2-stop-prod": "pm2 stop start ecosystem.config.cjs",
+    "pm2-restart-prod": "NODE_ENV=production && pm2 restart ecosystem.config.cjs --env production",
+    "pm2-restart-dev": "NODE_ENV=development && pm2 restart ecosystem.config.cjs --env development",
     "test": "test"
   },
   "keywords": [
