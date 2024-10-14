@@ -4,7 +4,7 @@ module.exports = {
         name: 'noels-deliveries-api',
         script: 'server.js',
         env_file: "./.env.local",
-        watch: true,
+        watch: false,
         ignore_watch:["node_modules"],
         instances: 'max',
         exec_mode: 'cluster',
