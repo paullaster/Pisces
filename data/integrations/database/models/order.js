@@ -21,15 +21,26 @@ const Order = sequelize.define('Order', {
         values: ['Cash On Delivery', 'Mpesa', 'Bank Card'],
         defaultValue: 'Cash On Delivery'
     },
+    paymentStatus: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: false,
+        defaultValue: 'unPaid',
+        values: ['unPaid', 'Paid'],
+    },
     orderStatus: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: false,
         defaultValue: 'New',
-        values: ['New', 'Pending Processing', 'Processed', 'Pending Delivery', 'Delivered'],
+        values: ['New', 'Pending Processing', 'Processed', 'Pending Delivery', 'Delivered', 'Cancelled', 'In Transit'],
     },
     originCart: {
         type: DataTypes.STRING,
+        allowNull: false,
+    },
+    totalPrice: {
+        type: DataTypes.DECIMAL,
         allowNull: false,
     },
 },
