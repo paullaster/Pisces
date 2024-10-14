@@ -1,6 +1,5 @@
 import { sequelize } from "../connection.js";
 import { DataTypes } from "sequelize";
-import Otp from "./user.one.time.passwords.js";
 
 const User = sequelize.define('User', {
     email: {
@@ -21,7 +20,11 @@ const User = sequelize.define('User', {
         type: DataTypes.ENUM('customer', 'admin'),
         defaultValue: 'customer'
     },
-    name: {
+    firstName: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    lastName: {
         type: DataTypes.STRING,
         allowNull: true
     },
