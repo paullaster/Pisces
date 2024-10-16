@@ -13,15 +13,20 @@ eventEmmitter.on("sendOTP-newcustomer", async(payload) => {
         console.log("sendOTP-newcustomer");
         const subject = "Noels Delivery OTP Code is " + payload.notifiable.Otps[0]['dataValues'].otp;
         const templateUrl =  path.join(__dirname, '../../../resources/views/otp.mail.template.html');
-        const logoUrl = `${app.webUrl}/public/logo.svg`;
         const OTPemailTemplate = fs.readFileSync(templateUrl, "utf8");
         const mailBody = OTPemailTemplate
             .replace('{{ otp }}', payload.notifiable.Otps[0]['dataValues'].otp)
-            .replace('logo-url', logoUrl)
             .replace('2020',new Date().getFullYear());
         const notify = new Notification(subject, mailBody);
+        const attachments = [
+            {
+                filename: "logo.svg",
+                path: 'https://noelsdeliveries.com:3500/public/logo.svg',
+                cid: "noelslogo"
+            }
+        ];
         if (payload.notificationType.type === 'email') {
-            await notify.via('viaEmail', payload.notifiable.email);
+            await notify.via('viaEmail', payload.notifiable.email, {attachments});
         }
         // else if (payload.notificationType.type === 'phone') {
         //     // Send SMS using Twilio

@@ -6,14 +6,15 @@ export class Notification {
         this.body = body;
         this.via = this.via.bind(this);
     }
-    async via(channel, notifiable, ...args) {
+    async via(channel, notifiable, options = {}) {
         try {
             const notify = {
                 email: notifiable,
                 subject: this.subject,
                 html: this.body,
-                ...args,
+                ...options,
             }
+            console.log(notify)
             switch(channel) {
                 case 'viaEmail':
                     return  await new EmailNotification().send(notify)
