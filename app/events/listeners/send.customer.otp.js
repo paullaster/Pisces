@@ -20,8 +20,8 @@ eventEmmitter.on("sendOTP-newcustomer", async(payload) => {
         const notify = new Notification(subject, mailBody);
         const attachments = [
             {
-                filename: "logo.svg",
-                path: 'https://noelsdeliveries.com:3500/public/logo.svg',
+                filename: "logo.png",
+                path: '../../../public/logo.png',
                 cid: "noelslogo"
             }
         ];
