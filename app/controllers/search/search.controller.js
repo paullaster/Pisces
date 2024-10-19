@@ -33,13 +33,9 @@ export class SearchController {
                 return;
             }
             const snapshot = products.rows.map((row) => {
-                // delete row.createdAt;
-                // delete row.updatedAt;
                 return {
                     ...row,
                     id: row.pid,
-                    price: Number(row.price),
-                    discount: Number(row.discount)
                 };
             });
             const insertsnapshot = await this.searchService.insertSnapshot(snapshot);
