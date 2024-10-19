@@ -10,6 +10,7 @@ import { assetRoutes } from './routes/asset.routes.js';
 import { setupsRouter } from './routes/setup.routes.js';
 import { userRoutes } from './routes/user.routes.js';
 import { mapRoutes } from './routes/maps.routes.js';
+import useSearchRoute from './routes/search.routes.js';
 
 appRouter.use('/v1/auth', authRoutes);
 appRouter.use('/v1/categories', categoryRoutes);
@@ -21,5 +22,6 @@ appRouter.use('/v1/assets', assetRoutes);
 appRouter.use('/v1/setups', setupsRouter);
 appRouter.use('/v1/user', userRoutes);
 appRouter.use('/v1/maps', mapRoutes);
+appRouter.use('/v1/search', useSearchRoute);
 
 export default appRouter;

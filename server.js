@@ -8,6 +8,8 @@ import "./app/events/listeners/send.customer.otp.js";
 import "./app/events/index.js";
 import "./data/integrations/database/associations.js";
 import appConfig from "./config/app.js";
+import "./app/events/emitters/event.emitters.js"
+import "./app/events/listeners/deploy.orama.index.js"
 
 const app = new express();
 

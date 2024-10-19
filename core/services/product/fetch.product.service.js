@@ -71,7 +71,7 @@ export class FetchProductService {
             products = {
                 count: data.count,
                 rows: products,
-              }
+            }
             return {success: true, products };
         } catch (error) {
             return {success: false, error: error.message}

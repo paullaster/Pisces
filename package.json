@@ -27,6 +27,7 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "@brainspore/transport": "^0.0.8",
+    "@oramacloud/client": "^1.3.17",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "express": "^4.19.2",
