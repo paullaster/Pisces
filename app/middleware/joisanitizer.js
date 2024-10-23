@@ -20,6 +20,8 @@ export class JoiSanitizer {
       appartment: Joi.string().required(),
       streetCode: Joi.string().allow('').optional(),
       address: Joi.string().optional(),
+      longitude: Joi.string().optional(),
+      latitude: Joi.string().optional(),
       town: Joi.string().required(),
     });
     for ( let prop in address ) {

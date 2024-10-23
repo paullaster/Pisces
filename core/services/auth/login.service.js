@@ -11,6 +11,7 @@ class LoginUseCase {
         this.sendOTP = this.sendOTP.bind(this);
         this.deleteUser = this.deleteUser.bind(this);
         this.updateUserProfile = this.updateUserProfile.bind(this);
+        this.getUserById = this.getUserById.bind(this);
     }
     async handle(username, password) {
        try {
@@ -27,6 +28,17 @@ class LoginUseCase {
        } catch (error) {
          return { error: error.message, success: false };
        }
+    }
+    async getUserById(userId) {
+        try {
+            let {user, success, error } = await this.userRespository.getUserById(userId);
+            if (!success) {
+                return { error, success };
+            }
+            return { user, success };
+        } catch (error) {
+            return { error: error.message, success: false };
+        }
     }
     async generateOTP(obj, model) {
         try {

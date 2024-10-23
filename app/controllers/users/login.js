@@ -10,6 +10,7 @@ class LoginController {
         this.OTP = this.OTP.bind(this);
         this.verifyOTP = this.verifyOTP.bind(this);
         this.updateUserProfile = this.updateUserProfile.bind(this);
+        this.getUserById = this.getUserById.bind(this);
     }
     async login(req, res) {
         try {
@@ -22,8 +23,20 @@ class LoginController {
             if (!success) {
                 return res.ApiResponse.error(400, error);
             }
-            const token = jwt.sign({userId: user.email, email: user.email, phoneNumber: user.phoneNumber, type: user.type, name: user.name}, app.key, {algorithm: 'HS512', expiresIn: '1h' });
+            const token = jwt.sign({id: user.id, userId: user.email, email: user.email, phoneNumber: user.phoneNumber, type: user.type, firstName: user.firstName, lastName: user.lastName}, app.key, {algorithm: 'HS512', expiresIn: '1h' });
             return res.ApiResponse.success(token, 200, "Login successful");
+        } catch (error) {
+            return res.ApiResponse.error(500, error.message);
+        }
+    }
+    async getUserById(req, res) {
+        try {
+            const { id:userId } = req.user;
+            const { success, user, error } = await this.LoginUseCase.getUserById(userId);
+            if (!success) {
+                return res.ApiResponse.error(404, error);
+            }
+            return res.ApiResponse.success(user, 200);
         } catch (error) {
             return res.ApiResponse.error(500, error.message);
         }

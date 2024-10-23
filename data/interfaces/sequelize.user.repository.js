@@ -19,10 +19,8 @@ export class SequelizeUserRespository extends UserRepository {
             let user;
             if (eagerLoad) {
                 user = await this.dataSource.findByPk(id, { include: associatedModels });
-                user = user['dataValues'];
             } else {
                 user = await this.dataSource.findByPk(id);
-                user = user['dataValues'];
             }
             if (!user) {
                 return { success: false, error: 'User not found' };

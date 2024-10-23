@@ -4,6 +4,10 @@ import { AddressService } from "../core/services/address/address.service.js";
 import { SequelizeAddressRepository } from "../data/interfaces/sequelize.address.repository.js";
 import Address from "../data/integrations/database/models/address.js";
 import { validateUserToken } from "../app/middleware/validate.token.js";
+import LoginController from "../app/controllers/users/login.js";
+import LoginUseCase from "../core/services/auth/login.service.js";
+import { SequelizeUserRespository } from "../data/interfaces/sequelize.user.repository.js";
+import User from "../data/integrations/database/models/users.js";
 
 const userRoutes = Router();
 
@@ -11,6 +15,10 @@ const userRoutes = Router();
 userRoutes.post("/address", 
     validateUserToken,
     new AddressController(new AddressService(new SequelizeAddressRepository(Address))).createAddress
+);
+userRoutes.get("/profile", 
+    validateUserToken,
+    new LoginController(new LoginUseCase (new SequelizeUserRespository (User))).getUserById
 );
 userRoutes.get("/address", 
     validateUserToken,
