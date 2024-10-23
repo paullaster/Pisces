@@ -29,7 +29,23 @@ export class MapServiceProvider {
                     } 
                 } catch (error) {
                     console.log(error);
-                    return { success: false, error: error?.response?.data?.message };
+                    return { success: false, error: error?.response?.data?.message || error.message || "Error fetching distance matrix"};
+                }
+            },
+            reverseGeocoding: async (long, lat, options = {}) => {
+                try {
+                    const response = await  axios.request({
+                        method: 'GET',
+                        url: ``,
+                        params: {
+                            longitude: long,
+                            latitude: lat,
+                            ...options,
+                            access_token: GOOGLE.apiKey,
+                        }
+                    });
+                } catch (error) {
+                    return { success: false, error: error.response.data.message || error.message || "Error from geocoding serveice" };
                 }
             }
         },
