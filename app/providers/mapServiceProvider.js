@@ -32,18 +32,22 @@ export class MapServiceProvider {
                     return { success: false, error: error?.response?.data?.message || error.message || "Error fetching distance matrix"};
                 }
             },
-            reverseGeocoding: async (long, lat, options = {}) => {
+            reverseGeocoding: async (long, lat, MAPBOX, options = {}) => {
                 try {
                     const response = await  axios.request({
                         method: 'GET',
-                        url: ``,
+                        url: `${this.url}/search/geocode/v6/reverse`,
                         params: {
                             longitude: long,
                             latitude: lat,
                             ...options,
-                            access_token: GOOGLE.apiKey,
+                            access_token: MAPBOX.apiKey,
                         }
                     });
+                    if (response.statusText === 'OK' ) {
+                        return { success: true, data: response.data };
+                    }
+                    return { success: false, data: response.data };
                 } catch (error) {
                     return { success: false, error: error.response.data.message || error.message || "Error from geocoding serveice" };
                 }

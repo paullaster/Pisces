@@ -12,5 +12,6 @@ const mapController = new MapController(mapService);
 
 
 mapRoutes.post("/duration-distance-matrix", validateUserToken, mapController.durationDistanceMatrix);
+mapRoutes.get("/reverse-geocode", validateUserToken, mapController.reverseGeocoding)
 
 export { mapRoutes}

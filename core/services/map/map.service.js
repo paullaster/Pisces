@@ -5,6 +5,7 @@ export class MapService {
     constructor (serviceProvider, ) {
         this.serviceProvider = serviceProvider;
         this.durationDistanceMatrix = this.durationDistanceMatrix.bind(this);
+        this.reverseGeocoding = this.reverseGeocoding.bind(this);
     }
     async durationDistanceMatrix(sourceCordinates, destinationCordinates, options = {}) {
         try {
@@ -42,6 +43,20 @@ export class MapService {
         } catch (error) {
             console.log(error);
             return {error: error.message, success: false};
+        }
+    }
+    async reverseGeocoding (longitude, latitude, options = {}) {
+        try {
+            const { MAPBOX } = this.serviceProvider.MAP_SERVICE;
+            if (this.serviceProvider.MAP_SERVICE_TYPE === 'MAPBOX') {
+                const {success, data, error} = await this.serviceProvider.fetch.Mapbox.reverseGeocoding(longitude, latitude, MAPBOX, options);
+                if (!success) {
+                    return { success, error };
+                }
+                return { success, data: data.features[0] };
+            }
+        } catch (error) {
+            return { success: false, error: error.message}
         }
     }
 }
