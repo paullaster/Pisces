@@ -7,6 +7,7 @@ export class MapController {
         this.mapService = mapService;
         this.durationDistanceMatrix = this.durationDistanceMatrix.bind(this);
         this.reverseGeocoding = this.reverseGeocoding.bind(this);
+        this.forwardGeocoding = this.forwardGeocoding.bind(this);
     }
     async durationDistanceMatrix(req, res) {
         try {
@@ -35,6 +36,21 @@ export class MapController {
             }
             const { longitude, latitude, ...options } = req.query;
             const { success, data, error } = await this.mapService.reverseGeocoding(longitude, latitude, options);
+            if (!success) {
+                return res.ApiResponse.error(500, error);
+            }
+            return res.ApiResponse.success(data, 200, " ");
+        } catch (error) {
+            return res.ApiResponse.error(500, error.message);
+        }
+    }
+    async forwardGeocoding(req, res) {
+        try {
+            if (!req.query.q) {
+                return res.ApiResponse.error(400, 'Search query is required');
+            }
+            const { q,...options } = req.query;
+            const { success, data, error } = await this.mapService.forwardGeocoding(q, options);
             if (!success) {
                 return res.ApiResponse.error(500, error);
             }

@@ -1,4 +1,7 @@
+import { Client } from "@googlemaps/google-maps-services-js";
+
 export default {
+    MAP_SERVICE: process.env.MAP_SERVICE || 'MAPBOX',
     MAPBOX: {
         apiKey: process.env.MAPBOX_SERVICE_API_KEY,
         mapStyle: process.env.MAPBOX_SERVICE_STYLE,
@@ -20,6 +23,7 @@ export default {
         defaultMarkerIcon: {},
         defaultMarkerPopup: {},
         defaultMarkerAnimation: "",
-        mapServiceURL: process.env.GOOGLE_MAPS_URL || "https://maps.googleapis.com"
+        mapServiceURL: process.env.GOOGLE_MAPS_URL || "https://maps.googleapis.com",
+        googleMapClient: new Client({}),
     }
 }
