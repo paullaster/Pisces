@@ -55,6 +55,10 @@ export class MapService {
             return { error: error.message, success: false };
         }
     }
+    /**
+     * @param {any} longitude
+     * @param {any} latitude
+     */
     async reverseGeocoding(longitude, latitude, options = {}) {
         try {
             if (this.serviceProvider.MAP_SERVICE_TYPE === 'MAPBOX') {
@@ -69,7 +73,7 @@ export class MapService {
                 if (!success) {
                     return { success, error };
                 }
-                return { success, data: data.features[0] };
+                return { success, data };
             }
         } catch (error) {
             return { success: false, error: error.message }

@@ -5,7 +5,7 @@ export default {
     MAPBOX: {
         apiKey: process.env.MAPBOX_SERVICE_API_KEY,
         mapStyle: process.env.MAPBOX_SERVICE_STYLE,
-        defaultZoom: parseInt(process.env.MAPBOX_SERVICE_DEFAULT_ZOOM),
+        defaultZoom: parseInt(String(process.env.MAPBOX_SERVICE_DEFAULT_ZOOM)),
         defaultCenter: {},
         defaultMarker: {},
         defaultMarkerIcon: {},
@@ -17,7 +17,7 @@ export default {
     GOOGLE: {
         apiKey: process.env.GOOGLE_MAPS_API_KEY,
         mapStyle: process.env.GOOGLE_MAPS_STYLE,
-        defaultZoom: parseInt(process.env.GOOGLE_MAPS_DEFAULT_ZOOM),
+        defaultZoom: parseInt(String(process.env.GOOGLE_MAPS_DEFAULT_ZOOM)),
         defaultCenter: {},
         defaultMarker: {},
         defaultMarkerIcon: {},

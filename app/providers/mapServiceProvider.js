@@ -111,7 +111,7 @@ export class MapServiceProvider {
             },
             reverseGeocoding: async (lng, lat, service, options = {}) => {
                 try {
-                    const response = service.googleMapClient.reverseGeocode({
+                    const response = await service.googleMapClient.reverseGeocode({
                         params: {
                             latlng: {
                                 lat,
@@ -122,7 +122,6 @@ export class MapServiceProvider {
                             enable_address_descriptor: true
                         },
                     })
-                    console.log('request got here!', response)
                     if (response.statusText === 'OK') {
                         return { success: true, data: response.data };
                     }
