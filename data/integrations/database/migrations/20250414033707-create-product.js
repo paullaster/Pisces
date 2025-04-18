@@ -27,15 +27,6 @@ export default {
         type: Sequelize.TEXT,
         allowNull: false,
       },
-      category: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        unique: false,
-        references: {
-          model: 'categories',
-          key: 'cid',
-        }
-      },
       quantity: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -78,6 +69,6 @@ export default {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Products');
+    await queryInterface.dropTable('products');
   }
 };

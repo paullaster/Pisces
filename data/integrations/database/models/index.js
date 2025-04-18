@@ -2,8 +2,11 @@
 
 import { Sequelize, DataTypes } from 'sequelize'
 import config from '../../../../config/db.cjs'
-// import user from './user'
-// import token from './token'
+import user from './user'
+import address from './address'
+import otp from './otp'
+import image from './image'
+import category from './category'
 
 const env = process.env.NODE_ENV || 'development'
 
@@ -21,8 +24,11 @@ catch (error) {
 }
 
 const models = {
-  // User: user(sequelize, DataTypes),
-  // Token: token(sequelize, DataTypes),
+  User: user(sequelize, DataTypes),
+  Address: address(sequelize, DataTypes),
+  Otp: otp(sequelize, DataTypes),
+  Category: category(sequelize, DataTypes),
+  Image: image(sequelize, DataTypes),
 }
 
 Object.values(models).forEach((model) => {

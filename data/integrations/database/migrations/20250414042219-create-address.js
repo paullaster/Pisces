@@ -1,31 +1,27 @@
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
-module.exports = {
+export default {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('Addresses', {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER
-      },
       addressId: {
-        type: Sequelize.STRING
-      },
-      userId: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        primaryKey: true,
+        allowNull: false,
       },
       street: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       streetCode: {
         type: Sequelize.STRING
       },
       city: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       country: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       zip: {
         type: Sequelize.STRING
@@ -34,19 +30,27 @@ module.exports = {
         type: Sequelize.STRING
       },
       default: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
       },
       latitude: {
-        type: Sequelize.DECIMAL
+        type: Sequelize.DECIMAL(10, 6),
+        defaultValue: 0,
+        allowNull: false,
       },
       longitude: {
-        type: Sequelize.DECIMAL
+        type: Sequelize.DECIMAL(10, 6),
+        allowNull: false,
+        defaultValue: 0,
       },
       appartment: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       town: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       placeId: {
         type: Sequelize.STRING

@@ -1,6 +1,6 @@
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
-module.exports = {
+export default {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('one_time_passwords', {
       id: {
@@ -10,19 +10,25 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       otp: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       type: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       expireAt: {
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        allowNull: false,
       },
       used: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       },
       usedAt: {
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        allowNull: true,
       },
       requestingDevice: {
         type: Sequelize.STRING

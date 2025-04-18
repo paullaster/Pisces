@@ -1,24 +1,23 @@
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
-module.exports = {
+export default {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('Images', {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER
-      },
       imgId: {
+        allowNull: false,
+        primaryKey: true,
         type: Sequelize.STRING
       },
       imagableId: {
         type: Sequelize.STRING
       },
       imagableType: {
-        type: Sequelize.STRING
+        allowNull: true,
+        unique: false,
+        type: Sequelize.STRING,
       },
       mimetype: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       createdAt: {
