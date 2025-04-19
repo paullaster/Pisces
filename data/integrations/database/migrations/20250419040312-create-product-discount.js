@@ -2,20 +2,12 @@
 /** @type {import('sequelize-cli').Migration} */
 export default {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Carts', {
-      cartId: {
+    await queryInterface.createTable('ProductDiscounts', {
+      id: {
         allowNull: false,
+        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.STRING
-      },
-      shippingRate: {
-        type: Sequelize.STRING
-      },
-      paymentMethod: {
-        type: Sequelize.STRING
-      },
-      cartCheckoutStatus: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,
@@ -28,6 +20,6 @@ export default {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Carts');
+    await queryInterface.dropTable('ProductDiscounts');
   }
 };

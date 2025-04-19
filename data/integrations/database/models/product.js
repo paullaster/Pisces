@@ -26,11 +26,24 @@ export default function (sequelize, DataTypes) {
           imagableType: 'Product',
         }
       })
-      this.belongsTo(models.Category, {
+      this.belongsToMany(models.Category, {
+        through: models.ProductCategory,
+        foreignKey: 'productId',
+        otherKey: 'categoryId',
+      })
+      this.hasMany(models.ProductCategory, {
         foreignKey: {
-          name: 'category',
+          name: 'productId',
           allowNull: false,
         }
+      })
+      this.belongsToMany(models.Discount, {
+        through: models.ProductDiscount,
+        foreignKey: 'productId',
+        otherKey: 'discountId',
+      })
+      this.hasMany(models.ProductDiscount, {
+        foreignKey: 'productId',
       })
     }
   }

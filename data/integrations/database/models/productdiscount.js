@@ -1,6 +1,5 @@
 'use strict';
 import { Model } from "sequelize";
-
 /**
  * 
  * @param {*} sequelize 
@@ -8,7 +7,7 @@ import { Model } from "sequelize";
  * @returns 
  */
 export default function (sequelize, DataTypes) {
-  class Cart extends Model {
+  class ProductDiscount extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -20,16 +19,18 @@ export default function (sequelize, DataTypes) {
      */
     static associate(models) {
       // define association here
+      this.belongsTo(models.Discount, {
+        foreignKey: 'discountId',
+      })
+      this.belongsTo(models.Product, {
+        foreignKey: 'productId',
+      })
     }
   }
-  Cart.init({
-    cartId: DataTypes.STRING,
-    shippingRate: DataTypes.STRING,
-    paymentMethod: DataTypes.STRING,
-    cartCheckoutStatus: DataTypes.STRING
+  ProductDiscount.init({
   }, {
     sequelize,
-    modelName: 'Cart',
+    modelName: 'ProductDiscount',
   });
-  return Cart;
+  return ProductDiscount;
 };

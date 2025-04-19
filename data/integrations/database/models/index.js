@@ -7,6 +7,7 @@ import address from './address'
 import otp from './otp'
 import image from './image'
 import category from './category'
+import productcategory from './productcategory'
 
 const env = process.env.NODE_ENV || 'development'
 
@@ -29,6 +30,7 @@ const models = {
   Otp: otp(sequelize, DataTypes),
   Category: category(sequelize, DataTypes),
   Image: image(sequelize, DataTypes),
+  ProductCategory: productcategory(sequelize, DataTypes),
 }
 
 Object.values(models).forEach((model) => {

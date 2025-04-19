@@ -8,7 +8,7 @@ import { Model } from "sequelize";
  * @returns 
  */
 export default function (sequelize, DataTypes) {
-  class Category extends Model {
+  class Discount extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -20,33 +20,28 @@ export default function (sequelize, DataTypes) {
      */
     static associate(models) {
       // define association here
-      this.hasMany(models.Image, {
-        foreignKey: 'imagableId',
-        constraints: false,
-        scope: {
-          imagableType: 'Category',
-        },
-      })
       this.belongsToMany(models.Product, {
-        through: models.ProductCategory,
-        foreignKey: 'categoryId',
+        through: models.ProductDiscount,
+        foreignKey: 'discountId',
         otherKey: 'productId',
       })
-      this.hasMany(models.ProductCategory, {
-        foreignKey: {
-          name: 'categoryId',
-          allowNull: false,
-        }
+      this.hasMany(models.ProductDiscount, {
+        foreignKey: 'discountId'
       })
     }
   }
-  Category.init({
-    cid: DataTypes.STRING,
-    name: DataTypes.STRING,
-    description: DataTypes.STRING
+  Discount.init({
+    title: DataTypes.STRING,
+    code: DataTypes.STRING,
+    amount: DataTypes.DECIMAL,
+    type: DataTypes.ENUM('Percentage', 'Fixed'),
+    usageLimit: DataTypes.INTEGER,
+    startPublishing: DataTypes.DATE,
+    endPublishing: DataTypes.DATE,
+    status: DataTypes.ENUM('Published', 'UnPublished')
   }, {
     sequelize,
-    modelName: 'Category',
+    modelName: 'Discount',
   });
-  return Category;
+  return Discount;
 };
