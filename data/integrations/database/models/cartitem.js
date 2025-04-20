@@ -39,12 +39,10 @@ export default function (sequelize, DataTypes) {
     cartId: DataTypes.STRING(255),
     variantId: DataTypes.BIGINT,
     quantity: DataTypes.INTEGER,
-    createdAt: DataTypes.DATE,
-    updatedAt: DataTypes.DATE,
   }, {
     sequelize,
     modelName: 'CartItem',
-    timestamps: true,
+    timestamps: false,
   });
   return CartItem;
 };

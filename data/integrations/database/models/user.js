@@ -26,7 +26,6 @@ export default function (sequelize, DataTypes) {
           allowNull: false,
           name: 'userId'
         },
-        onDelete: 'CASCADE',
       })
       this.hasMany(models.Order, {
         sourceKey: 'email',

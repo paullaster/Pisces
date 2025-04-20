@@ -38,7 +38,7 @@ export default function (sequelize, DataTypes) {
   Order.init({
     orderId: { type: DataTypes.STRING, primaryKey: true },
     userId: DataTypes.STRING(255),
-    shippingRate: DataTypes.DECIMAL,
+    shippingRate: DataTypes.DECIMAL(10, 2),
     status: DataTypes.ENUM('New', 'Pending Processing', 'Processed', 'Pending Delivery', 'Delivered', 'Cancelled', 'In Transit'),
     totalAmount: DataTypes.DECIMAL(10, 2),
     createdAt: DataTypes.DATE,

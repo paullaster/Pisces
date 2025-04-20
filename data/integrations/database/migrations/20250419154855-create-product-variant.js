@@ -10,7 +10,7 @@ export default {
         type: Sequelize.BIGINT
       },
       productId: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(255),
         allowNull: false,
         references: {
           model: 'Products',
