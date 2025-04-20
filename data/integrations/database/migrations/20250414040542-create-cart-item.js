@@ -1,53 +1,40 @@
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
-module.exports = {
+export default {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('CartItems', {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER
-      },
       itemId: {
-        type: Sequelize.STRING
+        allowNull: false,
+        primaryKey: true,
+        type: Sequelize.STRING(255)
       },
-      name: {
-        type: Sequelize.STRING
+      cartId: {
+        type: Sequelize.STRING(255),
+        allowNull: false,
+        references: {
+          model: 'Carts',
+          key: 'cartId',
+        },
+        onDelete: 'CASCADE',
+      },
+      variantId: {
+        type: Sequelize.BIGINT,
+        allowNull: false,
+        references: {
+          model: 'ProductVariants',
+          key: 'variantId'
+        },
+        onDelete: 'RESTRICT',
       },
       quantity: {
         type: Sequelize.INTEGER
       },
-      size: {
-        type: Sequelize.STRING
-      },
-      color: {
-        type: Sequelize.STRING
-      },
-      image: {
-        type: Sequelize.TEXT
-      },
-      price: {
-        type: Sequelize.DECIMAL
-      },
-      totalPrice: {
-        type: Sequelize.DECIMAL
-      },
-      discount: {
-        type: Sequelize.DECIMAL
-      },
-      productId: {
-        type: Sequelize.STRING
-      },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      }
     });
+    await queryInterface.addConstraint('CartItems', {
+      fields: ['cartId', 'variantId'],
+      type: 'primary key',
+      name: 'cart_items_pk',
+    })
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('CartItems');

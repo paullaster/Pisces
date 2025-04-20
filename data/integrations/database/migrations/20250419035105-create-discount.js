@@ -7,7 +7,7 @@ export default {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.BIGINT
       },
       title: {
         allowNull: false,
@@ -51,6 +51,9 @@ export default {
         type: Sequelize.DATE
       }
     });
+    await queryInterface.addIndex('Discounts', ['title'], { type: 'FULLTEXT', name: 'idx_title' });
+    await queryInterface.addIndex('Discounts', ['amount'], { name: 'idx_amount' });
+    await queryInterface.addIndex('Discount', ['type'], { name: 'idx_name' });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Discounts');

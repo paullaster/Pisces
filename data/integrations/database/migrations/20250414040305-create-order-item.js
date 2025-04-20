@@ -1,53 +1,47 @@
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
-module.exports = {
+export default {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('OrderItems', {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER
-      },
       itemId: {
-        type: Sequelize.STRING
+        allowNull: false,
+        primaryKey: true,
+        type: Sequelize.STRING(255),
       },
-      name: {
-        type: Sequelize.STRING
+      orderId: {
+        type: Sequelize.STRING(255),
+        allowNull: false,
+        references: {
+          model: 'Orders',
+          key: 'orderId'
+        },
+        onDelete: 'CASCADE',
+      },
+      variantId: {
+        type: Sequelize.BIGINT,
+        allowNull: false,
+        references: {
+          model: 'ProductVariants',
+          key: 'variantId'
+        },
+        onDelete: 'RESTRICT',
       },
       quantity: {
-        type: Sequelize.INTEGER
-      },
-      size: {
-        type: Sequelize.STRING
-      },
-      color: {
-        type: Sequelize.STRING
-      },
-      image: {
-        type: Sequelize.TEXT
-      },
-      price: {
-        type: Sequelize.DECIMAL
-      },
-      totalPrice: {
-        type: Sequelize.DECIMAL
-      },
-      discount: {
-        type: Sequelize.DECIMAL
-      },
-      productId: {
-        type: Sequelize.STRING
-      },
-      createdAt: {
+        type: Sequelize.INTEGER,
         allowNull: false,
-        type: Sequelize.DATE
+        defaultValue: 1,
       },
-      updatedAt: {
+      unitPrice: {
+        type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
-        type: Sequelize.DATE
-      }
+      },
+      subtotal: {
+        type: Sequelize.DECIMAL(10, 2),
+        allowNull: false,
+      },
     });
+    await queryInterface.addIndex('OrderItems', ['orderId'], { name: 'idx_orderId' });
+    await queryInterface.addIndex('OrderItems', ['variantId'], { name: 'idx_variantId' });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('OrderItems');

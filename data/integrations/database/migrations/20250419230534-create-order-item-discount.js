@@ -2,19 +2,19 @@
 /** @type {import('sequelize-cli').Migration} */
 export default {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('ProductDiscounts', {
-      id: {
+    await queryInterface.createTable('OrderItemDiscounts', {
+      orderItemDiscountId: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.BIGINT,
+        type: Sequelize.BIGINT
       },
-      productId: {
+      orderItemId: {
         type: Sequelize.STRING(255),
         allowNull: false,
         references: {
-          model: 'Products',
-          key: 'pid',
+          model: 'orderItems',
+          key: 'itemId',
         },
         onDelete: 'CASCADE',
       },
@@ -23,26 +23,22 @@ export default {
         allowNull: false,
         references: {
           model: 'Discounts',
-          key: 'id',
+          key: 'id'
         },
-        onDelete: 'CASCADE',
+        onDelete: 'RESTRICT',
       },
-      createdAt: {
+      discountAmount: {
+        type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
-        type: Sequelize.DATE
       },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      }
     });
-    await queryInterface.addConstraint('ProductDiscounts', {
-      fields: ['productId', 'discountId'],
+    await queryInterface.addConstraint('orderItemDiscounts', {
+      fields: ['orderItemId', 'discountId'],
       type: 'primary key',
-      name: 'product_discount_pk'
+      name: 'order_item_discounts_pk'
     })
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('ProductDiscounts');
+    await queryInterface.dropTable('OrderItemDiscounts');
   }
 };

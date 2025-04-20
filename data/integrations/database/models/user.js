@@ -20,26 +20,34 @@ export default function (sequelize, DataTypes) {
      */
     static associate(models) {
       // define association here
+      this.hasOne(models.Cart, {
+        sourceKey: 'email',
+        foreignKey: {
+          allowNull: false,
+          name: 'userId'
+        },
+        onDelete: 'CASCADE',
+      })
       this.hasMany(models.Order, {
         sourceKey: 'email',
         foreignKey: {
           name: 'userId',
           allowNull: false,
-        }
+        },
       });
       this.hasMany(models.Address, {
         sourceKey: 'email',
         foreignKey: {
           name: 'userId',
           allowNull: false,
-        }
+        },
       });
-      this.belongsToMany(models.Role, {
-        through: 'UserRoles',
-      });
-      models.Role.belongsToMany(this, {
-        through: 'UserRoles',
-      });
+      // this.belongsToMany(models.Role, {
+      //   through: 'UserRoles',
+      // });
+      // models.Role.belongsToMany(this, {
+      //   through: 'UserRoles',
+      // });
     }
   }
   User.init({
@@ -49,12 +57,23 @@ export default function (sequelize, DataTypes) {
     phoneNumber: DataTypes.STRING,
     password: DataTypes.STRING,
     email_verified_at: DataTypes.DATE,
+    lastLogin: DataTypes.DATE,
     veryfied: DataTypes.BOOLEAN,
     completed: DataTypes.BOOLEAN,
     type: DataTypes.ENUM('customer', 'admin')
   }, {
     sequelize,
     modelName: 'User',
+    indexes: [
+      {
+        unique: true,
+        fields: ['email', 'phoneNumber']
+      },
+      {
+        unique: false,
+        fields: ['lastLogin', 'type', 'completed', 'createdAt']
+      }
+    ]
   });
   return User;
 };

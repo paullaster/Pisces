@@ -4,13 +4,13 @@ export default {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('Products', {
       pid: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(255),
         primaryKey: true,
         allowNull: false,
         unique: true
       },
       name: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(500),
         allowNull: false
       },
       price: {
@@ -26,24 +26,6 @@ export default {
       description: {
         type: Sequelize.TEXT,
         allowNull: false,
-      },
-      quantity: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 1
-      },
-      color: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      size: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      discount: {
-        type: Sequelize.DECIMAL(10, 2),
-        allowNull: false,
-        defaultValue: 0
       },
       lastPid: {
         type: Sequelize.STRING,
@@ -67,6 +49,8 @@ export default {
       charset: 'utf8mb4',
       collate: 'utf8mb4_unicode_ci'
     });
+    await queryInterface.addIndex('Products', ['name'], { name: 'idx_name' })
+    await queryInterface.addIndex('Products', ['price'], { name: 'idx_price' })
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Products');

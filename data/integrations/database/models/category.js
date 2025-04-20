@@ -41,12 +41,15 @@ export default function (sequelize, DataTypes) {
     }
   }
   Category.init({
-    cid: DataTypes.STRING,
-    name: DataTypes.STRING,
-    description: DataTypes.STRING
+    cid: { type: DataTypes.STRING(255), primaryKey: true },
+    name: DataTypes.STRING(100),
+    description: DataTypes.STRING(255),
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE,
   }, {
     sequelize,
     modelName: 'Category',
+    timestamps: true,
   });
   return Category;
 };

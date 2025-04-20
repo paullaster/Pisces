@@ -6,16 +6,16 @@ export default {
       cartId: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.STRING
+        type: Sequelize.STRING(255)
       },
-      shippingRate: {
-        type: Sequelize.STRING
-      },
-      paymentMethod: {
-        type: Sequelize.STRING
-      },
-      cartCheckoutStatus: {
-        type: Sequelize.STRING
+      userId: {
+        type: Sequelize.STRING(255),
+        allowNull: false,
+        references: {
+          model: 'Users',
+          key: 'email',
+        },
+        onDelete: 'CASCADE'
       },
       createdAt: {
         allowNull: false,

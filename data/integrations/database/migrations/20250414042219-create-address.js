@@ -4,30 +4,39 @@ export default {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('Addresses', {
       addressId: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(255),
         primaryKey: true,
         allowNull: false,
       },
+      userId: {
+        type: Sequelize.STRING(255),
+        allowNull: false,
+        references: {
+          model: 'Users',
+          key: 'email'
+        },
+        onDelete: 'CASCADE'
+      },
       street: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(255),
         allowNull: false,
       },
       streetCode: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING(255)
       },
       city: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(255),
         allowNull: false,
       },
       country: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(255),
         allowNull: false,
       },
       zip: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING(255),
       },
       address: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT,
       },
       default: {
         type: Sequelize.BOOLEAN,
@@ -45,15 +54,15 @@ export default {
         defaultValue: 0,
       },
       appartment: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(255),
         allowNull: false,
       },
       town: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(255),
         allowNull: false,
       },
       placeId: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING(255),
       },
       createdAt: {
         allowNull: false,
@@ -64,6 +73,8 @@ export default {
         type: Sequelize.DATE
       }
     });
+    await queryInterface.addIndex('Addresses', ['city', 'town', 'street'], { name: 'idx_city_town_street' });
+    await queryInterface.addIndex('Addresses', ['userId'], { name: 'idx_userId' })
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Addresses');

@@ -6,10 +6,10 @@ export default {
       imgId: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.STRING
+        type: Sequelize.STRING(255),
       },
       imagableId: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING(255),
       },
       imagableType: {
         allowNull: true,

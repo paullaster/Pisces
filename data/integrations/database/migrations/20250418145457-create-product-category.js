@@ -7,8 +7,39 @@ export default {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.BIGINT
       },
+      categoryId: {
+        type: Sequelize.STRING(255),
+        allowNull: false,
+        references: {
+          model: 'Categoris',
+          key: 'cid',
+        },
+        onDelete: 'RESTRICT',
+      },
+      productId: {
+        type: Sequelize.STRING(255),
+        allowNull: false,
+        references: {
+          model: 'Products',
+          key: 'pid',
+        },
+        onDelete: 'CASCADE',
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      }
+    });
+    await queryInterface.addConstraint('ProductCategories', {
+      fields: ['categoryId', 'productId'],
+      type: 'primary key',
+      name: 'product_categories_pk'
     });
   },
   async down(queryInterface, Sequelize) {

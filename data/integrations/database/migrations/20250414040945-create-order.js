@@ -1,34 +1,34 @@
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
-module.exports = {
+export default {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('Orders', {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER
-      },
       orderId: {
-        type: Sequelize.STRING
+        allowNull: false,
+        primaryKey: true,
+        type: Sequelize.STRING(255)
+      },
+      userId: {
+        type: Sequelize.STRING(255),
+        allowNull: false,
+        references: {
+          model: 'Users',
+          key: 'email',
+        },
+        onDelete: 'RESTRICT',
       },
       shippingRate: {
-        type: Sequelize.DECIMAL
+        type: Sequelize.DECIMAL(10, 2),
+        allowNull: false,
+        defaultValue: 0,
       },
-      paymentMethod: {
-        type: Sequelize.STRING
+      status: {
+        allowNull: false,
+        type: Sequelize.ENUM('New', 'Pending Processing', 'Processed', 'Pending Delivery', 'Delivered', 'Cancelled', 'In Transit'),
+        defaultValue: 'New',
       },
-      paymentStatus: {
-        type: Sequelize.STRING
-      },
-      orderStatus: {
-        type: Sequelize.STRING
-      },
-      originCart: {
-        type: Sequelize.STRING
-      },
-      totalPrice: {
-        type: Sequelize.DECIMAL
+      totalAmount: {
+        type: Sequelize.DECIMAL(10, 2)
       },
       createdAt: {
         allowNull: false,
@@ -39,6 +39,10 @@ module.exports = {
         type: Sequelize.DATE
       }
     });
+    await queryInterface.addIndex('Orders', ['userId'], { name: 'idx_userId' });
+    await queryInterface.addIndex('Orders', ['totalAmount'], { name: 'idx_totalAmount' });
+    await queryInterface.addIndex('Orders', ['status'], { name: 'idx_status' });
+    await queryInterface.addIndex('Orders', ['createdAt'], { name: 'idx_createdAt' });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Orders');

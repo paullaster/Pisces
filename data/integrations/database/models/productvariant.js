@@ -8,7 +8,7 @@ import { Model } from "sequelize";
  * @returns 
  */
 export default function (sequelize, DataTypes) {
-  class Order extends Model {
+  class ProductVariant extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -20,55 +20,44 @@ export default function (sequelize, DataTypes) {
      */
     static associate(models) {
       // define association here
-      this.belongsTo(models.User, {
-        targetKey: 'email',
+      this.hasMany(models.CartItem, {
         foreignKey: {
-          name: 'userId',
+          name: 'variantId',
           allowNull: false,
         }
       });
       this.hasMany(models.OrderItem, {
         foreignKey: {
-          name: 'orderId',
+          name: 'variantId',
           allowNull: false,
         }
       })
     }
   }
-  Order.init({
-    orderId: { type: DataTypes.STRING, primaryKey: true },
-    userId: DataTypes.STRING(255),
-    shippingRate: DataTypes.DECIMAL,
-    status: DataTypes.ENUM('New', 'Pending Processing', 'Processed', 'Pending Delivery', 'Delivered', 'Cancelled', 'In Transit'),
-    totalAmount: DataTypes.DECIMAL(10, 2),
+  ProductVariant.init({
+    variantId: DataTypes.BIGINT,
+    productId: DataTypes.STRING(255),
+    sku: DataTypes.STRING(255),
+    price: DataTypes.DECIMAL(10, 2),
+    quantity: DataTypes.INTEGER,
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   }, {
     sequelize,
-    modelName: 'Order',
+    modelName: 'ProductVariant',
     timestamps: true,
     indexes: [
       {
         unique: false,
-        fields: ['createdAt'],
-        name: 'idx_createdAt',
+        fields: ['productId'],
+        name: 'idx_productId',
       },
       {
-        unique: false,
-        fields: ['status'],
-        name: 'idx_status',
+        unique: true,
+        fields: ['sku'],
+        name: 'idx_sku',
       },
-      {
-        unique: false,
-        fields: ['totalAmount'],
-        name: 'idx_totalAmount',
-      },
-      {
-        unique: false,
-        fields: ['userId'],
-        name: 'idx_userId',
-      }
     ],
   });
-  return Order;
+  return ProductVariant;
 };

@@ -8,7 +8,7 @@ import { Model } from "sequelize";
  * @returns 
  */
 export default function (sequelize, DataTypes) {
-  class Cart extends Model {
+  class OrderItemDiscount extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -20,36 +20,29 @@ export default function (sequelize, DataTypes) {
      */
     static associate(models) {
       // define association here
-      this.belongsTo(models.User, {
-        targetKey: 'email',
+      this.belongsTo(models.Discount, {
         foreignKey: {
+          name: 'discountId',
           allowNull: false,
-          name: 'userId'
-        }
-      })
-      this.hasMany(models.CartItem, {
+        },
+      });
+      this.belongsTo(models.OrderItem, {
         foreignKey: {
-          name: 'cartId',
+          name: 'orderItemId',
           allowNull: false,
         }
       })
     }
   }
-  Cart.init({
-    cartId: { type: DataTypes.STRING, primaryKey: true },
-    userId: DataTypes.STRING(255),
-    createdAt: DataTypes.DATE,
-    updatedAt: DataTypes.DATE,
+  OrderItemDiscount.init({
+    orderItemDiscountId: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
+    orderItemId: DataTypes.STRING(255),
+    discountId: DataTypes.BIGINT,
+    discountAmount: DataTypes.DECIMAL(10, 2)
   }, {
     sequelize,
-    modelName: 'Cart',
-    timestamps: true,
-    indexes: [
-      {
-        unique: true,
-        fields: ['userId']
-      }
-    ]
+    modelName: 'OrderItemDiscount',
+    timestamps: false,
   });
-  return Cart;
+  return OrderItemDiscount;
 };
