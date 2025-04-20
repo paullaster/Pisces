@@ -27,14 +27,6 @@ export default {
         },
         onDelete: 'CASCADE',
       },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      }
     });
     await queryInterface.addConstraint('ProductCategories', {
       fields: ['categoryId', 'productId'],

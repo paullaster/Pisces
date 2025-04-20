@@ -1,7 +1,5 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+import { Model } from "sequelize";
 
 /**
  * 
@@ -37,9 +35,13 @@ export default function (sequelize, DataTypes) {
     }
   }
   ProductCategory.init({
+    id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
+    categoryId: DataTypes.STRING(255),
+    productId: DataTypes.STRING(255),
   }, {
     sequelize,
     modelName: 'ProductCategory',
+    timestamps: false,
   });
   return ProductCategory;
 };

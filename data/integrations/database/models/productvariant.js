@@ -20,6 +20,23 @@ export default function (sequelize, DataTypes) {
      */
     static associate(models) {
       // define association here
+      this.belongsTo(models.Product, {
+        foreignKey: {
+          name: 'productId',
+          allowNull: false,
+        }
+      });
+      this.belongsToMany(models.AttributeValue, {
+        through: models.VariantAttribute,
+        foreignKey: {
+          name: 'variantId',
+          allowNull: false,
+        },
+        otherKey: {
+          name: 'valueId',
+          allowNull: false,
+        },
+      });
       this.hasMany(models.CartItem, {
         foreignKey: {
           name: 'variantId',
@@ -31,7 +48,13 @@ export default function (sequelize, DataTypes) {
           name: 'variantId',
           allowNull: false,
         }
-      })
+      });
+      this.hasMany(models.VariantAttribute, {
+        foreignKey: {
+          name: 'variantId',
+          allowNull: false,
+        }
+      });
     }
   }
   ProductVariant.init({
@@ -40,12 +63,10 @@ export default function (sequelize, DataTypes) {
     sku: DataTypes.STRING(255),
     price: DataTypes.DECIMAL(10, 2),
     quantity: DataTypes.INTEGER,
-    createdAt: DataTypes.DATE,
-    updatedAt: DataTypes.DATE,
   }, {
     sequelize,
     modelName: 'ProductVariant',
-    timestamps: true,
+    timestamps: false,
     indexes: [
       {
         unique: false,

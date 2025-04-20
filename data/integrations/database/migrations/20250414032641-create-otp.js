@@ -14,8 +14,9 @@ export default {
         allowNull: false,
       },
       type: {
-        type: Sequelize.STRING,
         allowNull: false,
+        type: Sequelize.ENUM('newAccount', 'passwordReset'),
+        defaultValue: 'newAccount'
       },
       expireAt: {
         type: Sequelize.DATE,
@@ -31,7 +32,7 @@ export default {
         allowNull: true,
       },
       requestingDevice: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
       },
       createdAt: {
         allowNull: false,
@@ -45,6 +46,7 @@ export default {
       charset: 'utf8mb4',
       collate: 'utf8mb4_unicode_ci'
     });
+    await queryInterface.addIndex('one_time_passwords', ['otp', 'type', 'expireAt', 'used'])
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('one_time_passwords');

@@ -3,25 +3,20 @@
 export default {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('VariantAttributes', {
-      variantId: {
+      variantAttributeId: {
         type: Sequelize.BIGINT,
         primaryKey: true,
+        autoIncrement: true,
+        allowNull: false,
+      },
+      variantId: {
+        type: Sequelize.BIGINT,
         allowNull: false,
         references: {
           model: 'ProductVariants',
           key: 'variantId'
         },
         onDelete: 'CASCADE',
-      },
-      attributeId: {
-        type: Sequelize.BIGINT,
-        primaryKey: true,
-        allowNull: false,
-        references: {
-          model: 'Attributes',
-          key: 'id'
-        },
-        onDelete: 'RESTRICT'
       },
       valueId: {
         type: Sequelize.BIGINT,
@@ -32,17 +27,14 @@ export default {
         },
         onDelete: 'RESTRICT',
       },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      }
     });
     await queryInterface.addIndex('VariantAttributes', ['variantId'], { name: 'idx_variantId' });
-    await queryInterface.addIndex('VariantAttributes', ['attributeId'], { name: 'idx_attributeId' });
+    await queryInterface.addIndex('VariantAttributes', ['valueId'], { name: 'idx_valueId' });
+    await queryInterface.addConstraint('VariantAttributes', {
+      fields: ['variantId', 'valueId'],
+      type: 'primary key',
+      name: 'variant_attributes_pk',
+    })
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('VariantAttributes');

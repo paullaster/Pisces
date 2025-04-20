@@ -14,12 +14,21 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Notification.init({
-    notficationdId: DataTypes.STRING,
+    notficationdId: { type: DataTypes.STRING(255), primaryKey: true },
     read: DataTypes.BOOLEAN,
-    content: DataTypes.STRING
+    content: DataTypes.TEXT,
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE,
   }, {
     sequelize,
     modelName: 'Notification',
+    timestamps: true,
+    indexes: [
+      {
+        unique: false,
+        fields: ['read'],
+      },
+    ],
   });
   return Notification;
 };

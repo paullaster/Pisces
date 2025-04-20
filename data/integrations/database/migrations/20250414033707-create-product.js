@@ -10,7 +10,7 @@ export default {
         unique: true
       },
       name: {
-        type: Sequelize.STRING(500),
+        type: Sequelize.STRING(255),
         allowNull: false
       },
       price: {
@@ -26,11 +26,6 @@ export default {
       description: {
         type: Sequelize.TEXT,
         allowNull: false,
-      },
-      lastPid: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        unique: false,
       },
       recipeTips: {
         type: Sequelize.TEXT,
@@ -49,7 +44,7 @@ export default {
       charset: 'utf8mb4',
       collate: 'utf8mb4_unicode_ci'
     });
-    await queryInterface.addIndex('Products', ['name'], { name: 'idx_name' })
+    await queryInterface.addIndex('Products', ['name'], { name: 'idx_name', type: 'FULLTEXT' })
     await queryInterface.addIndex('Products', ['price'], { name: 'idx_price' })
   },
   async down(queryInterface, Sequelize) {

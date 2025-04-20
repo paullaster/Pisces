@@ -23,14 +23,6 @@ export default {
         allowNull: false,
         type: Sequelize.STRING(255)
       },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      }
     });
     await queryInterface.addIndex('AttributeValues', ['attributeId'], { name: 'idx_attributeId' });
     await queryInterface.addIndex('AttributeValues', ['value'], { name: 'idx_value' });

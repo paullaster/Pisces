@@ -28,9 +28,13 @@ export default function (sequelize, DataTypes) {
     }
   }
   ProductDiscount.init({
+    id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
+    discountId: DataTypes.BIGINT,
+    productId: DataTypes.STRING(255),
   }, {
     sequelize,
     modelName: 'ProductDiscount',
+    timestamps: false,
   });
   return ProductDiscount;
 };

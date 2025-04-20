@@ -22,16 +22,24 @@ export default function (sequelize, DataTypes) {
     }
   }
   Otp.init({
+    id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
     otp: DataTypes.STRING,
     type: DataTypes.STRING,
     expireAt: DataTypes.DATE,
     used: DataTypes.BOOLEAN,
     usedAt: DataTypes.DATE,
-    requestingDevice: DataTypes.STRING
+    requestingDevice: DataTypes.TEXT
   }, {
     sequelize,
     modelName: 'Otp',
-    tableName: 'one_time_passwords'
+    tableName: 'one_time_passwords',
+    timestamps: true,
+    indexes: [
+      {
+        unique: false,
+        fields: ['otp', 'type', 'expireAt', 'used'],
+      },
+    ],
   });
   return Otp;
 };

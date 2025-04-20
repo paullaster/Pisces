@@ -3,20 +3,19 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('Notifications', {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER
-      },
       notficationdId: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING(255),
+        primaryKey: true,
+        allowNull: false
       },
       read: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       },
       content: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,
@@ -27,6 +26,7 @@ module.exports = {
         type: Sequelize.DATE
       }
     });
+    await queryInterface.addIndex('Notifications', ['read'])
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Notifications');

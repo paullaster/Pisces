@@ -32,14 +32,6 @@ export default {
         allowNull: false,
         defaultValue: 0
       },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      }
     });
     await queryInterface.addIndex('ProductVariants', ['productId'], { name: 'idx_productId' });
     await queryInterface.addIndex('ProductVariants', ['sku'], { name: 'idx_sku' });
