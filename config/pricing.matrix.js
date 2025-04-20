@@ -6,7 +6,7 @@ export default {
         sixtiethMinute: 30,
     },
     pricing: {
-        base: 50,
+        base: 40,
         perKilometer: 0.25,
     },
     timeOfDay: {
@@ -49,20 +49,20 @@ export default {
     },
     peakPrices: {
         morningPeak: {
-            base: 70,
-            perKilometer: 0.50,
+            base: 60,
+            perKilometer: 0.40,
         },
         afternoonPeak: {
-            base: 80,
-            perKilometer: 0.48,
+            base: 67,
+            perKilometer: 0.45,
         },
         eveningPeak: {
-            base: 90,
-            perKilometer: 0.70,
+            base: 79,
+            perKilometer: 0.60,
         },
         night: {
             base: 100,
-            perKilometer: 0.80,
+            perKilometer: 0.50,
         }
     },
     dayOfTheWeek: {
@@ -71,22 +71,22 @@ export default {
     },
     seasonalAdjustment: {
         summer: {
-            base: 65,
-            perKilometer: 0.33,
+            base: 55,
+            perKilometer: 0.32,
         },
         winter: {
-            base: 95,
-            perKilometer: 0.43,
+            base: 80,
+            perKilometer: 0.45,
         },
     },
     weekdaysPricing: {
-        base: 60,
-        perKilometer: 0.45,
+        base: 45,
+        perKilometer: 0.36,
         perMinute: 0.020,
     },
     weekendPricing: {
-        base: 85,
-        perKilometer: 0.80,
+        base: 75,
+        perKilometer: 0.55,
         perMinute: 0.021,
     },
     summerMonths: {
@@ -111,8 +111,8 @@ export default {
     minimumDuration: 60, //mins
     maximumDistance: 10000, // kilometers
     minimumCharge: 150, // KES
-    maximumCharge: 10000, // KES
+    maximumCharge: 2000, // KES
     maxPricesForTenKilometers: 350,
-    maxPricesForFiftyKilometer: 850,
+    maxPricesForFiftyKilometer: 750,
     maxPricesForHundredandKilometers: 1550,
 }
