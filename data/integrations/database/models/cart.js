@@ -37,7 +37,7 @@ export default function (sequelize, DataTypes) {
   }
   Cart.init({
     cartId: { type: DataTypes.STRING, primaryKey: true },
-    userId: DataTypes.STRING(255),
+    userId: DataTypes.BIGINT,
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   }, {

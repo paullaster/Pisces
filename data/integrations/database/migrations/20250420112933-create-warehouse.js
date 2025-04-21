@@ -18,7 +18,6 @@ export default {
         allowNull: false,
       },
     });
-    await queryInterface.addIndex('Warehouses', ['location']);
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Warehouses');

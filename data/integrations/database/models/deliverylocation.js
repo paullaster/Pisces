@@ -46,11 +46,6 @@ export default function (sequelize, DataTypes) {
       },
       {
         unique: false,
-        fields: ['destination'],
-        name: 'idx_destination',
-      },
-      {
-        unique: false,
         fields: ['distanceMeters'],
         name: 'idx_distanceMeters',
       },

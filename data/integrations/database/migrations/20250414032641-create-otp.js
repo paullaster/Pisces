@@ -9,6 +9,15 @@ export default {
         primaryKey: true,
         type: Sequelize.BIGINT
       },
+      userId: {
+        type: Sequelize.BIGINT,
+        allowNull: false,
+        references: {
+          model: 'Users',
+          key: 'id'
+        },
+        onDelete: 'CASCADE'
+      },
       otp: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -42,11 +51,9 @@ export default {
         allowNull: false,
         type: Sequelize.DATE
       }
-    }, {
-      charset: 'utf8mb4',
-      collate: 'utf8mb4_unicode_ci'
     });
-    await queryInterface.addIndex('one_time_passwords', ['otp', 'type', 'expireAt', 'used'])
+    await queryInterface.addIndex('one_time_passwords', ['otp', 'type', 'expireAt', 'used']);
+    await queryInterface.addIndex('one_time_passwords', ['userId'], { name: 'idx_userId' });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('one_time_passwords');

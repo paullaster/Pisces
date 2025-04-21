@@ -11,7 +11,7 @@ import appConfig from "./config/app.js";
 import "./app/events/emitters/event.emitters.js"
 import "./app/events/listeners/deploy.orama.index.js"
 
-const app = new express();
+const app = express();
 
 
 // Middlewares
@@ -26,7 +26,6 @@ const _filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(_filename);
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
-
 // APP ROUTER PROVIDER
 app.use('/pisces', routeServiceProvider);
 
@@ -38,8 +37,8 @@ app.set('author', appConfig.author);
 app.set('url', appConfig.url);
 app.set('license', appConfig.license);
 app.set('key', appConfig.key);
-process.NODE_ENV = appConfig.environment;
-app.set('environment', process.NODE_ENV);
+process.env.NODE_ENV = appConfig.environment;
+app.set('environment', process.env.NODE_ENV);
 app.set('timezone', appConfig.timezone);
 const port = process.env.APP_PORT || 3500;
 app.set('PORT', port);

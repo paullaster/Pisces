@@ -13,7 +13,7 @@ export default {
         type: Sequelize.STRING(255),
         allowNull: false,
         references: {
-          model: 'Categoris',
+          model: 'Categories',
           key: 'cid',
         },
         onDelete: 'RESTRICT',
@@ -29,9 +29,26 @@ export default {
       },
     });
     await queryInterface.addConstraint('ProductCategories', {
-      fields: ['categoryId', 'productId'],
-      type: 'primary key',
-      name: 'product_categories_pk'
+      fields: ['categoryId'],
+      type: 'foreign key',
+      name: 'fk_ProductCategories_categoryId',
+      onDelete: 'RESTRICT',
+      onUpdate: 'CASCADE',
+      references: {
+        table: 'Categories',
+        field: 'cid',
+      }
+    });
+    await queryInterface.addConstraint('ProductCategories', {
+      fields: ['productId'],
+      type: 'foreign key',
+      name: 'fk_ProductCategories_productId',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+      references: {
+        table: 'Products',
+        field: 'pid',
+      }
     });
   },
   async down(queryInterface, Sequelize) {

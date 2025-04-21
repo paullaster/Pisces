@@ -31,10 +31,27 @@ export default {
     await queryInterface.addIndex('VariantAttributes', ['variantId'], { name: 'idx_variantId' });
     await queryInterface.addIndex('VariantAttributes', ['valueId'], { name: 'idx_valueId' });
     await queryInterface.addConstraint('VariantAttributes', {
-      fields: ['variantId', 'valueId'],
-      type: 'primary key',
-      name: 'variant_attributes_pk',
-    })
+      fields: ['variantId'],
+      type: 'foreign key',
+      name: 'fk_VariantAttributes_variantId',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+      references: {
+        table: 'ProductVariants',
+        field: 'variantId'
+      }
+    });
+    await queryInterface.addConstraint('VariantAttributes', {
+      fields: ['valueId'],
+      type: 'foreign key',
+      name: 'fk_VariantAttributes_valueId',
+      onDelete: 'RESTRICT',
+      onUpdate: 'CASCADE',
+      references: {
+        table: 'AttributeValues',
+        field: 'id'
+      }
+    });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('VariantAttributes');

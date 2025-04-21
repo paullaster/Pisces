@@ -31,7 +31,7 @@ export default function (sequelize, DataTypes) {
   }
   Address.init({
     addressId: { type: DataTypes.STRING(255), primaryKey: true },
-    userId: DataTypes.STRING(255),
+    userId: DataTypes.BIGINT,
     street: DataTypes.STRING(255),
     streetCode: DataTypes.STRING(255),
     city: DataTypes.STRING(255),

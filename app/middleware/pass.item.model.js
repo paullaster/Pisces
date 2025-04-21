@@ -1,4 +1,13 @@
-import CartItem from "../../data/integrations/database/models/cartItem.js";
+import { models } from "../../data/integrations/database/models/index.js";
+
+const { CartItem } = models;
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @returns 
+ */
 export const itemModelMiddleware = (req, res, next) => {
     try {
         req.model = [

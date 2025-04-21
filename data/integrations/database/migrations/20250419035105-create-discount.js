@@ -53,7 +53,7 @@ export default {
     });
     await queryInterface.addIndex('Discounts', ['title'], { type: 'FULLTEXT', name: 'idx_title' });
     await queryInterface.addIndex('Discounts', ['amount'], { name: 'idx_amount' });
-    await queryInterface.addIndex('Discount', ['type'], { name: 'idx_name' });
+    await queryInterface.addIndex('Discounts', ['type'], { name: 'idx_name' });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Discounts');

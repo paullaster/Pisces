@@ -56,8 +56,8 @@ export default function (sequelize, DataTypes) {
     orderId: DataTypes.STRING(255),
     variantId: DataTypes.BIGINT,
     quantity: DataTypes.INTEGER,
-    unitPrice: DataTypes.DeCIMAL(10, 6),
-    subtotal: DataTypes.DECIMAL(10, 6),
+    unitPrice: DataTypes.DECIMAL(10, 2),
+    subtotal: DataTypes.DECIMAL(10, 2),
   }, {
     sequelize,
     modelName: 'OrderItem',

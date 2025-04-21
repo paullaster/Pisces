@@ -57,9 +57,6 @@ export default {
         type: Sequelize.DATE,
         allowNull: true,
       }
-    }, {
-      charset: 'utf8mb4',
-      collate: 'utf8mb4_unicode_ci',
     });
     await queryInterface.addIndex('payments', ['amount'], { name: 'idx_amount' });
     await queryInterface.addIndex('payments', ['status'], { name: 'idx_status' });

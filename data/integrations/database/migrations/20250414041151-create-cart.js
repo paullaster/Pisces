@@ -9,11 +9,12 @@ export default {
         type: Sequelize.STRING(255)
       },
       userId: {
-        type: Sequelize.STRING(255),
+        type: Sequelize.BIGINT,
         allowNull: false,
         references: {
           model: 'Users',
-          key: 'email',
+          key: 'id',
+
         },
         onDelete: 'CASCADE'
       },
@@ -26,6 +27,17 @@ export default {
         type: Sequelize.DATE
       }
     });
+    await queryInterface.addConstraint('Carts', {
+      type: 'foreign key',
+      fields: ['userId'],
+      references: {
+        table: 'Users',
+        field: 'id'
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+      name: 'fk_Carts_userId',
+    })
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Carts');

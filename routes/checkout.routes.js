@@ -3,7 +3,6 @@ import { InitiateCheckoutController } from "../app/controllers/checkout/initiate
 import { InitiatePaymentRequestService } from "../core/services/checkout/initiate.checkout.service.js";
 import { SequelizeTransactionRepository } from "../data/interfaces/sequilize.transaction.respository.js";
 import { SequilizeCartRepository } from "../data/interfaces/sequilize.cart.repository.js";
-import Transaction from "../data/integrations/database/models/transaction.js";
 import { CheckoutHandler } from "../app/middleware/CheckoutHandler.js";
 import Cart from "../data/integrations/database/models/cart.js";
 import Order from "../data/integrations/database/models/order.js";
@@ -21,13 +20,14 @@ import { Mpesa } from "../lib/mpesa/mpesa.lib.js";
 import { DeleteCartController } from "../app/controllers/cart/delete.cart.js";
 import { DeleteCartService } from "../core/services/cart/delete.cart.service.js";
 import { itemModelMiddleware } from "../app/middleware/pass.item.model.js";
-import FailedTransaction from "../data/integrations/database/models/failedTransaction.js";
+import { models } from "../data/integrations/database/models/index.js";
 
+const { Transaction } = models;
 // LIB
 const mpesa = new Mpesa();
 
 // Repositories
-const transactionRepository = new SequelizeTransactionRepository(Transaction, FailedTransaction);
+const transactionRepository = new SequelizeTransactionRepository(Transaction);
 const cartRepository = new SequilizeCartRepository(Cart);
 const orderRepository = new SequilizeOrderRepository(Order);
 

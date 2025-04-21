@@ -23,6 +23,7 @@ export default function (sequelize, DataTypes) {
   }
   Otp.init({
     id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
+    userId: DataTypes.BIGINT,
     otp: DataTypes.STRING,
     type: DataTypes.STRING,
     expireAt: DataTypes.DATE,
@@ -39,6 +40,11 @@ export default function (sequelize, DataTypes) {
         unique: false,
         fields: ['otp', 'type', 'expireAt', 'used'],
       },
+      {
+        unique: false,
+        fields: ['userId'],
+        name: 'idx_userId',
+      }
     ],
   });
   return Otp;

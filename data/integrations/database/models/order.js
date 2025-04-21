@@ -21,7 +21,7 @@ export default function (sequelize, DataTypes) {
     static associate(models) {
       // define association here
       this.belongsTo(models.User, {
-        targetKey: 'email',
+        targetKey: 'id',
         foreignKey: {
           name: 'userId',
           allowNull: false,
@@ -49,7 +49,7 @@ export default function (sequelize, DataTypes) {
   }
   Order.init({
     orderId: { type: DataTypes.STRING, primaryKey: true },
-    userId: DataTypes.STRING(255),
+    userId: DataTypes.BIGINT,
     paymentId: DataTypes.STRING(255),
     status: DataTypes.ENUM('New', 'Pending Processing', 'Processed', 'Pending Delivery', 'Delivered', 'Cancelled', 'In Transit'),
     deliveryFee: DataTypes.DECIMAL(10, 2),

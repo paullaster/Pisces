@@ -9,11 +9,11 @@ export default {
         allowNull: false,
       },
       userId: {
-        type: Sequelize.STRING(255),
+        type: Sequelize.BIGINT,
         allowNull: false,
         references: {
           model: 'Users',
-          key: 'email'
+          key: 'id'
         },
         onDelete: 'CASCADE'
       },
@@ -74,7 +74,17 @@ export default {
       }
     });
     await queryInterface.addIndex('Addresses', ['city', 'town', 'street'], { name: 'idx_city_town_street' });
-    await queryInterface.addIndex('Addresses', ['userId'], { name: 'idx_userId' })
+    await queryInterface.addIndex('Addresses', ['userId'], { name: 'idx_userId' });
+    await queryInterface.addConstraint('Addresses', {
+      type: 'foreign key',
+      fields: ['userId'],
+      references: {
+        table: 'Users',
+        field: 'id',
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    })
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Addresses');

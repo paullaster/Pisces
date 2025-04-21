@@ -41,6 +41,12 @@ export default function (sequelize, DataTypes) {
           allowNull: false,
         },
       });
+      this.hasMany(models.Notification, {
+        foreignKey: {
+          name: 'userId',
+          allowNull: false,
+        }
+      })
       // this.belongsToMany(models.Role, {
       //   through: 'UserRoles',
       // });

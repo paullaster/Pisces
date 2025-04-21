@@ -36,12 +36,6 @@ export default function (sequelize, DataTypes) {
     sequelize,
     modelName: 'Warehouse',
     timestamps: false,
-    indexes: [
-      {
-        unique: false,
-        fields: ['location'],
-      },
-    ]
   });
   return Warehouse;
 };

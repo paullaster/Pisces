@@ -1,7 +1,7 @@
 
 'use strict';
 import { Model } from "sequelize";
-import { uppercasefirst } from "../../../../common/uppercasefirst";
+import { uppercasefirst } from "../../../../common/uppercasefirst.js";
 /**
  * 
  * @param {*} sequelize 

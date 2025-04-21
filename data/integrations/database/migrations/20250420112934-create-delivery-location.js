@@ -37,7 +37,6 @@ export default {
       }
     });
     await queryInterface.addIndex('DeliveryLocations', ['warehouseId'], { name: 'idx_warehouseId' });
-    await queryInterface.addIndex('DeliveryLocations', ['destination'], { name: 'idx_destination' });
     await queryInterface.addIndex('DeliveryLocations', ['distanceMeters'], { name: 'idx_distanceMeters' });
     await queryInterface.addIndex('DeliveryLocations', ['durationSeconds'], { name: 'idx_durationSeconds' });
   },

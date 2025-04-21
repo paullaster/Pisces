@@ -55,9 +55,6 @@ export default {
         allowNull: false,
         type: Sequelize.DATE
       }
-    }, {
-      charset: 'utf8mb4',
-      collate: 'utf8mb4_unicode_ci',
     });
     await queryInterface.addIndex('Users', ['email'], { name: 'idx_email' })
     await queryInterface.addIndex('Users', ['phoneNumber'], { name: 'idx_phoneNumber' })

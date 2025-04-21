@@ -9,22 +9,13 @@ export default {
         type: Sequelize.STRING(255)
       },
       userId: {
-        type: Sequelize.STRING(255),
+        type: Sequelize.BIGINT,
         allowNull: false,
         references: {
           model: 'Users',
-          key: 'email',
+          key: 'id',
         },
         onDelete: 'RESTRICT',
-      },
-      paymentId: {
-        type: Sequelize.STRING(255),
-        allowNull: true,
-        references: {
-          model: 'payments',
-          key: 'transId',
-        },
-        onDelete: 'SET NULL'
       },
       status: {
         allowNull: false,
@@ -56,7 +47,6 @@ export default {
     await queryInterface.addIndex('Orders', ['totalAmount'], { name: 'idx_totalAmount' });
     await queryInterface.addIndex('Orders', ['status'], { name: 'idx_status' });
     await queryInterface.addIndex('Orders', ['createdAt'], { name: 'idx_createdAt' });
-    await queryInterface.addIndex('Orders', ['paymentId'], { name: 'idx_paymentId' });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Orders');

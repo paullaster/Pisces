@@ -31,10 +31,27 @@ export default {
       },
     });
     await queryInterface.addConstraint('CartItems', {
-      fields: ['cartId', 'variantId'],
-      type: 'primary key',
-      name: 'cart_items_pk',
-    })
+      fields: ['cartId'],
+      type: 'foreign key',
+      name: 'fk_CartItems_cardId',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+      references: {
+        table: 'Carts',
+        field: 'cartId',
+      }
+    });
+    await queryInterface.addConstraint('CartItems', {
+      fields: ['variantId'],
+      type: 'foreign key',
+      name: 'fk_CartItems_variantId',
+      onDelete: 'RESTRICT',
+      onUpdate: 'CASCADE',
+      references: {
+        table: 'ProductVariants',
+        field: 'variantId'
+      }
+    });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('CartItems');

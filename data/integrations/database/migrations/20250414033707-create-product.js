@@ -40,9 +40,6 @@ export default {
         allowNull: false,
         type: Sequelize.DATE
       }
-    }, {
-      charset: 'utf8mb4',
-      collate: 'utf8mb4_unicode_ci'
     });
     await queryInterface.addIndex('Products', ['name'], { name: 'idx_name', type: 'FULLTEXT' })
     await queryInterface.addIndex('Products', ['price'], { name: 'idx_price' })

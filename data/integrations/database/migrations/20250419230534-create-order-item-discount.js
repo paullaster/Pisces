@@ -13,7 +13,7 @@ export default {
         type: Sequelize.STRING(255),
         allowNull: false,
         references: {
-          model: 'orderItems',
+          model: 'OrderItems',
           key: 'itemId',
         },
         onDelete: 'CASCADE',
@@ -32,11 +32,28 @@ export default {
         allowNull: false,
       },
     });
-    await queryInterface.addConstraint('orderItemDiscounts', {
-      fields: ['orderItemId', 'discountId'],
-      type: 'primary key',
-      name: 'order_item_discounts_pk'
-    })
+    await queryInterface.addConstraint('OrderItemDiscounts', {
+      fields: ['orderItemId'],
+      type: 'foreign key',
+      name: 'fk_OrderItemDiscounts_orderItemId',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+      references: {
+        table: 'OrderItems',
+        field: 'itemId',
+      }
+    });
+    await queryInterface.addConstraint('OrderItemDiscounts', {
+      fields: ['discountId'],
+      type: 'foreign key',
+      onDelete: 'RESTRICT',
+      onUpdate: 'CASCADE',
+      references: {
+        table: 'Discounts',
+        field: 'id',
+      },
+      name: 'fk_OrderItemDiscounts_discountId'
+    });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('OrderItemDiscounts');
