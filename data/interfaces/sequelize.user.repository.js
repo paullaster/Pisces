@@ -1,9 +1,19 @@
 import { UserRepository } from "../../core/app/user.interface.js";
 import { User } from "../../core/types/user.js";
-import { Op } from "sequelize";
+import { Model, Op } from "sequelize";
 import { RandomCodeGenerator } from "../../common/generating_unique_codes.js";
 
+/**
+ * Repository class for handling user operations using Sequelize ORM
+ * @class
+ * @extends UserRepository
+ * @param {Object} UserModel - Sequelize model for User
+ * @returns {Promise<Object>} Returns a promise that resolves to an object containing success status and user data or error
+ */
 export class SequelizeUserRespository extends UserRepository {
+    /**
+     * @param {*} UserModel - Sequelize Model instance
+     */
     constructor(UserModel) {
         super();
         this.dataSource = UserModel;
@@ -14,6 +24,13 @@ export class SequelizeUserRespository extends UserRepository {
         this.userPassword = null;
         this.verifyOTP = this.verifyOTP.bind(this);
     }
+    /**
+     * 
+     * @param {*} id 
+     * @param {*} associatedModels 
+     * @param {*} eagerLoad 
+     * @returns 
+     */
     async getUserById(id, associatedModels = [], eagerLoad = false) {
         try {
             let user;
@@ -30,6 +47,11 @@ export class SequelizeUserRespository extends UserRepository {
             return { success: false, error: error.message };
         }
     }
+    /**
+     * 
+     * @param {*} username 
+     * @returns 
+     */
     async getUserByUsername(username) {
         try {
             const user = await this.dataSource.findOne({ where: { [Op.or]: [{ email: username }, { phoneNumber: username }] } });
@@ -42,6 +64,11 @@ export class SequelizeUserRespository extends UserRepository {
             return { success: false, error: error.message };
         }
     }
+    /**
+     * 
+     * @param {*} email 
+     * @returns 
+     */
     async getUserByEmail(email) {
         try {
             let user = await this.dataSource.findOne({ where: { email } });
@@ -55,6 +82,12 @@ export class SequelizeUserRespository extends UserRepository {
             return { success: false, error: error.message };
         }
     }
+    /**
+     * 
+     * @param {*} user 
+     * @param {*} model 
+     * @returns 
+     */
     async getUserAssociations(user, model) {
         try {
             const { user: data, success, error } = await this.getUserById(user, model, true);
@@ -66,14 +99,25 @@ export class SequelizeUserRespository extends UserRepository {
             return { success: false, error: error.message };
         }
     }
+    /**
+     * 
+     * @param {*} payload 
+     * @returns 
+     */
     async create(payload) {
         try {
             const user = await this.dataSource.create(payload);
             return this.mapToUser(user);
         } catch (error) {
-            return { sucess: false, error: error.message };
+            return { success: false, error: error.message };
         }
     }
+    /**
+     * 
+     * @param {*} payload 
+     * @param {*} model 
+     * @returns 
+     */
     async createTempCustomer(payload, model) {
         try {
             const newUser = {};
@@ -119,39 +163,39 @@ export class SequelizeUserRespository extends UserRepository {
         }
     }
     async verifyOTP(options, model) {
-       try {
-         const user = await this.dataSource.findOne({
-             where: {
-                 [Op.or]: [{ email: options.username }, { phoneNumber: options.username }]
-             },
-             include: {
-                 model: model,
-                 where: {
-                     otp: options.otp,
-                     expireAt: {[Op.gte]: new Date()},
-                     used: false
-                 },
-             }
-         });
-         if (!user) {
-             return { success: false, error: 'User not found' };
-         }
-         const otpModel = user.dataValues.Otps[0];
-         await user.update( {veryfied: true, completed: true, email_verified_at: new Date()});
-         await otpModel.update({used: true, usedAt: new Date()});
-         return { success: true, user: this.mapToUser(user) };
-       } catch (error) {
-         return { success: false, error: error.message };
-       }
+        try {
+            const user = await this.dataSource.findOne({
+                where: {
+                    [Op.or]: [{ email: options.username }, { phoneNumber: options.username }]
+                },
+                include: {
+                    model: model,
+                    where: {
+                        otp: options.otp,
+                        expireAt: { [Op.gte]: new Date() },
+                        used: false
+                    },
+                }
+            });
+            if (!user) {
+                return { success: false, error: 'User not found' };
+            }
+            const otpModel = user.dataValues.Otps[0];
+            await user.update({ veryfied: true, completed: true, email_verified_at: new Date() });
+            await otpModel.update({ used: true, usedAt: new Date() });
+            return { success: true, user: this.mapToUser(user) };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
     }
     async update(user, obj) {
         try {
-            const result = await this.dataSource.update(obj, { where: { [Op.or]:[{email: user}, {phoneNumber: user}]}});
+            const result = await this.dataSource.update(obj, { where: { [Op.or]: [{ email: user }, { phoneNumber: user }] } });
             console.log(result);
             if (!result[0]) {
                 return { success: false, error: 'User not found' };
             }
-            return {success: true, user: this.mapToUser(result)};
+            return { success: true, user: this.mapToUser(result) };
         } catch (error) {
             return { sucess: false, error: error.message };
         }
@@ -164,6 +208,11 @@ export class SequelizeUserRespository extends UserRepository {
             return { success: false, error: error.message };
         }
     }
+    /**
+     * 
+     * @param {Object} user 
+     * @returns Promise<Object>
+     */
     mapToUser(user) {
         try {
 
