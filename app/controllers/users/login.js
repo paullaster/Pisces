@@ -55,6 +55,12 @@ class LoginController {
             return res.ApiResponse.error(500, error.message);
         }
     }
+    /**
+     * 
+     * @param {*} req 
+     * @param {*} res 
+     * @returns 
+     */
     async getUserById(req, res) {
         try {
             const { id: userId } = req.user;
@@ -67,6 +73,12 @@ class LoginController {
             return res.ApiResponse.error(500, error.message);
         }
     }
+    /**
+     * 
+     * @param {*} req 
+     * @param {*} res 
+     * @returns 
+     */
     async getUser(req, res) {
         try {
             const { username } = req.body;

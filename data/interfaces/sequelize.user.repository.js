@@ -49,7 +49,7 @@ export class SequelizeUserRespository extends UserRepository {
     }
     /**
      * 
-     * @param {*} username 
+     * @param {string} username 
      * @returns 
      */
     async getUserByUsername(username) {
