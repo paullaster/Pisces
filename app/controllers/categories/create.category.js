@@ -1,8 +1,20 @@
+import { CreateCategoryService } from "../../../core/services/category/create.category.service.js";
+
 export class CreateCategoryController {
-    constructor (createCategoryService) {
+    /**
+     * 
+     * @param {CreateCategoryService} createCategoryService 
+     */
+    constructor(createCategoryService) {
         this.createCategoryService = createCategoryService;
         this.createCategory = this.createCategory.bind(this);
     }
+    /**
+     * 
+     * @param {*} req 
+     * @param {*} res 
+     * @returns 
+     */
     async createCategory(req, res) {
         try {
             if (!req.body) {
@@ -11,7 +23,7 @@ export class CreateCategoryController {
             if (!Object.keys(req.body).length) {
                 return res.ApiResponse.error(400, 'category cannot be empty');
             }
-            const {success, data, error } = await this.createCategoryService.createCategory(req.body);
+            const { success, data, error } = await this.createCategoryService.createCategory(req.body);
             if (!success) {
                 return res.ApiResponse.error(400, error);
             }

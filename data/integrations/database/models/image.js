@@ -43,9 +43,9 @@ export default function (sequelize, DataTypes) {
     }
   }
   Image.init({
-    imgId: DataTypes.STRING,
-    imagableId: DataTypes.STRING,
-    imagableType: DataTypes.STRING,
+    imgId: { type: DataTypes.STRING(255), primaryKey: true },
+    imagableId: DataTypes.STRING(255),
+    imagableType: DataTypes.STRING(255),
     mimetype: DataTypes.STRING
   }, {
     sequelize,

@@ -14,11 +14,11 @@ export default {
       imagableType: {
         allowNull: true,
         unique: false,
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(255),
       },
       mimetype: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.STRING(255)
       },
       createdAt: {
         allowNull: false,
