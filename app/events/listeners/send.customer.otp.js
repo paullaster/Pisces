@@ -28,7 +28,7 @@ eventEmmitter.on("sendOTP-newcustomer", async (payload) => {
             }
         ];
         if (payload.notificationType.type === 'email') {
-            await notify.via('viaEmail', payload.notifiable.email, { attachments });
+            await notify.via('viaEmail', payload.notifiable.user.email, { attachments });
         }
         // else if (payload.notificationType.type === 'phone') {
         //     // Send SMS using Twilio

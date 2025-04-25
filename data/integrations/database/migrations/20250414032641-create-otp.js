@@ -22,27 +22,21 @@ export default {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      type: {
+      purpose: {
         allowNull: false,
         type: Sequelize.ENUM('newAccount', 'passwordReset'),
         defaultValue: 'newAccount'
       },
-      expireAt: {
+      expiryTime: {
         type: Sequelize.DATE,
         allowNull: false,
       },
-      used: {
+      isUsed: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
-      usedAt: {
-        type: Sequelize.DATE,
-        allowNull: true,
-      },
-      requestingDevice: {
-        type: Sequelize.TEXT
-      },
+
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -52,7 +46,7 @@ export default {
         type: Sequelize.DATE
       }
     });
-    await queryInterface.addIndex('one_time_passwords', ['otp', 'type', 'expireAt', 'used']);
+    await queryInterface.addIndex('one_time_passwords', ['otp', 'purpose', 'expiryTime', 'isUsed']);
     await queryInterface.addIndex('one_time_passwords', ['userId'], { name: 'idx_userId' });
   },
   async down(queryInterface, Sequelize) {

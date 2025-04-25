@@ -62,7 +62,7 @@ class LoginUseCase {
      * @param {*} model 
      * @returns 
      */
-    async generateOTP(obj, model) {
+    async createTempUser(obj, model) {
         try {
             let { user, success, error } = await this.userRespository.createTempCustomer(obj, model);
             if (!success) {

@@ -2,7 +2,6 @@ import express from 'express';
 import { CreateProductController } from '../app/controllers/products/create.product.js';
 import { CreateProductService } from '../core/services/product/create.product.service.js';
 import { SequelizeProductRepository } from '../data/interfaces/sequelize.product.repository.js';
-import Product from '../data/integrations/database/models/product.js';
 import { FetchProductController } from '../app/controllers/products/fetch.product.js';
 import { FetchProductService } from '../core/services/product/fetch.product.service.js';
 import { UpdateProductController } from '../app/controllers/products/update.product.js';
@@ -10,6 +9,8 @@ import { UpdateProductService } from '../core/services/product/update.product.se
 import { DeleteProductService } from '../core/services/product/delete.product.service.js';
 import { DeleteProductController } from '../app/controllers/products/delete.product.js';
 import { productImageMiddleware } from '../app/middleware/fetch.product.with.image.js';
+import { models } from '../data/integrations/database/models/index.js';
+const { Product } = models;
 
 
 const prodcutRoutes = express.Router();
@@ -28,7 +29,7 @@ const updateProductService = new UpdateProductService(productRepository);
 const updateProductController = new UpdateProductController(updateProductService);
 
 // delete product
-const deleteProductService  = new DeleteProductService(productRepository);
+const deleteProductService = new DeleteProductService(productRepository);
 const deleteProductController = new DeleteProductController(deleteProductService);
 
 

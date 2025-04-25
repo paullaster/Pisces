@@ -46,6 +46,12 @@ export default function (sequelize, DataTypes) {
           name: 'userId',
           allowNull: false,
         }
+      });
+      this.hasMany(models.Otp, {
+        foreignKey: {
+          name: 'userId',
+          allowNull: false,
+        }
       })
       // this.belongsToMany(models.Role, {
       //   through: 'UserRoles',
@@ -62,7 +68,7 @@ export default function (sequelize, DataTypes) {
     phoneNumber: DataTypes.STRING,
     password: DataTypes.STRING,
     email_verified_at: DataTypes.DATE,
-    lastLogin: DataTypes.DATE,
+    lastLogin: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
     veryfied: DataTypes.BOOLEAN,
     completed: DataTypes.BOOLEAN,
     type: DataTypes.ENUM('customer', 'admin')

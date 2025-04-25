@@ -55,8 +55,9 @@ export class SequelizeUserRespository extends UserRepository {
     async getUserByUsername(username) {
         try {
             const user = await this.dataSource.findOne({ where: { [Op.or]: [{ email: username }, { phoneNumber: username }] } });
+            console.log('get user', user)
             if (!user) {
-                return { sucess: false, error: 'Invalid username' };
+                return { success: false, error: 'Invalid username' };
             }
             this.userPassword = user['dataValues']['password'];
             return this.mapToUser(user);
@@ -129,36 +130,21 @@ export class SequelizeUserRespository extends UserRepository {
             }
             if (Object.keys(newUser).length) {
                 const user = await this.dataSource.create(newUser);
-                const savedOtp = await user.createOtp({
-                    otp: RandomCodeGenerator(6, ''),
-                    expireAt: new Date(new Date().getTime() + 600000),
-                    requestingDevice: payload.requestingDevice,
-                });
-
-                const refrreshedModel = await user.reload({
-                    include: {
-                        model: model,
-                        where: {
-                            type: savedOtp['dataValues']['type'],
-                            otp: savedOtp['dataValues']['otp'],
-                            expireAt: savedOtp['dataValues']['expireAt'],
-                            requestingDevice: savedOtp['dataValues']['requestingDevice'],
-                            used: savedOtp['dataValues']['used'],
-                        },
-                        attributes: ['otp', 'expireAt']
-                    }
-                });
-                return this.mapToUser(refrreshedModel);
+                if (!user) return { success: false, error: 'User not created!' }
+                return this.mapToUser(user);
             } else {
                 return { success: false, error: 'Invalid payload!' };
             }
         } catch (error) {
+            console.log(error)
             const user = await this.dataSource.findOne({
                 where: {
                     [Op.or]: [{ email: payload.value }, { phoneNumber: payload.value }]  // check for existing user with same email or phone number
                 },
             })
-            await user.destroy();
+            if (user) {
+                await user.destroy();
+            }
             return { sucess: false, error: error.message };
         }
     }

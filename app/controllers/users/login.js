@@ -3,8 +3,12 @@ import app from "../../../config/app.js";
 import { valueType } from "../../../common/get.customer.payload.type.js";
 import { models } from "../../../data/integrations/database/models/index.js";
 import LoginUseCase from "../../../core/services/auth/login.service.js";
+import { OTPInterface } from "../../../core/services/otp/otpUsecase.js"; // Import OTP service
+import { SequelizeOTPRepository } from "../../../data/interfaces/Sequelize.otp.respository.js"; // Import repository
 
 const { Otp } = models;
+const otpRepository = new SequelizeOTPRepository(Otp); // Initialize repository
+const otpService = new OTPInterface(otpRepository); // Initialize OTP service
 
 class LoginController {
     /**
@@ -15,7 +19,7 @@ class LoginController {
         this.LoginUseCase = LoginUseCase;
         this.login = this.login.bind(this);
         this.getUser = this.getUser.bind(this);
-        this.OTP = this.OTP.bind(this);
+        this.OTP = this.createTempUser.bind(this);
         this.verifyOTP = this.verifyOTP.bind(this);
         this.updateUserProfile = this.updateUserProfile.bind(this);
         this.getUserById = this.getUserById.bind(this);
@@ -83,22 +87,31 @@ class LoginController {
         try {
             const { username } = req.body;
             const { success, user, error } = await this.LoginUseCase.getUser(username);
+            console.log({ success, user, error })
             if (!success) {
-                return await this.OTP(req, res, error);
+
+                return await this.createTempUser(req, res, error);
             }
-            if (!user.veryfied || !user.completed) {
-                const { success: deleted } = await this.LoginUseCase.deleteUser(user.id);
-                if (deleted) {
-                    return await this.OTP(req, res, error);
-                }
-                return res.ApiResponse.error(500, error);
-            }
+            // if (!user.veryfied || !user.completed) {
+            //     const { success: deleted } = await this.LoginUseCase.deleteUser(user.id);
+            //     if (deleted) {
+            //         return await this.OTP(req, res, error);
+            //     }
+            //     return res.ApiResponse.error(500, error);
+            // }
             return res.ApiResponse.success({ exist: true, user }, 200);
         } catch (error) {
             return res.ApiResponse.error(500, error.message);
         }
     }
-    async OTP(req, res, error) {
+    /**
+     * Creates a temporary user and sends an OTP.
+     * @param {*} req 
+     * @param {*} res 
+     * @param {*} error 
+     * @returns 
+     */
+    async createTempUser(req, res, error) {
         try {
             const { username } = req.body;
             if (req.body?.type === 'customer') {
@@ -107,15 +120,24 @@ class LoginController {
                     return res.ApiResponse.error(400, "Invalid email or phone");
                 }
                 value.requestingDevice = req.headers['host'];
-                const { success: s, user: userWithOtp, error: err } = await this.LoginUseCase.generateOTP(value, Otp);
+
+                const { success: s, user, error: err } = await this.LoginUseCase.createTempUser(value, Otp);
                 if (!s) {
                     return res.ApiResponse.error(499, err);
                 }
-                const result = await this.LoginUseCase.sendOTP(userWithOtp, value);
+
+                // Use OTP service to generate and send OTP
+                const { success: otpSuccess, otp, expiryTime, message } = await otpService.generateOTP(user.id, "newAccount");
+                if (!otpSuccess) {
+                    return res.ApiResponse.error(500, message || "Failed to generate OTP");
+                }
+
+                const result = await this.LoginUseCase.sendOTP({ otp, expiryTime, user }, value);
                 if (!result) {
                     return res.ApiResponse.error(500, "Failed to send OTP");
                 }
                 const { success: otpSent, error: e } = result;
+
                 if (otpSent) {
                     return res.ApiResponse.success({ otp: true, loginType: value.type }, 200, "We have sent One Time Password to your " + value.type);
                 } else {
@@ -128,6 +150,12 @@ class LoginController {
             return res.ApiResponse.error(500, error.message);
         }
     }
+    /**
+     * 
+     * @param {*} req 
+     * @param {*} res 
+     * @returns 
+     */
     async verifyOTP(req, res) {
         try {
             const { otp, datapoint } = req.body;

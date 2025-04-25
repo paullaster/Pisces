@@ -19,17 +19,21 @@ export default function (sequelize, DataTypes) {
      */
     static associate(models) {
       // define association here
+      this.belongsTo(models.User, {
+        foreignKey: {
+          name: 'userId',
+          allowNull: false,
+        }
+      })
     }
   }
   Otp.init({
     id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
     userId: DataTypes.BIGINT,
     otp: DataTypes.STRING,
-    type: DataTypes.STRING,
-    expireAt: DataTypes.DATE,
-    used: DataTypes.BOOLEAN,
-    usedAt: DataTypes.DATE,
-    requestingDevice: DataTypes.TEXT
+    purpose: { type: DataTypes.ENUM('newAccount', 'passwordReset'), defaultValue: 'newAccount' },
+    expiryTime: DataTypes.DATE,
+    isUsed: { type: DataTypes.BOOLEAN, defaultValue: false, },
   }, {
     sequelize,
     modelName: 'Otp',
@@ -38,7 +42,7 @@ export default function (sequelize, DataTypes) {
     indexes: [
       {
         unique: false,
-        fields: ['otp', 'type', 'expireAt', 'used'],
+        fields: ['otp', 'purpose', 'expiryTime', 'isUsed'],
       },
       {
         unique: false,
