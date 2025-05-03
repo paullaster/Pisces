@@ -10,6 +10,21 @@ const { Otp } = models;
 const otpRepository = new SequelizeOTPRepository(Otp); // Initialize repository
 const otpService = new OTPInterface(otpRepository); // Initialize OTP service
 
+/**
+ * Extracts and validates the customer payload from the request.
+ * @param {string} username
+ * @param {object} req
+ * @returns {{ value?: object, error?: string }}
+ */
+function getValidatedCustomerPayload(username, req) {
+    const value = valueType(username);
+    if (value.type === 'unknown') {
+        return { error: "Invalid email or phone" };
+    }
+    value.requestingDevice = req.headers['host'];
+    return { value };
+}
+
 class LoginController {
     /**
      * 
@@ -38,8 +53,8 @@ class LoginController {
             const { username, password } = req.body;
             const { error, success, user } = await this.LoginUseCase.handle(username, password);
 
-            if (!success) {
-                return res.ApiResponse.error(400, error);
+            if (!success || !user) {
+                return res.ApiResponse.error(400, error || 'User not found');
             }
             const token = jwt.sign(
                 {
@@ -88,17 +103,29 @@ class LoginController {
             const { username } = req.body;
             const { success, user, error } = await this.LoginUseCase.getUser(username);
             console.log({ success, user, error })
-            if (!success) {
-
+            if (!success || !user) {
                 return await this.createTempUser(req, res, error);
             }
-            // if (!user.veryfied || !user.completed) {
-            //     const { success: deleted } = await this.LoginUseCase.deleteUser(user.id);
-            //     if (deleted) {
-            //         return await this.OTP(req, res, error);
-            //     }
-            //     return res.ApiResponse.error(500, error);
-            // }
+            if (user && (!user.veryfied || !user.completed)) {
+                // Use OTP service to generate and send OTP
+                const { success: otpSuccess, otp, expiryTime, message } = await otpService.generateOTP(String(user.id), "newAccount");
+                if (!otpSuccess) {
+                    return res.ApiResponse.error(500, message || "Failed to generate OTP");
+                }
+                const { error: validationError, value } = getValidatedCustomerPayload(req.body.username, req)
+                if (validationError) return res.ApiResponse(500, validationError);
+                const result = await this.LoginUseCase.sendOTP({ otp, expiryTime, user }, value);
+                if (!result) {
+                    return res.ApiResponse.error(500, "Failed to send OTP");
+                }
+                const { success: otpSent, error: e } = result;
+
+                if (otpSent) {
+                    return res.ApiResponse.success({ otp: true, loginType: value.type }, 200, "We have sent One Time Password to your " + value.type);
+                } else {
+                    return res.ApiResponse.error(500, e);
+                }
+            }
             return res.ApiResponse.success({ exist: true, user }, 200);
         } catch (error) {
             return res.ApiResponse.error(500, error.message);
@@ -115,19 +142,18 @@ class LoginController {
         try {
             const { username } = req.body;
             if (req.body?.type === 'customer') {
-                const value = valueType(username);
-                if (value.type === 'unknown') {
-                    return res.ApiResponse.error(400, "Invalid email or phone");
+                const { value, error: validationError } = getValidatedCustomerPayload(username, req);
+                if (validationError) {
+                    return res.ApiResponse.error(400, validationError);
                 }
-                value.requestingDevice = req.headers['host'];
 
                 const { success: s, user, error: err } = await this.LoginUseCase.createTempUser(value, Otp);
-                if (!s) {
-                    return res.ApiResponse.error(499, err);
+                if (!s || !user) {
+                    return res.ApiResponse.error(499, err || 'User creation failed');
                 }
 
                 // Use OTP service to generate and send OTP
-                const { success: otpSuccess, otp, expiryTime, message } = await otpService.generateOTP(user.id, "newAccount");
+                const { success: otpSuccess, otp, expiryTime, message } = await otpService.generateOTP(String(user.id), "newAccount");
                 if (!otpSuccess) {
                     return res.ApiResponse.error(500, message || "Failed to generate OTP");
                 }

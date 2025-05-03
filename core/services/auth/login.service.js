@@ -11,7 +11,6 @@ class LoginUseCase {
     constructor(userRespository) {
         this.userRespository = userRespository;
         this.handle = this.handle.bind(this);
-        this.generateOTP = this.generateOTP.bind(this);
         this.getUser = this.getUser.bind(this);
         this.sendOTP = this.sendOTP.bind(this);
         this.deleteUser = this.deleteUser.bind(this);
@@ -26,10 +25,14 @@ class LoginUseCase {
      */
     async handle(username, password) {
         try {
-            let { user, success, error } = await this.userRespository.getUserByUsername(username);
-            if (!success) {
-                return { error, success };
+            const result = await this.userRespository.getUserByUsername(username);
+            if (!result.success) {
+                return { error: result.error, success: false };
             }
+            if (!('user' in result) || !result.user) {
+                return { success: false, error: 'User not found' };
+            }
+            const { user, success } = result;
             const decodePassword = Buffer.from(password, 'base64').toString('utf-8');
             const isPasswordMatch = await bcrypt.compare(decodePassword, this.userRespository.userPassword)
             if (isPasswordMatch !== true) {
@@ -47,10 +50,14 @@ class LoginUseCase {
      */
     async getUserById(userId) {
         try {
-            let { user, success, error } = await this.userRespository.getUserById(userId);
-            if (!success) {
-                return { error, success };
+            let result = await this.userRespository.getUserById(userId);
+            if (!result.success) {
+                return { error: result.error, success: result.success };
             }
+            if (!('user' in result) || !result.user) {
+                return { success: false, error: 'User not found' };
+            }
+            const { user, success } = result;
             return { user, success };
         } catch (error) {
             return { error: error.message, success: false };
@@ -64,10 +71,14 @@ class LoginUseCase {
      */
     async createTempUser(obj, model) {
         try {
-            let { user, success, error } = await this.userRespository.createTempCustomer(obj, model);
-            if (!success) {
-                return { error, success };
+            let result = await this.userRespository.createTempCustomer(obj, model);
+            if (!('success' in result) || !result.success) {
+                return { success: false, error: result.error };
             }
+            if (!('user' in result) || !result.user) {
+                return { success: false, error: "User not found" };
+            }
+            const { success, user } = result;
             return { user, success };
         } catch (error) {
             return { error: error.message, success: false };
@@ -96,11 +107,14 @@ class LoginUseCase {
      */
     async getUser(username) {
         try {
-            let { user, success, error } = await this.userRespository.getUserByUsername(username);
-            if (!success) {
-                return { error, success };
+            let result = await this.userRespository.getUserByUsername(username);
+            if (!('success' in result) || !result.success) {
+                return { success: false, error: result.error };
             }
-
+            if (!('user' in result) || !result.user) {
+                return { success: false, error: "User not found!" };
+            }
+            const { user, success } = result;
             return { user, success };
         } catch (error) {
             return { error: error.message, success: false };

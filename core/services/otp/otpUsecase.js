@@ -1,5 +1,5 @@
 import { randomBytes } from 'crypto';
-import { OTPConfig } from '../../../infrastructure/config/otp.config';
+import { OTPConfig } from '../../../infrastructure/config/otp.config.js';
 
 // @ts-check
 
@@ -35,7 +35,6 @@ export class OTPInterface {
 
     /**
      * Generates cryptographically secure OTP
-     * @private
      * @returns {number}
      */
     #generateSecureOTP() {
@@ -100,7 +99,6 @@ export class OTPInterface {
     }
 
     /**
-     * @private
      * @param {OTPData} storedOTP 
      * @param {number} inputOTP 
      * @returns {boolean}
@@ -112,7 +110,6 @@ export class OTPInterface {
     }
 
     /**
-     * @private
      * @param {OTPData} storedOTP 
      * @param {number} inputOTP 
      * @returns {string}

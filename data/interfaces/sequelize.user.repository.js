@@ -1,7 +1,6 @@
 import { UserRepository } from "../../core/app/user.interface.js";
 import { User } from "../../core/types/user.js";
-import { Model, Op } from "sequelize";
-import { RandomCodeGenerator } from "../../common/generating_unique_codes.js";
+import { Op } from "sequelize";
 
 /**
  * Repository class for handling user operations using Sequelize ORM
@@ -55,7 +54,6 @@ export class SequelizeUserRespository extends UserRepository {
     async getUserByUsername(username) {
         try {
             const user = await this.dataSource.findOne({ where: { [Op.or]: [{ email: username }, { phoneNumber: username }] } });
-            console.log('get user', user)
             if (!user) {
                 return { success: false, error: 'Invalid username' };
             }
@@ -91,11 +89,14 @@ export class SequelizeUserRespository extends UserRepository {
      */
     async getUserAssociations(user, model) {
         try {
-            const { user: data, success, error } = await this.getUserById(user, model, true);
-            if (!success) {
-                return { success: false, error };
+            const result = await this.getUserById(user, model, true);
+            if (!result.success) {
+                return { success: false, error: result.error };
             }
-            return { data, success };
+            if (!('user' in result) || !result.user) {
+                return { success: false, error: 'User not found' };
+            }
+            return { data: result.user, success: true };
         } catch (error) {
             return { success: false, error: error.message };
         }
@@ -199,10 +200,13 @@ export class SequelizeUserRespository extends UserRepository {
      * @param {Object} user 
      * @returns Promise<Object>
      */
-    mapToUser(user) {
+    /**
+     * Maps a database user object to a User domain model
+     * @param {import("../../core/types/user.js").User} user - The user object from database
+     * @returns {Promise<{success: boolean, user?: User, error?: string}>} Mapped user object or error
+     */
+    async mapToUser(user) {
         try {
-
-            user['dataValues']?.password && delete user['dataValues'].password;
             return { success: true, user: new User(user['dataValues']) };
         } catch (error) {
             return { success: false, error: error.message }

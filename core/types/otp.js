@@ -37,9 +37,7 @@ export class OTP {
     /**
      * Validates the OTP against input and checks its state.
      * @param {number} inputOTP
-     * @returns {{boolean, string}} Validation result
-     *         -Validation result.isValid - Whether the OTP is valid.
-     *         -Validation result.reason - The reason if invalid.
+     * @returns {{isValid: boolean, reason: string}} Validation result
      */
     validate(inputOTP) {
         if (this.isUsed) {

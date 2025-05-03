@@ -1,5 +1,5 @@
-import { ITOPInterface } from '../../core/app/otp.interface';
-import { OTP } from '../../core/types/otp';
+import { ITOPInterface } from '../../core/app/otp.interface.js';
+import { OTP } from '../../core/types/otp.js';
 
 /**
  * SequelizeOTPRepository
