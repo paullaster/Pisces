@@ -48,12 +48,13 @@ export class SequelizeUserRespository extends UserRepository {
     }
     /**
      * 
-     * @param {string} username 
+     * @param {*} username 
+     * @param {*} model 
      * @returns 
      */
-    async getUserByUsername(username) {
+    async getUserByUsername(username, model = []) {
         try {
-            const user = await this.dataSource.findOne({ where: { [Op.or]: [{ email: username }, { phoneNumber: username }] } });
+            const user = await this.dataSource.findOne({ where: { [Op.or]: [{ email: username }, { phoneNumber: username }] }, include: model });
             if (!user) {
                 return { success: false, error: 'Invalid username' };
             }
@@ -149,21 +150,29 @@ export class SequelizeUserRespository extends UserRepository {
             return { sucess: false, error: error.message };
         }
     }
+    /**
+     * 
+     * @param {*} options 
+     * @param {*} model 
+     * @returns 
+     */
     async verifyOTP(options, model) {
         try {
+            console.log({ options, model })
             const user = await this.dataSource.findOne({
                 where: {
                     [Op.or]: [{ email: options.username }, { phoneNumber: options.username }]
                 },
-                include: {
-                    model: model,
-                    where: {
-                        otp: options.otp,
-                        expireAt: { [Op.gte]: new Date() },
-                        used: false
-                    },
-                }
+                // include: {
+                //     model: model,
+                //     where: {
+                //         otp: options.otp,
+                //         expiryTime: { [Op.gte]: new Date() },
+                //         isUsed: false
+                //     },
+                // }
             });
+            console.log('user: ', user)
             if (!user) {
                 return { success: false, error: 'User not found' };
             }

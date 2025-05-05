@@ -21,7 +21,7 @@ function getValidatedCustomerPayload(username, req) {
     if (value.type === 'unknown') {
         return { error: "Invalid email or phone" };
     }
-    value.requestingDevice = req.headers['host'];
+    value.requestingDevice = req.headers['user-agent'];
     return { value };
 }
 
@@ -38,6 +38,7 @@ class LoginController {
         this.verifyOTP = this.verifyOTP.bind(this);
         this.updateUserProfile = this.updateUserProfile.bind(this);
         this.getUserById = this.getUserById.bind(this);
+        this.resendOTP = this.resendOTP.bind(this);
     }
     /**
      * 
@@ -102,7 +103,6 @@ class LoginController {
         try {
             const { username } = req.body;
             const { success, user, error } = await this.LoginUseCase.getUser(username);
-            console.log({ success, user, error })
             if (!success || !user) {
                 return await this.createTempUser(req, res, error);
             }
@@ -180,6 +180,44 @@ class LoginController {
      * 
      * @param {*} req 
      * @param {*} res 
+     */
+    async resendOTP(req, res) {
+        try {
+            const [username, type, usernameType] = Buffer.from(req.body.datapoint, 'base64').toString('utf-8').split(":");
+            if (type !== 'customer') return res.ApiResponse.error(400, 'Action can be performed by customers only!');
+            const { success, user, error } = await this.LoginUseCase.getUserByUsername(username);
+            if (!success) return res.ApiResponse.error(500, error);
+
+            // Use OTP service to generate and send OTP
+            const { success: otpSuccess, otp, expiryTime, message } = await otpService.generateOTP(String(user?.id), "newAccount");
+            if (!otpSuccess) {
+                return res.ApiResponse.error(500, message || "Failed to generate OTP");
+            }
+            const value = {
+                type: usernameType,
+                value: username,
+                requestingDevice: req.headers['user-agent']
+            }
+            const result = await this.LoginUseCase.sendOTP({ otp, expiryTime, user }, value);
+            if (!result) {
+                return res.ApiResponse.error(500, "Failed to send OTP");
+            }
+            const { success: otpSent, error: e } = result;
+
+            if (otpSent) {
+                return res.ApiResponse.success({ otp: true, loginType: value.type }, 200, "We have sent One Time Password to your " + value.type);
+            } else {
+                return res.ApiResponse.error(500, e);
+            }
+
+        } catch (error) {
+            return res.ApiResponse.error(500, error.message);
+        }
+    }
+    /**
+     * 
+     * @param {*} req 
+     * @param {*} res 
      * @returns 
      */
     async verifyOTP(req, res) {
@@ -196,6 +234,12 @@ class LoginController {
             return res.ApiResponse.error(500, error.message);
         }
     }
+    /**
+     * 
+     * @param {*} req 
+     * @param {*} res 
+     * @returns 
+     */
     async updateUserProfile(req, res) {
         try {
             const { username } = req.params;

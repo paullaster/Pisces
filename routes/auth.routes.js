@@ -20,6 +20,7 @@ const createAccount = new CreateAccount(accountCreationService);
 authRoutes.post('/register', createAccount.createAccount);
 authRoutes.post('/login', loginController.login);
 authRoutes.post('/get-user', loginController.getUser);
+authRoutes.post('/resend-otp', loginController.resendOTP);
 authRoutes.post('/verify-otp', loginController.verifyOTP);
 authRoutes.patch('/update-profile/:username', loginController.updateUserProfile);
 export { authRoutes };

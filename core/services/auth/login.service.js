@@ -16,6 +16,7 @@ class LoginUseCase {
         this.deleteUser = this.deleteUser.bind(this);
         this.updateUserProfile = this.updateUserProfile.bind(this);
         this.getUserById = this.getUserById.bind(this);
+        this.getUserByUsername = this.getUserByUsername.bind(this);
     }
     /**
      * 
@@ -59,6 +60,24 @@ class LoginUseCase {
             }
             const { user, success } = result;
             return { user, success };
+        } catch (error) {
+            return { error: error.message, success: false };
+        }
+    }
+    /**
+     * 
+     * @param {*} username 
+     * @param {*} model 
+     * @returns 
+     */
+    async getUserByUsername(username, model = []) {
+        try {
+            if (!username) return { success: false, error: 'Missing required username' }
+            const result = await this.userRespository.getUserByUsername(username, model);
+            if (!result.success) return { success: false, error: result.error }
+            if (!('user' in result) || !result.user) return { success: false, error: 'User not found!' }
+            const { user, success } = result;
+            return { user, success }
         } catch (error) {
             return { error: error.message, success: false };
         }
