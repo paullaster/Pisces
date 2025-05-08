@@ -6,10 +6,13 @@ import path from "path";
 import { fileURLToPath } from "url";
 import "./app/events/listeners/send.customer.otp.js";
 import "./app/events/index.js";
-import "./data/integrations/database/associations.js";
 import appConfig from "./config/app.js";
-import "./app/events/emitters/event.emitters.js"
-import "./app/events/listeners/deploy.orama.index.js"
+import "./app/events/emitters/event.emitters.js";
+import "./app/events/listeners/deploy.orama.index.js";
+import "./app/events/listeners/delete.expired.user.otps.js";
+import "./data/integrations/database/models/hooks.js"
+import "./app/workers/listeners/workerControl.js"
+import "./app/workers/listeners/userActivity.listener.js"
 
 const app = express();
 

@@ -1,13 +1,7 @@
 import { eventEmmitter } from "../index.js"
 import { EmailTemplateBuilder } from "@brainspore/shackuz";
-import * as fs from "fs";
-import app from "../../../config/app.js";
 import { Notification } from "../../notifications/notification.js";
 import { models } from "../../../data/integrations/database/models/index.js";
-import path from "path";
-import { fileURLToPath } from "url";
-const _filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(_filename);
 
 const { User } = models;
 
@@ -22,8 +16,10 @@ eventEmmitter.on("sendOTP-newcustomer", async (payload) => {
             marginBottom: '20px',
         }
         const emailBody = new EmailTemplateBuilder({ appConfig: { title: 'Customer OTP Notification' } })
+            .addBlock('p', `Greetings,`)
             .addBlock('p', 'Below is your one time passcode that you need to use to complete your authentication.')
-            .addBlock('p', 'The verification code will be valid for 10 minutes. Please do not share this code with anyone.')
+            .addBlock('p', `This verification code is valid until ${payload.notifiable.expiryTime}.`)
+            .addBlock('p', 'Please do not share this code with anyone.')
             .addBlock('d')
             .addBlock('p', `${payload.notifiable.otp}`, otpClasses)
             .buildHTML();

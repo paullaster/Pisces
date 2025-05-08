@@ -1,3 +1,5 @@
+/** @typedef {import('../types/user.result.jsdoc').UserResult} UserResult */
+
 /**
  * @class UserRepository
  * @abstract
@@ -6,52 +8,44 @@
 class UserRepository {
     /**
      * @abstract
-     * @param { id } 
-     * @returns { Promise<User | null>}
+     * @param {string|number} id
+     * @returns {Promise<UserResult>}
      */
     async getUserById(id) {
-        throw new Error('Not implemented');
+        return Promise.resolve({ success: false });
     }
     /**
      * @abstract
-     * @param { username } 
-     * @returns { Promise<User | null>}
+     * @param {string} username
+     * @returns {Promise<UserResult>}
      */
     async getUserByUsername(username) {
-        throw new Error('Not implemented');
+        return Promise.resolve({ success: false })
     }
     /**
      * @abstract
-     * @param { email } 
-     * @returns { Promise<User | null>}
+     * @param {string} email
+     * @returns {Promise<UserResult>}
      */
     async getUserByEmail(email) {
-        throw new Error('Not implemented');
+        return Promise.resolve({ success: false })
     }
     /**
      * @abstract
-     * @param { User} 
-     * @returns { Promise<User | null>}
+     * @param {any} userId
+     * @param {object} update
+     * @returns Promise{ <UserResult>}
      */
-    async update(user) {
-        throw new Error('Not implemented');
+    async update(userId, update) {
+        return Promise.resolve({ success: false });
     }
     /**
      * @abstract
-     * @param { id } 
-     * @returns { Promise<User | null>}
+     * @param {string|number} id
+     * @returns {Promise<UserResult>}
      */
     async delete(id) {
-        throw new Error('Not implemented');
-    }
-    /**
-     * @abstract
-     * @param { options} 
-     * @param { model }
-     * @returns { Promise<User | null>}
-     */
-    async verifyOTP(options, model) {
-        throw new Error('Not implemented');
+        return Promise.resolve({ success: false });
     }
 }
 

@@ -58,6 +58,32 @@ export class SequelizeOTPRepository extends ITOPInterface {
         }
     }
 
+
+    /**
+     * Retrieves an OTP entry for a specific user and purpose.
+     * @param {object} query
+     * @returns {Promise<{success: boolean, error?: string, otp?: OTP[]}|null>}
+     */
+    async getOTPs(query) {
+        try {
+            const records = await this.model.findAll(query);
+
+            if (!records) return null;
+
+            return {
+                success: true, otp: records.map((record) => new OTP({
+                    userId: record.userId,
+                    otp: record.otp,
+                    purpose: record.purpose,
+                    expiryTime: record.expiryTime,
+                    isUsed: record.isUsed,
+                }))
+            };
+        } catch (error) {
+            return { error: `Failed to retrieve OTPs: ${error.message}`, success: false };
+        }
+    }
+
     /**
      * Marks an OTP as used in the repository.
      * @param {string} userId
@@ -68,7 +94,7 @@ export class SequelizeOTPRepository extends ITOPInterface {
         try {
             const result = await this.model.update(
                 { isUsed: true },
-                { where: { userId, purpose } }
+                { where: { userId, purpose }, individualHooks: true }
             );
 
             if (result[0] === 0) {

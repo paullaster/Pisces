@@ -108,20 +108,20 @@ class LoginController {
             }
             if (user && (!user.veryfied || !user.completed)) {
                 // Use OTP service to generate and send OTP
-                const { success: otpSuccess, otp, expiryTime, message } = await otpService.generateOTP(String(user.id), "newAccount");
+                const { success: otpSuccess, otp, expiryTime, purpose, message } = await otpService.generateOTP(String(user.id), "newAccount");
                 if (!otpSuccess) {
                     return res.ApiResponse.error(500, message || "Failed to generate OTP");
                 }
                 const { error: validationError, value } = getValidatedCustomerPayload(req.body.username, req)
                 if (validationError) return res.ApiResponse(500, validationError);
-                const result = await this.LoginUseCase.sendOTP({ otp, expiryTime, user }, value);
+                const result = await otpService.sendOTP({ otp, expiryTime, user }, value);
                 if (!result) {
                     return res.ApiResponse.error(500, "Failed to send OTP");
                 }
                 const { success: otpSent, error: e } = result;
 
                 if (otpSent) {
-                    return res.ApiResponse.success({ otp: true, loginType: value.type }, 200, "We have sent One Time Password to your " + value.type);
+                    return res.ApiResponse.success({ otp: true, loginType: value.type, id: user.id, purpose }, 200, "We have sent One Time Password to your " + value.type);
                 } else {
                     return res.ApiResponse.error(500, e);
                 }
@@ -158,7 +158,7 @@ class LoginController {
                     return res.ApiResponse.error(500, message || "Failed to generate OTP");
                 }
 
-                const result = await this.LoginUseCase.sendOTP({ otp, expiryTime, user }, value);
+                const result = await otpService.sendOTP({ otp, expiryTime, user }, value);
                 if (!result) {
                     return res.ApiResponse.error(500, "Failed to send OTP");
                 }
@@ -198,7 +198,7 @@ class LoginController {
                 value: username,
                 requestingDevice: req.headers['user-agent']
             }
-            const result = await this.LoginUseCase.sendOTP({ otp, expiryTime, user }, value);
+            const result = await otpService.sendOTP({ otp, expiryTime, user }, value);
             if (!result) {
                 return res.ApiResponse.error(500, "Failed to send OTP");
             }
@@ -224,12 +224,14 @@ class LoginController {
         try {
             const { otp, datapoint } = req.body;
             const datapointString = Buffer.from(datapoint, 'base64').toString('utf-8');
-            const username = datapointString.split(':')[0];
-            const { success, user, error } = await this.LoginUseCase.verifyOTP({ otp, username }, Otp);
-            if (!success) {
-                return res.ApiResponse.error(400, error);
+            const [, , , id, purpose] = datapointString.split(':');
+            const { Otp } = models;
+            const otpUsecase = new OTPInterface(new SequelizeOTPRepository(Otp));
+            const { success: verified, message } = await otpUsecase.verifyOTP(id, otp, purpose);
+            if (!verified) {
+                return res.ApiResponse.error(400, message);
             }
-            return res.ApiResponse.success(user, 200, "OTP verified successfully");
+            return res.ApiResponse.success({}, 200, message);
         } catch (error) {
             return res.ApiResponse.error(500, error.message);
         }
@@ -242,8 +244,12 @@ class LoginController {
      */
     async updateUserProfile(req, res) {
         try {
-            const { username } = req.params;
-            const { success, user, error } = await this.LoginUseCase.updateUserProfile(username, req.body);
+            const { userId } = req.params;
+            if (!userId) {
+                return res.ApiResponse.error(400, 'Invalid request. Missing required parameter');
+            }
+            const id = Buffer.from(userId, 'base64').toString('utf-8');
+            const { success, user, error } = await this.LoginUseCase.updateUserProfile(id, req.body);
             if (!success) {
                 return res.ApiResponse.error(400, error);
             }

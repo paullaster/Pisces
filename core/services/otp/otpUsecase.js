@@ -1,5 +1,6 @@
 import { randomBytes } from 'crypto';
 import { OTPConfig } from '../../../infrastructure/config/otp.config.js';
+import { eventEmmitter } from '../../../app/events/index.js';
 
 // @ts-check
 
@@ -9,6 +10,8 @@ import { OTPConfig } from '../../../infrastructure/config/otp.config.js';
  * @property {number} [otp]
  * @property {Date} [expiryTime]
  * @property {string} [message]
+ * @property {string} [error]
+ * @property {string} [purpose]
  */
 
 /**
@@ -65,10 +68,28 @@ export class OTPInterface {
             return {
                 success: true,
                 otp,
-                expiryTime
+                expiryTime,
+                purpose,
             };
         } catch (error) {
-            throw new Error(`OTP Generation failed: ${error.message}`);
+            return { error: `OTP Generation failed: ${error.message}`, success: false };
+        }
+    }
+
+    /**
+ * 
+ * @param {*} notifiable 
+ * @param {*} notificationType 
+ * @returns 
+ */
+    async sendOTP(notifiable, notificationType) {
+        try {
+            if (notifiable && notificationType) {
+                eventEmmitter.emit('sendOTP-newcustomer', { notifiable, notificationType });
+                return { success: true }
+            }
+        } catch (error) {
+            return { error: error.message, success: false };
         }
     }
 
@@ -94,7 +115,7 @@ export class OTPInterface {
             await this.#repository.markOTPAsUsed(userId, purpose);
             return { success: true, message: 'OTP verified successfully' };
         } catch (error) {
-            throw new Error(`OTP Verification failed: ${error.message}`);
+            return { error: `OTP Verification failed: ${error.message}`, success: false };
         }
     }
 
@@ -132,7 +153,22 @@ export class OTPInterface {
             await this.#repository.deleteOTP(userId, purpose);
             return { success: true, message: 'OTP invalidated successfully' };
         } catch (error) {
-            throw new Error(`OTP Invalidation failed: ${error.message}`);
+            return { success: false, error: `OTP Invalidation failed: ${error.message}` };
+        }
+    }
+    /**
+     * 
+     * @param {object} query 
+     * @returns 
+     */
+    async getOTPs(query) {
+        try {
+            if (!query) {
+                return { success: false, error: 'Missing query param.' };
+            }
+            return await this.#repository.getOTPs(query);
+        } catch (error) {
+            return { success: false, error: error.message }
         }
     }
 }

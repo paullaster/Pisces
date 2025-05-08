@@ -7,11 +7,11 @@ export default {
     license: process.env.APP_LICENSE,
     key: process.env.APP_KEY,
     environment: process.env.APP_ENV,
-    timezone: process.env.APP_TIMEZONE,
+    timezone: process.env.APP_TIMEZONE || '+03:00',
     defaultCurrency: process.env.DEFUALT_CURRENCY,
     webUrl: process.env.WEB_URL,
     removebg: process.env.REMOVE_BG_API_KEY,
     pwdRounds: process.env.PWD_ROUNDS,
     cartUrl: `${process.env.APP_URL}${process.env.CART_URL}`,
-    
+
 };

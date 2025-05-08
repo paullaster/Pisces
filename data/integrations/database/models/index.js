@@ -72,5 +72,4 @@ Object.values(models).forEach((model) => {
     model.associate(models)
   }
 })
-
 export { sequelize, models }

@@ -1,3 +1,5 @@
+const { default: app } = require("./app");
+
 module.exports = {
     "development": {
         dialect: process.env.DB_CONNECTION,
@@ -6,6 +8,10 @@ module.exports = {
         username: process.env.DB_USERNAME,
         password: process.env.DB_PASSWORD,
         database: process.env.DB_DATABASE,
+        timezone: app.timezone,
+        dialectOptions: {
+            timezone: app.timezone,
+        }
     },
     "test": {
         dialect: process.env.DB_CONNECTION,
@@ -14,6 +20,10 @@ module.exports = {
         username: process.env.DB_USERNAME,
         password: process.env.DB_PASSWORD,
         database: process.env.DB_DATABASE,
+        timezone: app.timezone,
+        dialectOptions: {
+            timezone: app.timezone,
+        }
     },
     "production": {
         dialect: process.env.DB_CONNECTION,
@@ -22,5 +32,9 @@ module.exports = {
         username: process.env.DB_USERNAME,
         password: process.env.DB_PASSWORD,
         database: process.env.DB_DATABASE,
+        timezone: app.timezone,
+        dialectOptions: {
+            timezone: app.timezone,
+        }
     }
 }

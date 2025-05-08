@@ -1,18 +1,17 @@
 import bcrypt from 'bcrypt';
-import { eventEmmitter } from '../../../app/events/index.js';
 import app from '../../../config/app.js';
-import { SequelizeUserRespository } from '../../../data/interfaces/sequelize.user.repository.js';
+
+/**@typedef {import('../../types/user.result.jsdoc.js').UserResult} UserResult*/
 
 class LoginUseCase {
     /**
      * 
-     * @param {SequelizeUserRespository} userRespository 
+     * @param {any} userRespository 
      */
     constructor(userRespository) {
         this.userRespository = userRespository;
         this.handle = this.handle.bind(this);
         this.getUser = this.getUser.bind(this);
-        this.sendOTP = this.sendOTP.bind(this);
         this.deleteUser = this.deleteUser.bind(this);
         this.updateUserProfile = this.updateUserProfile.bind(this);
         this.getUserById = this.getUserById.bind(this);
@@ -22,7 +21,7 @@ class LoginUseCase {
      * 
      * @param {string} username 
      * @param {string} password 
-     * @returns 
+     * @returns {Promise<UserResult>}
      */
     async handle(username, password) {
         try {
@@ -47,7 +46,7 @@ class LoginUseCase {
     /**
      * 
      * @param {string} userId 
-     * @returns 
+     * @returns {Promise<UserResult>}
      */
     async getUserById(userId) {
         try {
@@ -68,7 +67,7 @@ class LoginUseCase {
      * 
      * @param {*} username 
      * @param {*} model 
-     * @returns 
+     * @returns {Promise<UserResult>}
      */
     async getUserByUsername(username, model = []) {
         try {
@@ -86,7 +85,7 @@ class LoginUseCase {
      * 
      * @param {*} obj 
      * @param {*} model 
-     * @returns 
+     * @returns {Promise<UserResult>}
      */
     async createTempUser(obj, model) {
         try {
@@ -105,24 +104,8 @@ class LoginUseCase {
     }
     /**
      * 
-     * @param {*} notifiable 
-     * @param {*} notificationType 
-     * @returns 
-     */
-    async sendOTP(notifiable, notificationType) {
-        try {
-            if (notifiable && notificationType) {
-                eventEmmitter.emit('sendOTP-newcustomer', { notifiable, notificationType });
-                return { success: true }
-            }
-        } catch (error) {
-            return { error: error.message, success: false };
-        }
-    }
-    /**
-     * 
      * @param {string} username 
-     * @returns 
+     * @returns {Promise<UserResult>}
      */
     async getUser(username) {
         try {
@@ -139,6 +122,11 @@ class LoginUseCase {
             return { error: error.message, success: false };
         }
     }
+    /**
+     * 
+     * @param {any} user 
+     * @returns {Promise<UserResult>}
+     */
     async deleteUser(user) {
         try {
             let { success, error } = await this.userRespository.delete(user);
@@ -152,28 +140,21 @@ class LoginUseCase {
     }
     /**
      * 
-     * @param {*} option 
-     * @param {*} model 
-     * @returns 
+     * @param {any} userId 
+     * @param {object} payload 
+     * @returns {Promise<UserResult>}
      */
-    async verifyOTP(option, model) {
+    async updateUserProfile(userId, payload) {
         try {
-            let { success, error, user } = await this.userRespository.verifyOTP(option, model);
-            if (!success) {
-                return { error, success };
+            if (!userId || !payload || !Object.keys(payload).length) {
+                return { success: false, error: 'Invalid request' }
             }
-            return { success, user };
-        } catch (error) {
-            return { error: error.message, success: false };
-        }
-    }
-    async updateUserProfile(username, payload) {
-        try {
-            const password = Buffer.from(payload.password, 'base64').toString('utf-8');
-            const usrname = Buffer.from(username, 'base64').toString('utf-8');
-            const salt = await bcrypt.genSalt(parseInt(String(app.pwdRounds || 10)));
-            payload.password = await bcrypt.hash(password, salt);
-            let { success, error, user } = await this.userRespository.update(usrname, payload);
+            if (payload.password) {
+                const password = Buffer.from(payload.password, 'base64').toString('utf-8');
+                const salt = await bcrypt.genSalt(parseInt(String(app.pwdRounds || 10)));
+                payload.password = await bcrypt.hash(password, salt);
+            }
+            let { success, error, user } = await this.userRespository.update(userId, payload);
             if (!success) {
                 return { error, success };
             }
