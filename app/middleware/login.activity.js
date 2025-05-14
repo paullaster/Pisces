@@ -26,9 +26,12 @@ export const loginActivity = (req, res, next) => {
         const diff = process.hrtime(start);
         const responseTimeMs = (diff[0] * 1e3) + (diff[1] / 1e6);
         console.log(`Response sent: status=${res.statusCode}, url=${req.originalUrl}, time=${responseTimeMs.toFixed(2)}ms`);
-        const user = verifyJwtToken(responseBody.data, app);
-        if (typeof user === 'object' && user !== null && 'id' in user)
-            userActivityQueue.add('updateLastLogin', { userId: user.id, date: new Date() });
+
+        if (res.statusCode > 199 && res.statusCode < 300) {
+            const user = verifyJwtToken(responseBody.data, app);
+            if (typeof user === 'object' && user !== null && 'id' in user)
+                userActivityQueue.add('updateLastLogin', { userId: user.id, date: new Date() });
+        }
     });
 
     res.on('close', () => {

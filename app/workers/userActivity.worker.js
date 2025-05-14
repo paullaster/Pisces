@@ -8,7 +8,7 @@ import { SequelizeUserRespository } from "../../data/interfaces/sequelize.user.r
 
 const { User } = models;
 const userUsecase = new LoginUseCase(new SequelizeUserRespository(User));
-const connection = new IORedis({ maxRetriesPerRequest: 5 })
+const connection = new IORedis({ maxRetriesPerRequest: null })
 const worker = new Worker('user-activity', async (job) => {
     switch (job.name) {
         case 'updateLastLogin':
@@ -20,3 +20,4 @@ const worker = new Worker('user-activity', async (job) => {
             }
     }
 }, { connection });
+

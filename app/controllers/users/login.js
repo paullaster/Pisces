@@ -106,7 +106,7 @@ class LoginController {
             if (!success || !user) {
                 return await this.createTempUser(req, res, error);
             }
-            if (user && (!user.veryfied || !user.completed)) {
+            if (user && user.type !== 'admin' && (!user.veryfied || !user.completed)) {
                 // Use OTP service to generate and send OTP
                 const { success: otpSuccess, otp, expiryTime, purpose, message } = await otpService.generateOTP(String(user.id), "newAccount");
                 if (!otpSuccess) {
