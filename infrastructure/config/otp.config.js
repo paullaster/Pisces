@@ -57,9 +57,8 @@ export class OTPConfig {
         this.#validityPeriod = validityPeriod;
         return this;
     }
-
     /**
-     * @private
+     *
      */
     #updateRanges() {
         this.#minRange = Math.pow(10, this.#length - 1);

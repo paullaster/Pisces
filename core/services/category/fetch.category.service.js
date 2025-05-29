@@ -33,17 +33,19 @@ export class FetchCategoryService {
                 return { success: false, error };
             }
             let categories = data.rows.map(row => {
-                row.Images= row.Images.map( image =>{
-                    image['dataValues'].url = prepareImageUrl(image.imgId, image.mimetype);
-                    return image;
-                });
+                if (row.Images) {
+                    row.Images = row.Images.map(image => {
+                        image['dataValues'].url = prepareImageUrl(image.imgId, image.mimetype);
+                        return image;
+                    });
+                }
                 return row;
             });
             categories = {
                 count: data.count,
                 rows: categories,
-              }
-            return { success,  categories };
+            }
+            return { success, categories };
         } catch (error) {
             return { success: false, error: error.message }
         }

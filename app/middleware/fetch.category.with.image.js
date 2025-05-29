@@ -9,7 +9,7 @@ const { Image } = models;
  */
 export const categoryImageMiddleware = (req, res, next) => {
     try {
-        req.model = [{ model: Image, where: { imagableType: 'Category' }, attributes: ['imgId', 'mimetype'] }];
+        req.model = [{}];
         next();
     } catch (error) {
         return res.ApiResponse.error(401, error.message);

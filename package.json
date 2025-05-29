@@ -7,7 +7,7 @@
   "sequelize": "cross-env NODE_ENV=development sequelize $*",
   "scripts": {
     "start": "NODE_ENV=development node --env-file=.env.development --watch ./server.js",
-    "dev:migrate:up": "NODE_ENV=development dotenv -e .env.development -c development npx sequelize-cli db:migrate",
+    "dev:migrate": "NODE_ENV=development dotenv -e .env.development -c development npx sequelize-cli db:migrate",
     "migrate:undo": "npx sequelize-cli db:migrate:undo",
     "production": "NODE_ENV=production node --env-file=.env  server.js",
     "pm2-start-dev": "NODE_ENV=development && pm2 start ecosystem.config.cjs --env development",
@@ -18,11 +18,7 @@
     "pm2-restart-dev": "NODE_ENV=development && pm2 restart ecosystem.config.cjs --env development",
     "test": "test"
   },
-  "keywords": [
-    "NODEJS",
-    "ECOMMERRCE",
-    "JAVASCRIPT"
-  ],
+  "keywords": ["NODEJS", "ECOMMERRCE", "JAVASCRIPT"],
   "author": "paullaster okoth",
   "license": "GPL-3.0-or-later",
   "dependencies": {

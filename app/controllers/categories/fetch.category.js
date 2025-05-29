@@ -9,13 +9,13 @@ export class FetchCategoryController {
         try {
             if (req.query) {
                 const { page, limit, ...options } = req.query;
-                const { success, categories, error } = await this.fetchCategoryService.fetchAllCategories(options, page, limit, true, req.model);
+                const { success, categories, error } = await this.fetchCategoryService.fetchAllCategories(options, page, limit, false, req.model);
                 if (!success) {
                     return res.ApiResponse.error(404, error);
                 }
                 return res.ApiResponse.success(categories, 200);
             }
-            const { success, data:categories, error } = await this.fetchCategoryService.fetchAllCategories();
+            const { success, data: categories, error } = await this.fetchCategoryService.fetchAllCategories();
             if (!success) {
                 return res.ApiResponse.error(400, error);
             }
@@ -29,7 +29,7 @@ export class FetchCategoryController {
             if (!req.params.cid) {
                 return res.ApiResponse.error(428, 'The Category ID is required');
             }
-            const {success, category, error } = await this.fetchCategoryService.fetchCategoryByID(req.params.cid);
+            const { success, category, error } = await this.fetchCategoryService.fetchCategoryByID(req.params.cid);
             if (!success) {
                 return res.ApiResponse.error(404, error);
             }
@@ -40,12 +40,12 @@ export class FetchCategoryController {
     }
     async fetchCategoryByName(req, res) {
         try {
-            
+
             if (!req.params.name) {
                 return res.ApiResponse.error(428, 'The Category name is required');
             }
             const { page, limit } = req.query;
-            const {success, categories, error } = await this.fetchCategoryService.fetchCategoryByName(req.params.name, page, limit);
+            const { success, categories, error } = await this.fetchCategoryService.fetchCategoryByName(req.params.name, page, limit);
 
             if (!success) {
                 return res.ApiResponse.error(404, error);

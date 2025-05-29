@@ -16,6 +16,19 @@ export default {
         type: Sequelize.STRING(255),
         allowNull: false,
       },
+      color: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      icon: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      isActive: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

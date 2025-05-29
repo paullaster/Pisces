@@ -44,6 +44,13 @@ export default function (sequelize, DataTypes) {
     cid: { type: DataTypes.STRING(255), primaryKey: true },
     name: DataTypes.STRING(100),
     description: DataTypes.STRING(255),
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    color: DataTypes.STRING(255),
+    icon: DataTypes.STRING(255),
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   }, {
