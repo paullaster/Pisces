@@ -5,7 +5,7 @@ import LoginUseCase from "../../core/services/auth/login.service.js";
 import { SequelizeUserRespository } from "../../data/interfaces/sequelize.user.repository.js";
 
 
-const connection = new IORedis({ maxRetriesPerRequest: null })
+const connection = new IORedis({ maxRetriesPerRequest: null });
 
 const { User } = models;
 
