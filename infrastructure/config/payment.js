@@ -1,4 +1,4 @@
-import app from './app'
+import app from './app.js'
 const payment = {
     NCBA: {
         baseUrl: process.env.NCBA_BASE_URL,

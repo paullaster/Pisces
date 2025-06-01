@@ -1,5 +1,5 @@
 import { PricingMatrix } from "../../../app/providers/pricingMatrixProvider.js";
-import pricingMatrix from "../../../config/pricing.matrix.js";
+import pricingMatrix from "../../../infrastructure/config/pricing.matrix.js";
 
 export class MapService {
     constructor(serviceProvider,) {

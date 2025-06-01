@@ -5,9 +5,8 @@ export default {
     await queryInterface.createTable('Warehouses', {
       warehouseId: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.BIGINT
+        type: Sequelize.STRING
       },
       warehouseName: {
         type: Sequelize.STRING(255),

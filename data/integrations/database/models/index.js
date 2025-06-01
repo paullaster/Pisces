@@ -1,7 +1,7 @@
 'use strict'
 
 import { Sequelize, DataTypes } from 'sequelize'
-import config from '../../../../config/db.cjs'
+import config from '../../../../infrastructure/config/db.cjs'
 import user from './user.js'
 import address from './address.js'
 import otp from './otp.js'
@@ -25,6 +25,8 @@ import productvariant from './productvariant.js'
 import transaction from './transaction.js'
 import variantattribute from './variantattribute.js'
 import warehouse from './warehouse.js'
+import paymentmethodchannels from './paymentmethodchannels.js'
+import idempotencycache from './idempotencycache.js'
 
 const env = process.env.NODE_ENV || 'development'
 
@@ -65,6 +67,8 @@ const models = {
   Transaction: transaction(sequelize, DataTypes),
   VariantAttribute: variantattribute(sequelize, DataTypes),
   Warehouse: warehouse(sequelize, DataTypes),
+  PaymentMethodChannel: paymentmethodchannels(sequelize, DataTypes),
+  IdempotencyCache: idempotencycache(sequelize, DataTypes),
 }
 
 Object.values(models).forEach((model) => {

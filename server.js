@@ -6,7 +6,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import "./app/events/listeners/send.customer.otp.js";
 import "./app/events/index.js";
-import appConfig from "./config/app.js";
+import appConfig from "./infrastructure/config/app.js"
 import "./app/events/emitters/event.emitters.js";
 import "./app/events/listeners/deploy.orama.index.js";
 import "./app/events/listeners/delete.expired.user.otps.js";

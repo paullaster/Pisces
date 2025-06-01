@@ -29,7 +29,7 @@ export default function (sequelize, DataTypes) {
     }
   }
   Attribute.init({
-    id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true, },
+    id: { type: DataTypes.BIGINT, primaryKey: true, },
     name: DataTypes.STRING
   }, {
     sequelize,

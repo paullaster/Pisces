@@ -1,14 +1,7 @@
 const path = require("path");
 module.exports = {
-    config: path.resolve('config', 'db.cjs'),
+    config: path.resolve('infrastructure', 'config', 'db.cjs'),
     'migrations-path': path.resolve('data', 'integrations', 'database', 'migrations'),
     'seeders-path': path.resolve('data', 'integrations', 'database', 'seeders'),
     'models-path': path.resolve('data', 'integrations', 'database', 'models'),
 };
-
-// module.exports = {
-//     config: path.resolve('server/config', 'db.cjs'),
-//     'models-path': path.resolve('server/utils/db', 'models'),
-//     'seeders-path': path.resolve('server/utils/db', 'seeders'),
-//     'migrations-path': path.resolve('server/utils/db', 'migrations'),
-// };

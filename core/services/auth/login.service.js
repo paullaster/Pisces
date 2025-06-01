@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import app from '../../../config/app.js';
+import app from '../../../infrastructure/config/app.js';
 
 /**@typedef {import('../../types/user.result.jsdoc.js').UserResult} UserResult*/
 

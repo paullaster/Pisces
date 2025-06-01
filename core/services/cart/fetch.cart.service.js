@@ -4,12 +4,12 @@ export class FetchCartService {
         this.fetchCart = this.fetchCart.bind(this);
         this.fetchUserCartItems = this.fetchUserCartItems.bind(this);
     }
-    async fetchCart(user, model = []) {
+    async fetchCart(user) {
         try {
             if (!user) {
                 return { success: false, error: "Invalid!" };
             }
-            const { success, error, data:cart } = await this.cartRepository.getUserCart(user, model, 'fetch', true);
+            const { success, error, data: cart } = await this.cartRepository.getUserCart(user, 'fetch', true);
             if (!success) {
                 return { success: false, error };
             }
@@ -30,7 +30,7 @@ export class FetchCartService {
             if (!Object.keys(filters).length) {
                 filters.itemCheckoutStatus = 'New';
             }
-            const { success, error, data:cart } = await this.cartRepository.fetch(userId, filters);
+            const { success, error, data: cart } = await this.cartRepository.fetch(userId, filters);
             if (!success) {
                 return { success: false, error };
             }

@@ -38,6 +38,8 @@ export default function (sequelize, DataTypes) {
     itemId: { type: DataTypes.STRING, primaryKey: true },
     cartId: DataTypes.STRING(255),
     variantId: DataTypes.BIGINT,
+    price: DataTypes.DECIMAL(10, 2),
+    name: DataTypes.STRING(255),
     quantity: DataTypes.INTEGER,
   }, {
     sequelize,

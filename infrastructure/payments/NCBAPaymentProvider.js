@@ -33,14 +33,14 @@ export class NCBAPaymentProvider {
             return { success: false, error: error.message };
         }
     }
-    async c2bSTKPush(payment) {
+    async b2cSTKPush(payment) {
         try {
             if (!payment || safeTypeChecker(payment) !== 'Object') {
                 return { success: false, error: 'Invalid payment request' };
             }
             const validationResult = {
                 isValid: true,
-                missingProperty: ''
+                missingProperty: '',
             };
 
             for (const [key, value] of Object.entries(payment)) {
@@ -102,13 +102,6 @@ export class NCBAPaymentProvider {
                 return { success: false, error: response.description };
             }
             return { success: true, message: response.description };
-        } catch (error) {
-            return { success: false, error: error?.message };
-        }
-    }
-    async callbackNotification() {
-        try {
-
         } catch (error) {
             return { success: false, error: error?.message };
         }

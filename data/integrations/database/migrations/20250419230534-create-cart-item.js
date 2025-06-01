@@ -18,7 +18,7 @@ export default {
         onDelete: 'CASCADE',
       },
       variantId: {
-        type: Sequelize.BIGINT,
+        type: Sequelize.STRING,
         allowNull: false,
         references: {
           model: 'ProductVariants',
@@ -28,6 +28,15 @@ export default {
       },
       quantity: {
         type: Sequelize.INTEGER
+      },
+      name: {
+        type: Sequelize.STRING(255),
+        allowNull: false
+      },
+      price: {
+        type: Sequelize.DECIMAL(10, 2),
+        allowNull: false,
+        defaultValue: 0
       },
     });
     await queryInterface.addConstraint('CartItems', {

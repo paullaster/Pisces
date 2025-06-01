@@ -6,12 +6,11 @@ export default {
     await queryInterface.createTable('AttributeValues', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.BIGINT
+        type: Sequelize.STRING(255)
       },
       attributeId: {
-        type: Sequelize.BIGINT,
+        type: Sequelize.STRING,
         allowNull: false,
         references: {
           model: 'Attributes',

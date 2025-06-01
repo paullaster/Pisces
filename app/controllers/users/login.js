@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import app from "../../../config/app.js";
+import app from "../../../infrastructure/config/app.js";
 import { valueType } from "../../../common/get.customer.payload.type.js";
 import { models } from "../../../data/integrations/database/models/index.js";
 import LoginUseCase from "../../../core/services/auth/login.service.js";

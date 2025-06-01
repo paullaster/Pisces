@@ -1,5 +1,5 @@
 import { createTransport } from 'nodemailer';
-import { mail } from '../../config/mail.js';
+import { mail } from '../../infrastructure/config/mail.js';
 
 const transporter = createTransport({
     // Specify the transport type explicitly for type safety

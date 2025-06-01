@@ -5,9 +5,8 @@ export default {
     await queryInterface.createTable('ProductDiscounts', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.BIGINT,
+        type: Sequelize.STRING(255),
       },
       productId: {
         type: Sequelize.STRING(255),
@@ -19,7 +18,7 @@ export default {
         onDelete: 'CASCADE',
       },
       discountId: {
-        type: Sequelize.BIGINT,
+        type: Sequelize.STRING(255),
         allowNull: false,
         references: {
           model: 'Discounts',

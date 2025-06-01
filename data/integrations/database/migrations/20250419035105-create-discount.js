@@ -5,9 +5,8 @@ export default {
     await queryInterface.createTable('Discounts', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.BIGINT
+        type: Sequelize.STRING(255),
       },
       title: {
         allowNull: false,

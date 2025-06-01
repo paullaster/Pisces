@@ -1,4 +1,4 @@
-import { mail } from "../../config/mail.js";
+import { mail } from "../../infrastructure/config/mail.js";
 import transporter from "../providers/Mailtransport.js";
 
 export class EmailNotification {

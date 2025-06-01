@@ -5,9 +5,8 @@ export default {
     await queryInterface.createTable('Attributes', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.BIGINT
+        type: Sequelize.STRING(255),
       },
       name: {
         allowNull: false,

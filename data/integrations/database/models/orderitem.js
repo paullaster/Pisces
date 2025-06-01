@@ -57,6 +57,7 @@ export default function (sequelize, DataTypes) {
     variantId: DataTypes.BIGINT,
     quantity: DataTypes.INTEGER,
     unitPrice: DataTypes.DECIMAL(10, 2),
+    name: DataTypes.STRING(255),
     subtotal: DataTypes.DECIMAL(10, 2),
   }, {
     sequelize,

@@ -5,12 +5,11 @@ export default {
     await queryInterface.createTable('DeliveryLocations', {
       locationId: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.BIGINT
+        type: Sequelize.STRING
       },
       warehouseId: {
-        type: Sequelize.BIGINT,
+        type: Sequelize.STRING,
         references: {
           model: 'Warehouses',
           key: 'warehouseId',

@@ -5,7 +5,7 @@ import { SequelizeAssetRepository } from '../data/interfaces/sequelize.assets.re
 import { models } from '../data/integrations/database/models/index.js';
 import { file } from '../app/middleware/multer.js';
 import { FileProcessor } from '../data/interfaces/file.processor.js';
-import app from '../config/app.js';
+import app from '../infrastructure/config/app.js';
 
 const { Image } = models;
 const assetRoutes = express.Router();

@@ -4,13 +4,12 @@ export default {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('VariantAttributes', {
       variantAttributeId: {
-        type: Sequelize.BIGINT,
+        type: Sequelize.STRING,
         primaryKey: true,
-        autoIncrement: true,
         allowNull: false,
       },
       variantId: {
-        type: Sequelize.BIGINT,
+        type: Sequelize.STRING,
         allowNull: false,
         references: {
           model: 'ProductVariants',
@@ -19,7 +18,7 @@ export default {
         onDelete: 'CASCADE',
       },
       valueId: {
-        type: Sequelize.BIGINT,
+        type: Sequelize.STRING,
         allowNull: false,
         references: {
           model: 'AttributeValues',

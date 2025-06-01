@@ -1,6 +1,6 @@
 import { RandomCodeGenerator } from "../../../common/generating_unique_codes.js";
 import { ValidateObjectPayload } from "../../validation/validate.object.payload.js";
-import app from "../../../config/app.js";
+import app from "../../../infrastructure/config/app.js";
 
 const { defaultCurrency } = app;
 export class CreateProductService {

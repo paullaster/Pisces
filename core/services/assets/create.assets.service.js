@@ -1,4 +1,4 @@
-import app from '../../../config/app.js';
+import app from '../../../infrastructure/config/app.js';
 import { FileProcessor } from '../../../data/interfaces/file.processor.js';
 import { SequelizeAssetRepository } from '../../../data/interfaces/sequelize.assets.repository.js';
 

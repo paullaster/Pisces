@@ -58,8 +58,13 @@ export default function (sequelize, DataTypes) {
     }
   }
   ProductVariant.init({
-    variantId: DataTypes.BIGINT,
+    variantId: {
+      type: DataTypes.BIGINT,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     productId: DataTypes.STRING(255),
+    name: DataTypes.STRING(255),
     sku: DataTypes.STRING(255),
     price: DataTypes.DECIMAL(10, 2),
     quantity: DataTypes.INTEGER,

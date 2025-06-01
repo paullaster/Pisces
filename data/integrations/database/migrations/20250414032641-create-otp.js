@@ -10,7 +10,7 @@ export default {
         type: Sequelize.BIGINT
       },
       userId: {
-        type: Sequelize.BIGINT,
+        type: Sequelize.STRING,
         allowNull: false,
         references: {
           model: 'Users',

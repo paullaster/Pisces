@@ -5,9 +5,8 @@ export default {
     await queryInterface.createTable('ProductVariants', {
       variantId: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.BIGINT
+        type: Sequelize.STRING(255),
       },
       productId: {
         type: Sequelize.STRING(255),
@@ -17,6 +16,10 @@ export default {
           key: 'pid'
         },
         onDelete: 'CASCADE',
+      },
+      name: {
+        type: Sequelize.STRING(255),
+        allowNull: false,
       },
       sku: {
         type: Sequelize.STRING(255),

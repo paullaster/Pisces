@@ -1,4 +1,4 @@
-import mapservice from "../../config/mapservice.js";
+import mapservice from "../../infrastructure/config/mapservice.js";
 import axios from "axios";
 import { Client } from "@googlemaps/google-maps-services-js";
 

@@ -33,7 +33,7 @@ export default {
         defaultValue: 'Pending',
       },
       paymentMethodId: {
-        type: Sequelize.BIGINT,
+        type: Sequelize.STRING,
         allowNull: false,
         references: {
           model: 'PaymentMethods',

@@ -1,4 +1,4 @@
-import app from "../../../config/app.js";
+import app from "../../../infrastructure/config/app.js";
 import { SequelizeUserRespository } from "../../../data/interfaces/sequelize.user.repository.js";
 import { Email } from "../../validation/email.js";
 import { Password } from "../../validation/password.js";

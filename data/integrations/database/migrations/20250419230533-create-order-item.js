@@ -18,7 +18,7 @@ export default {
         onDelete: 'CASCADE',
       },
       variantId: {
-        type: Sequelize.BIGINT,
+        type: Sequelize.STRING,
         allowNull: false,
         references: {
           model: 'ProductVariants',
@@ -34,6 +34,10 @@ export default {
       unitPrice: {
         type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
+      },
+      name: {
+        type: Sequelize.STRING(255),
+        allowNull: false
       },
       subtotal: {
         type: Sequelize.DECIMAL(10, 2),

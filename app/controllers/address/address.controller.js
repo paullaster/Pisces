@@ -1,6 +1,6 @@
 import { JoiSanitizer } from "../../middleware/joisanitizer.js";
 import { MapServiceProvider } from "../../providers/mapServiceProvider.js";
-import mapservice from "../../../config/mapservice.js";
+import mapservice from "../../../infrastructure/config/mapservice.js";
 import { MapService } from "../../../core/services/map/map.service.js";
 
 export class AddressController {
@@ -59,7 +59,7 @@ export class AddressController {
                 })
                 if (success) {
                     req.body.longitude = data.geometry.coordinates[0],
-                    req.body.latitude = data.geometry.coordinates[1];
+                        req.body.latitude = data.geometry.coordinates[1];
                 }
             }
             // const sanitizer = new JoiSanitizer();

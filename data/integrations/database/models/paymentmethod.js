@@ -25,13 +25,20 @@ export default function (sequelize, DataTypes) {
           name: 'paymentMethodId',
           allowNull: false,
         }
-      })
+      });
+      this.belongsTo(models.PaymentMethodChannel, {
+        targetKey: 'id',
+        foreignKey: {
+          name: 'channeId',
+          allowNull: false,
+        }
+      });
     }
   }
   PaymentMethod.init({
     methodId: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
     name: DataTypes.STRING(50),
-    channel: DataTypes.ENUM('B2C_STK_PUSH', 'C2B', 'B2C_RTG'),
+    channel: DataTypes.STRING(255),
     type: DataTypes.ENUM('CARD', 'MOBILE_MONEY', 'OTHER'),
     provider: DataTypes.STRING(200),
     isActive: {

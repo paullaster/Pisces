@@ -9,7 +9,7 @@ export class FetchPaymentRequestService {
             if (!paymentRequestId) {
                 return { success: false, error: 'Payment request ID is required' };
             }
-            if (typeof paymentRequestId!=='string') {
+            if (typeof paymentRequestId !== 'string') {
                 return { success: false, error: 'Payment request ID must be a string' };
             }
             const { success, paymentRequest, error } = await this.paymentRequestRepository.findById(paymentRequestId);
@@ -18,12 +18,11 @@ export class FetchPaymentRequestService {
             return { success: false, error: error.message };
         }
     }
-    async fetchPaymentRequestWithUniqueKeys(keys, options = {}) { 
+    async fetchPaymentRequestWithUniqueKeys(keys, options = {}) {
         try {
             if (!Object.keys(keys).length) {
                 return { success: false, error: 'Keys are required' };
             }
-            console.log(keys)
             const { success, data, error } = await this.paymentRequestRepository.getTransactionByUniqueProperty(keys, options);
             if (!success) {
                 return { success, error };

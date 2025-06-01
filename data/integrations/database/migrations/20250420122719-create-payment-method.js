@@ -5,16 +5,15 @@ export default {
     await queryInterface.createTable('PaymentMethods', {
       methodId: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.BIGINT
+        type: Sequelize.STRING
       },
       name: {
         type: Sequelize.STRING(50),
         allowNull: false,
       },
       channel: {
-        type: Sequelize.ENUM('B2C_STK_PUSH', 'C2B', 'B2C_RTG'),
+        type: Sequelize.STRING(255),
         allowNull: false,
       },
       type: {
@@ -36,7 +35,7 @@ export default {
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       }
     });
     await queryInterface.addIndex('PaymentMethods', ['name', 'channel', 'type']);

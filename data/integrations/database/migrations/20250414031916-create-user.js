@@ -6,9 +6,8 @@ export default {
     await queryInterface.createTable('Users', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.BIGINT
+        type: Sequelize.STRING(255),
       },
       firstName: {
         type: Sequelize.STRING(100)
