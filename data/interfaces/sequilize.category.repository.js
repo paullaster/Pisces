@@ -1,4 +1,4 @@
-import { Category } from "../../core/types/category.js";
+import { Category } from "../../core/entities/category.js";
 import { CategoryRepository } from "../../core/app/category.interface.js";
 
 export class SequelizeCategoryRepository extends CategoryRepository {

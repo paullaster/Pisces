@@ -45,8 +45,8 @@ export default function (sequelize, DataTypes) {
     }
   }
   AttributeValue.init({
-    id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
-    attributeId: DataTypes.BIGINT,
+    id: { type: DataTypes.STRING, primaryKey: true },
+    attributeId: DataTypes.STRING,
     value: DataTypes.STRING
   }, {
     sequelize,

@@ -35,7 +35,7 @@ export default function (sequelize, DataTypes) {
     }
   }
   ProductCategory.init({
-    id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
+    id: { type: DataTypes.STRING, primaryKey: true },
     categoryId: DataTypes.STRING(255),
     productId: DataTypes.STRING(255),
   }, {

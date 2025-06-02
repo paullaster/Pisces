@@ -2,7 +2,7 @@ import { ProductRepository } from "../../core/app/product.interface.js";
 import { Product } from "../../core/entities/product.js";
 
 export class SequelizeProductRepository extends ProductRepository {
-    constructor(ProductModel) {
+    constructor(ProductModel, ProductCategoryModel) {
         super();
         this.dataSource = ProductModel;
         this.mapToProduct = this.mapToProduct.bind(this);

@@ -35,8 +35,13 @@ export default function (sequelize, DataTypes) {
     }
   }
   VariantAttribute.init({
-    variantId: DataTypes.BIGINT,
-    valueId: DataTypes.BIGINT,
+    variantAttributeId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      primaryKey: true,
+    },
+    variantId: DataTypes.STRING,
+    valueId: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'VariantAttribute',

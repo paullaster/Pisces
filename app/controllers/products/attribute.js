@@ -40,7 +40,7 @@ export class AttributeController {
     }
     async findOne(req, res) {
         try {
-            const { success, data, error } = await this.fetchAttributeUseCase.findById(req.params.attributeId);
+            const { success, data, error } = await this.fetchAttributeUseCase.findById(req.params.attributeId, req.query);
             if (!success) {
                 return res.ApiResponse.error(500, error, data);
             }
@@ -51,7 +51,7 @@ export class AttributeController {
     }
     async findAll(req, res) {
         try {
-            const { success, data, error } = await this.fetchAttributeUseCase.findAll();
+            const { success, data, error } = await this.fetchAttributeUseCase.findAll(req.query);
             if (!success) {
                 return res.ApiResponse.error(500, error, data);
             }

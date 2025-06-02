@@ -82,12 +82,23 @@ export class JoiSanitizer {
   validateAttribute(attribute) {
     const schema = Joi.object({
       name: Joi.string().required(),
+      values: Joi.array().optional(),
     });
     return schema.validate(attribute);
   }
   validateParams = (schema) => {
     return (req, res, next) => {
       const { error, value } = schema.validate(req.params);
+      if (error) {
+        return res.status(400).json({ error: error.details[0].message });
+      }
+      req.params = value;
+      next();
+    };
+  };
+  validateBody = (schema) => {
+    return (req, res, next) => {
+      const { error, value } = schema.validate(req.body);
       if (error) {
         return res.status(400).json({ error: error.details[0].message });
       }
