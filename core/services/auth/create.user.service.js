@@ -3,6 +3,7 @@ import { SequelizeUserRespository } from "../../../data/interfaces/sequelize.use
 import { Email } from "../../validation/email.js";
 import { Password } from "../../validation/password.js";
 import bcrypt from "bcrypt";
+import { RandomCodeGenerator } from "../../../common/generating_unique_codes.js";
 
 export class CreateUserService {
     /**
@@ -32,7 +33,7 @@ export class CreateUserService {
             }
             const salt = await bcrypt.genSalt(parseInt(String(app.pwdRounds || 10)));
             passwordObj.password = await bcrypt.hash(passwordObj.password, salt);
-            const { success: status, error: er, user } = await this.userRepository.create({ email: emailObj.email, password: passwordObj.password, ...rest });
+            const { success: status, error: er, user } = await this.userRepository.create({ id: `${RandomCodeGenerator(6, 'user_')}_${Date.now()}`, email: emailObj.email, password: passwordObj.password, ...rest });
             if (status) {
                 return { success: status, user };
             }

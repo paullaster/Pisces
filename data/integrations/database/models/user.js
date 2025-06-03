@@ -62,6 +62,10 @@ export default function (sequelize, DataTypes) {
     }
   }
   User.init({
+    id: {
+      type: DataTypes.STRING(255),
+      primaryKey: true,
+    },
     firstName: DataTypes.STRING,
     lastName: DataTypes.STRING,
     email: DataTypes.STRING,
