@@ -12,11 +12,11 @@ import { models, sequelize } from '../data/integrations/database/models/index.js
 import { JoiSanitizer } from '../app/middleware/joisanitizer.js';
 import Joi from 'joi';
 import { SequelizeProductRepository } from '../infrastructure/repositories/productRepository.js';
-const { Product, ProductCategory, Image, VariantAttribute, ProductVariant } = models;
+const { Product, ProductCategory, Image, VariantAttribute, ProductVariant, ProductDiscount } = models;
 
 
 const prodcutRoutes = express.Router();
-const productRepository = new SequelizeProductRepository(sequelize, Product, ProductCategory, Image, ProductVariant, VariantAttribute);
+const productRepository = new SequelizeProductRepository(sequelize, Product, ProductCategory, Image, ProductVariant, VariantAttribute, ProductDiscount);
 
 // Create product
 const createProductService = new CreateProductService(productRepository);

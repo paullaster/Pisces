@@ -28,6 +28,9 @@ export class SequelizeProductRepository extends IProductRepository {
     async save(product) {
         const t = await this.sequelizeInstance.transaction();
         try {
+            if (!(product instanceof Product)) {
+                return { success: false, error: 'Must of of type Product', data: product };
+            }
             const productData = product.toPersistenceObject();
             const productExist = await this.productModel.findByPk(product.productId, { transaction: t });
             if (productExist) {
@@ -89,9 +92,8 @@ export class SequelizeProductRepository extends IProductRepository {
             await t.commit();
             return { success: true, data: product }
         } catch (error) {
-            console.log(error.message, error.stack)
             await t.rollback();
-            return { success: false, error: error.message };
+            return { success: false, error: error.message, data: error.stack };
         }
     }
     mapToProduct(product) {
