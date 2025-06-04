@@ -1,49 +1,62 @@
-import { sequelize } from "../connection.js";
-import { DataTypes } from "sequelize";
-import Image from "./images.js";
+'use strict';
+import { Model } from "sequelize";
 
-
-const Category  = sequelize.define('Category',{
-    cid: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-        primaryKey: true,
+/**
+ * 
+ * @param {*} sequelize 
+ * @param {*} DataTypes 
+ * @returns 
+ */
+export default function (sequelize, DataTypes) {
+  class Category extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    /**
+     * 
+     * @param {*} models 
+     */
+    static associate(models) {
+      // define association here
+      this.hasMany(models.Image, {
+        foreignKey: 'imagableId',
+        constraints: false,
+        scope: {
+          imagableType: 'Category',
+        },
+      })
+      this.belongsToMany(models.Product, {
+        through: models.ProductCategory,
+        foreignKey: 'categoryId',
+        otherKey: 'productId',
+      })
+      this.hasMany(models.ProductCategory, {
+        foreignKey: {
+          name: 'categoryId',
+          allowNull: false,
+        }
+      })
+    }
+  }
+  Category.init({
+    cid: { type: DataTypes.STRING(255), primaryKey: true },
+    name: DataTypes.STRING(100),
+    description: DataTypes.STRING(255),
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
     },
-    name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false
-    },
-    description: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false
-    },
-}, {
-    tableName: 'categories',
+    color: DataTypes.STRING(255),
+    icon: DataTypes.STRING(255),
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE,
+  }, {
+    sequelize,
+    modelName: 'Category',
     timestamps: true,
-    underscored: true,
-    freezeTableName: true,
-    charset: 'utf8mb4',
-    collate: 'utf8mb4_unicode_ci'
-});
-
-
-Category.hasMany(Image, {
-    foreignKey: 'imagableId',
-    constraints: false,
-    // scope: {
-    //     imagableType: 'Category'
-    // }
-});
-
-
-Image.belongsTo(Category, {
-    foreignKey: 'imagableId',
-    constraints: false,
-})
-
-Category.sync();
-
-export default Category;
+  });
+  return Category;
+};

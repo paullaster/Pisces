@@ -1,97 +1,84 @@
-import { sequelize } from "../connection.js";
-import { DataTypes } from "sequelize";
-import Category from "./category.js";
-import Image from "./images.js";
-
-const Product = sequelize.define('Product',{
-    pid: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-        primaryKey: true,
-    },
-    name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false,
-    },
-    price: {
-        type: DataTypes.DECIMAL(10, 2),
-        allowNull: false,
-        unique: false,
-        defaultValue: 0,
-    },
-    description: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false
-    },
-    category: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false,
-        references: {
-            model: Category,
-            key: 'cid',
-            onDelete: 'CASCADE',
-            onUpdate: 'CASCADE'
-        },
-    },
-    quantity: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        unique: false
-    },
-    color: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false
-    },
-    size: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false
-    },
-    discount: {
-        type: DataTypes.DECIMAL(10, 2),
-        allowNull: false,
-        unique: false,
-        defaultValue: 0,
-    },
-    lastPid: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false,
-    },
-    recipeTips: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-        unique: false,
+'use strict';
+import { Model } from "sequelize";
+/**
+ * 
+ * @param {*} sequelize 
+ * @param {*} DataTypes 
+ * @returns 
+ */
+export default function (sequelize, DataTypes) {
+  class Product extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    /**
+     * 
+     * @param {*} models 
+     */
+    static associate(models) {
+      // define association here
+      this.hasMany(models.Image, {
+        foreignKey: 'imagableId',
+        constraints: false,
+        scope: {
+          imagableType: 'Product',
+        }
+      });
+      this.belongsToMany(models.Category, {
+        through: models.ProductCategory,
+        foreignKey: 'productId',
+        otherKey: 'categoryId',
+      });
+      this.hasMany(models.ProductCategory, {
+        foreignKey: {
+          name: 'productId',
+          allowNull: false,
+        }
+      });
+      this.belongsToMany(models.Discount, {
+        through: models.ProductDiscount,
+        foreignKey: 'productId',
+        otherKey: 'discountId',
+      })
+      this.hasMany(models.ProductDiscount, {
+        foreignKey: 'productId',
+      });
+      this.hasMany(models.ProductVariant, {
+        foreignKey: {
+          name: 'productId',
+          allowNull: false,
+        }
+      });
     }
-},
-{
-    tableName: 'products',
+  }
+  Product.init({
+    pid: { type: DataTypes.STRING(255), primaryKey: true },
+    name: DataTypes.STRING(255),
+    discountedPrice: { type: DataTypes.DECIMAL(10, 2), defaultValue: 0 },
+    price: { type: DataTypes.DECIMAL(10, 2), defaultValue: 0 },
+    description: DataTypes.TEXT,
+    recipeTips: DataTypes.TEXT,
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE,
+  }, {
+    sequelize,
+    modelName: 'Product',
     timestamps: true,
-    underscored: true,
-    freezeTableName: true,
-    charset: 'utf8mb4',
-    collate: 'utf8mb4_unicode_ci'
-});
-
-Product.hasMany(Image, {
-    foreignKey: 'imagableId',
-    constraints: false,
-    // scope: {
-    //     imagableType: 'Product'
-    // }
-});
-
-Image.belongsTo(Product, {
-    foreignKey: 'imagableId',
-    constraints: false,
-});
-
-
-Product.sync();
-
-export default Product;
+    indexes: [
+      {
+        unique: false,
+        fields: ['name'],
+        type: 'FULLTEXT',
+        name: 'idx_name',
+      },
+      {
+        unique: false,
+        fields: ['price'],
+        name: 'idx_price',
+      },
+    ],
+  });
+  return Product;
+};

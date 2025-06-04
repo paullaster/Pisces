@@ -15,18 +15,18 @@ export class CreateCartService {
             if (!payload) {
                 return { success: false, error: "Can't add empty item to cart!" };
             }
-            if (typeof payload!=='object') {
+            if (typeof payload !== 'object') {
                 return { success: false, error: "Item must be a key value pair of item information" };
             }
-            if (Object.keys(payload).length===0) {
+            if (Object.keys(payload).length === 0) {
                 return { success: false, error: "Can't add empty item to cart!" };
             }
-            payload.cartId = RandomCodeGenerator(12, 'CT');
+            payload.cartId = RandomCodeGenerator(40, 'CT');
             payload.userId = userId;
             payload.item.itemId = RandomCodeGenerator(10, 'CI');
             payload.item.cartId = payload.cartId;
             new ValidateObjectPayload(payload);
-            const { success, error, data:cart } = await this.cartRepository.create(userId, payload, model);
+            const { success, error, data: cart } = await this.cartRepository.create(userId, payload, model);
             if (!success) {
                 return { success: false, error };
             }

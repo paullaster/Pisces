@@ -1,12 +1,24 @@
-import { Category } from "../../core/types/category.js";
+import { Category } from "../../core/entities/category.js";
 import { CategoryRepository } from "../../core/app/category.interface.js";
 
 export class SequelizeCategoryRepository extends CategoryRepository {
+    /**
+     * 
+     * @param {*} CategoryModel 
+     */
     constructor(CategoryModel) {
         super();
         this.dataSource = CategoryModel;
         this.mapToCategory = this.mapToCategory.bind(this);
     }
+    /**
+     * 
+     * @param {*} cid 
+     * @param {*} type 
+     * @param {*} eager 
+     * @param {*} model 
+     * @returns 
+     */
     async getCategoryById(cid, type = 'fetch', eager = false, model = []) {
         try {
             let category = await this.dataSource.findByPk(cid);
@@ -27,6 +39,15 @@ export class SequelizeCategoryRepository extends CategoryRepository {
             return { error: error.message, success: false };
         }
     }
+    /**
+     * 
+     * @param {*} options 
+     * @param {*} offset 
+     * @param {*} limit 
+     * @param {*} eager 
+     * @param {*} model 
+     * @returns 
+     */
     async getCategorys(options = {}, offset = 0, limit = 10, eager = false, model = []) {
         try {
             let categories;
@@ -47,11 +68,16 @@ export class SequelizeCategoryRepository extends CategoryRepository {
             if (!categories) {
                 return { error: 'No category at the moment!', success: false };
             }
-            return { success: true, data:{count: categories.count, rows: categories.rows.map(category => this.mapToCategory(category)?.data)} };
+            return { success: true, data: { count: categories.count, rows: categories.rows.map(category => this.mapToCategory(category)?.data) } };
         } catch (error) {
             return { error: error.message, success: false };
         }
     }
+    /**
+     * 
+     * @param {*} category 
+     * @returns 
+     */
     async create(category) {
         try {
             const { success, error } = await this.getCategoryById(category.cid, 'create');

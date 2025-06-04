@@ -1,79 +1,67 @@
-import { sequelize } from "../connection.js";
-import { DataTypes } from "sequelize";
-import User from "./users.js";
+'use strict';
+import { Model } from 'sequelize';
 
-const Address = sequelize.define('Address',{
-    addressId: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-        primaryKey: true,
-    },
-    userId: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        references: {
-            model: User,
-            key: 'email'
+/**
+ * 
+ * @param {*} sequelize 
+ * @param {*} DataTypes 
+ * @returns 
+ */
+export default function (sequelize, DataTypes) {
+  class Address extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    /**
+     * 
+     * @param {*} models 
+     */
+    static associate(models) {
+      // define association here
+      this.belongsTo(models.User, {
+        targetKey: 'email',
+        foreignKey: {
+          name: 'userId',
+          allowNull: false,
         }
-    },
-    street: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    streetCode: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    city: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    country: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-    },
-    zip: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    address: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    default: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-    },
-    latitude: {
-        type: DataTypes.DECIMAL(10, 6),
-        allowNull: false,
-        defaultValue: 0,
-    },
-    longitude: {
-        type: DataTypes.DECIMAL(10, 6),
-        allowNull: false,
-        defaultValue: 0,
-    },
-    appartment: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    town: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-},
-{
-    tableName: 'addresses',
+      });
+    }
+  }
+  Address.init({
+    addressId: { type: DataTypes.STRING(255), primaryKey: true },
+    userId: DataTypes.BIGINT,
+    street: DataTypes.STRING(255),
+    streetCode: DataTypes.STRING(255),
+    city: DataTypes.STRING(255),
+    country: DataTypes.STRING(255),
+    zip: DataTypes.STRING(255),
+    address: DataTypes.TEXT,
+    default: DataTypes.BOOLEAN,
+    latitude: DataTypes.DECIMAL(10, 6),
+    longitude: DataTypes.DECIMAL(10, 6),
+    appartment: DataTypes.STRING(255),
+    town: DataTypes.STRING(255),
+    placeId: DataTypes.STRING(255),
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE,
+  }, {
+    sequelize,
+    modelName: 'Address',
     timestamps: true,
-    underscored: true,
-    freezeTableName: true,
-    charset: 'utf8mb4',
-    collate: 'utf8mb4_unicode_ci'
-}
-);
-
-Address.sync();
-
-export default Address;
+    indexes: [
+      {
+        unique: false,
+        fields: ['city', 'town', 'street'],
+        name: 'city_town_street',
+      },
+      {
+        unique: false,
+        fields: ['userId'],
+        name: 'idx_userId'
+      }
+    ]
+  });
+  return Address;
+};

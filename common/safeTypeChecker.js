@@ -1,0 +1,1 @@
+export const safeTypeChecker = (input) => Object.prototype.toString.call(input).slice(8, -1);

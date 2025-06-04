@@ -1,60 +1,94 @@
-import { sequelize } from "../connection.js";
-import { DataTypes } from "sequelize";
-import User from "./users.js";
+'use strict';
+import { Model } from "sequelize";
 
-const Order = sequelize.define('Order', {
-    orderId: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-        primaryKey: true,
-    },
-    shippingRate: {
-        type: DataTypes.DECIMAL,
-        allowNull: false,
-        defaultValue: 0
-    },
-    paymentMethod: {
-        type: DataTypes.STRING,
-        allowNull: false,
+/**
+ * 
+ * @param {*} sequelize 
+ * @param {*} DataTypes 
+ * @returns 
+ */
+export default function (sequelize, DataTypes) {
+  class Order extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    /**
+     * 
+     * @param {*} models 
+     */
+    static associate(models) {
+      // define association here
+      this.belongsTo(models.User, {
+        targetKey: 'id',
+        foreignKey: {
+          name: 'userId',
+          allowNull: false,
+        }
+      });
+      this.hasMany(models.OrderItem, {
+        foreignKey: {
+          name: 'orderId',
+          allowNull: false,
+        }
+      });
+      this.hasMany(models.Transaction, {
+        foreignKey: {
+          name: 'orderId',
+          allowNull: false,
+        }
+      });
+      this.belongsTo(models.Transaction, {
+        foreignKey: {
+          name: 'paymentId',
+          allowNull: true,
+        }
+      });
+    }
+  }
+  Order.init({
+    orderId: { type: DataTypes.STRING, primaryKey: true },
+    userId: DataTypes.BIGINT,
+    paymentId: DataTypes.STRING(255),
+    status: DataTypes.ENUM('New', 'Pending Processing', 'Processed', 'Pending Delivery', 'Delivered', 'Cancelled', 'In Transit'),
+    deliveryFee: DataTypes.DECIMAL(10, 2),
+    totalAmount: DataTypes.DECIMAL(10, 2),
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE,
+    deletedAt: DataTypes.DATE,
+  }, {
+    sequelize,
+    modelName: 'Order',
+    timestamps: true,
+    paranoid: true,
+    indexes: [
+      {
         unique: false,
-        values: ['Cash On Delivery', 'Mpesa', 'Bank Card'],
-        defaultValue: 'Cash On Delivery'
-    },
-    paymentStatus: {
-        type: DataTypes.STRING,
-        allowNull: false,
+        fields: ['createdAt'],
+        name: 'idx_createdAt',
+      },
+      {
         unique: false,
-        defaultValue: 'unPaid',
-        values: ['unPaid', 'Paid'],
-    },
-    orderStatus: {
-        type: DataTypes.STRING,
-        allowNull: false,
+        fields: ['status'],
+        name: 'idx_status',
+      },
+      {
         unique: false,
-        defaultValue: 'New',
-        values: ['New', 'Pending Processing', 'Processed', 'Pending Delivery', 'Delivered', 'Cancelled', 'In Transit'],
-    },
-    originCart: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    totalPrice: {
-        type: DataTypes.DECIMAL,
-        allowNull: false,
-    },
-},
-    {
-        tableName: 'orders',
-        timestamps: true,
-        underscored: true,
-        freezeTableName: true,
-        charset: 'utf8mb4',
-        collate: 'utf8mb4_unicode_ci'
-    });
-
-Order.belongsTo(User, { targetKey: 'email', foreignKey: 'userEmail' });
-
-Order.sync();
-
-export default Order;
+        fields: ['totalAmount'],
+        name: 'idx_totalAmount',
+      },
+      {
+        unique: false,
+        fields: ['userId'],
+        name: 'idx_userId',
+      },
+      {
+        unique: false,
+        fields: ['paymentId'],
+        name: 'idx_paymentId'
+      }
+    ],
+  });
+  return Order;
+};

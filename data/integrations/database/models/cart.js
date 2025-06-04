@@ -1,42 +1,55 @@
-import { sequelize } from "../connection.js";
-import { DataTypes } from "sequelize";
-import User from "./users.js";
+'use strict';
+import { Model } from "sequelize";
 
-const Cart = sequelize.define('Cart', {
-    cartId: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-        primaryKey: true,
-    },
-    shippingRate: {
-        type: DataTypes.DECIMAL,
-        allowNull: false,
-        defaultValue: 0
-    },
-    paymentMethod: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false,
-        defaultValue: 'Cash On Delivery'
-    },
-    cartCheckoutStatus: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false,
-        defaultValue: 'New',
-        values: ['New', 'Paid'],
+/**
+ * 
+ * @param {*} sequelize 
+ * @param {*} DataTypes 
+ * @returns 
+ */
+export default function (sequelize, DataTypes) {
+  class Cart extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    /**
+     * 
+     * @param {*} models 
+     */
+    static associate(models) {
+      // define association here
+      this.belongsTo(models.User, {
+        targetKey: 'email',
+        foreignKey: {
+          allowNull: false,
+          name: 'userId'
+        }
+      })
+      this.hasMany(models.CartItem, {
+        foreignKey: {
+          name: 'cartId',
+          allowNull: false,
+        }
+      })
     }
-},
-    {
-        tableName: 'carts',
-        timestamps: true,
-        underscored: true,
-        freezeTableName: true,
-        charset: 'utf8mb4',
-        collate: 'utf8mb4_unicode_ci'
-    });
-    Cart.belongsTo(User, { targetKey: 'email', foreignKey: 'userEmail' });
-    Cart.sync();
-
-export default Cart;
+  }
+  Cart.init({
+    cartId: { type: DataTypes.STRING, primaryKey: true },
+    userId: DataTypes.BIGINT,
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE,
+  }, {
+    sequelize,
+    modelName: 'Cart',
+    timestamps: true,
+    indexes: [
+      {
+        unique: true,
+        fields: ['userId']
+      }
+    ]
+  });
+  return Cart;
+};

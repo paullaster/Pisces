@@ -3,9 +3,7 @@ import { InitiateCheckoutController } from "../app/controllers/checkout/initiate
 import { InitiatePaymentRequestService } from "../core/services/checkout/initiate.checkout.service.js";
 import { SequelizeTransactionRepository } from "../data/interfaces/sequilize.transaction.respository.js";
 import { SequilizeCartRepository } from "../data/interfaces/sequilize.cart.repository.js";
-import Transaction from "../data/integrations/database/models/transaction.js";
 import { CheckoutHandler } from "../app/middleware/CheckoutHandler.js";
-import Cart from "../data/integrations/database/models/cart.js";
 import Order from "../data/integrations/database/models/order.js";
 import { FetchPaymentRequestController } from "../app/controllers/checkout/fetch.payment.js";
 import { FetchPaymentRequestService } from "../core/services/checkout/get.payment.service.js";
@@ -17,22 +15,22 @@ import { SequilizeOrderRepository } from "../data/interfaces/sequilize.order.rep
 import { CheckoutCallbackController } from "../app/controllers/checkout/checkout.callback.js";
 import { UpdatePaymentRequestService } from "../core/services/checkout/update.payment.service.js";
 import { validateUserToken } from "../app/middleware/validate.token.js";
-import { Mpesa } from "../lib/mpesa/mpesa.lib.js";
 import { DeleteCartController } from "../app/controllers/cart/delete.cart.js";
 import { DeleteCartService } from "../core/services/cart/delete.cart.service.js";
-import { itemModelMiddleware } from "../app/middleware/pass.item.model.js";
-import FailedTransaction from "../data/integrations/database/models/failedTransaction.js";
+import { models } from "../data/integrations/database/models/index.js";
+import { paymentProviderFactory } from "../infrastructure/payments/paymentProviderFactory.js";
+import { SequelizeIdempotencyRepository } from "../infrastructure/repositories/idempotencyRepository.js";
 
-// LIB
-const mpesa = new Mpesa();
+const { Transaction, Cart, CartItem, IdempotencyCache } = models;
 
 // Repositories
-const transactionRepository = new SequelizeTransactionRepository(Transaction, FailedTransaction);
-const cartRepository = new SequilizeCartRepository(Cart);
+const transactionRepository = new SequelizeTransactionRepository(Transaction);
+const cartRepository = new SequilizeCartRepository(Cart, CartItem);
 const orderRepository = new SequilizeOrderRepository(Order);
+const idempotencyRepository = new SequelizeIdempotencyRepository(IdempotencyCache)
 
 // Services
-const iniatePaymentRequestService = new InitiatePaymentRequestService(transactionRepository, mpesa);
+const iniatePaymentRequestService = new InitiatePaymentRequestService(cartRepository, transactionRepository, paymentProviderFactory, idempotencyRepository);
 const fetchPaymentReuestService = new FetchPaymentRequestService(transactionRepository);
 const fetchCartService = new FetchCartService(cartRepository);
 const createOrderService = new CreateOrderService(orderRepository);
@@ -49,9 +47,9 @@ const deleteCartController = new DeleteCartController(deleteCartService);
 
 
 // Routes
-const checkoutRoutes = express.Router();
+const checkoutRoutes = express.Router({ mergeParams: true, caseSensitive: true });
 
-checkoutRoutes.post('/', validateUserToken, itemModelMiddleware, iniateCheckoutRequest.initiateCheckout);
+checkoutRoutes.post('/', validateUserToken, iniateCheckoutRequest.initiateCheckout);
 checkoutRoutes.post('/callback', checkoutCallback.checkoutCallback);
 
 export { checkoutRoutes };

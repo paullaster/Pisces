@@ -1,4 +1,4 @@
-import app from "../config/app.js"
+import app from "../infrastructure/config/app.js"
 
 /**
  * 
@@ -8,4 +8,4 @@ import app from "../config/app.js"
  * @returns 
  */
 // .${mimeType.split('/')[1]}
-export const prepareImageUrl =  (name,  mimeType = 'image/jpeg', storage = 'public/image') => `${app.url}/${storage}/${name}`
+export const prepareImageUrl = (name, mimeType = 'image/jpeg', storage = 'public/image') => `${app.url}/${storage}/${name}`

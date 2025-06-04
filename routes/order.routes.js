@@ -11,8 +11,9 @@ import { UpdateOrderService } from '../core/services/order/update.order.service.
 import { SequilizeOrderRepository } from '../data/interfaces/sequilize.order.repository.js';
 import { SequelizeUserRespository } from '../data/interfaces/sequelize.user.repository.js';
 import Order from '../data/integrations/database/models/order.js';
-import User from '../data/integrations/database/models/users.js';
+import { models } from '../data/integrations/database/models/index.js';
 
+const { User } = models;
 // Repository
 const orderRepository = new SequilizeOrderRepository(Order);
 const userRepository = new SequelizeUserRespository(User);

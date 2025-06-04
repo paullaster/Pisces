@@ -1,5 +1,5 @@
-import jwt from 'jsonwebtoken';
-import app from '../../config/app.js';
+import verifyJwtToken from '../../common/verify.jwt.token.js';
+import app from '../../infrastructure/config/app.js';
 
 export const validateUserToken = (req, res, next) => {
     try {
@@ -9,9 +9,9 @@ export const validateUserToken = (req, res, next) => {
                 return res.ApiResponse.error(401);
             }
             req.token = token;
-            const user = jwt.verify(token, app.key, {algorithms: 'HS512'});
+            const user = verifyJwtToken(token, app);
             req.user = user;
-        }else {
+        } else {
             return res.ApiResponse.error(401);
         }
         next();

@@ -1,9 +1,15 @@
 import Joi from "joi";
 import sanitizeHtml from "sanitize-html";
 export class JoiSanitizer {
+  checkoutRequiredRequestValues(object) {
+    const schema = Joi.object({
+      provider: Joi.string().required(),
+      'X-Idempotency-Key': Joi.string().required(),
+    });
+    return schema.validate(object);
+  }
   cleanMpesaCheckout(mpesaCheckoutSchema) {
     const schema = Joi.object({
-      checkoutId: Joi.string().required(),
       phoneNumber: Joi.string().pattern(/^\+\d{1,2}\s?\d{4,14}$/).required(),
     });
     for (let prop in mpesaCheckoutSchema) {
@@ -24,13 +30,13 @@ export class JoiSanitizer {
       latitude: Joi.string().optional(),
       town: Joi.string().required(),
     });
-    for ( let prop in address ) {
+    for (let prop in address) {
       address[prop] = sanitizeHtml(address[prop]);
     }
     return schema.validate(address);
   }
   sanitizeObject(obj) {
-    for ( let prop in obj ) {
+    for (let prop in obj) {
       // obj[prop] = sanitizeHtml(obj[prop]);
       if (typeof obj[prop] === "object") {
         this.sanitizeObject(obj[prop]);
@@ -73,4 +79,31 @@ export class JoiSanitizer {
     }
     return obj;
   }
+  validateAttribute(attribute) {
+    const schema = Joi.object({
+      name: Joi.string().required(),
+      values: Joi.array().optional(),
+    });
+    return schema.validate(attribute);
+  }
+  validateParams = (schema) => {
+    return (req, res, next) => {
+      const { error, value } = schema.validate(req.params);
+      if (error) {
+        return res.status(400).json({ error: error.details[0].message });
+      }
+      req.params = value;
+      next();
+    };
+  };
+  validateBody = (schema) => {
+    return (req, res, next) => {
+      const { error, value } = schema.validate(req.body);
+      if (error) {
+        return res.status(400).json({ error: error.details[0].message });
+      }
+      req.params = value;
+      next();
+    };
+  };
 }

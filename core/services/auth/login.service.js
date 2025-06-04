@@ -1,78 +1,132 @@
 import bcrypt from 'bcrypt';
-import { eventEmmitter } from '../../../app/events/index.js';
-import app from '../../../config/app.js';
+import app from '../../../infrastructure/config/app.js';
+
+/**@typedef {import('../../types/user.result.jsdoc.js').UserResult} UserResult*/
 
 class LoginUseCase {
+    /**
+     * 
+     * @param {any} userRespository 
+     */
     constructor(userRespository) {
         this.userRespository = userRespository;
         this.handle = this.handle.bind(this);
-        this.generateOTP = this.generateOTP.bind(this);
         this.getUser = this.getUser.bind(this);
-        this.sendOTP = this.sendOTP.bind(this);
         this.deleteUser = this.deleteUser.bind(this);
         this.updateUserProfile = this.updateUserProfile.bind(this);
         this.getUserById = this.getUserById.bind(this);
+        this.getUserByUsername = this.getUserByUsername.bind(this);
     }
+    /**
+     * 
+     * @param {string} username 
+     * @param {string} password 
+     * @returns {Promise<UserResult>}
+     */
     async handle(username, password) {
-       try {
-        let {user, success, error } = await this.userRespository.getUserByUsername(username);
-        if (!success) {
-                return { error, success};
+        try {
+            const result = await this.userRespository.getUserByUsername(username);
+            if (!result.success) {
+                return { error: result.error, success: false };
+            }
+            if (!('user' in result) || !result.user) {
+                return { success: false, error: 'User not found' };
+            }
+            const { user, success } = result;
+            const decodePassword = Buffer.from(password, 'base64').toString('utf-8');
+            const isPasswordMatch = await bcrypt.compare(decodePassword, this.userRespository.userPassword)
+            if (isPasswordMatch !== true) {
+                return { error: "Password mismatch", success: false };
+            }
+            return { success, user };
+        } catch (error) {
+            return { error: error.message, success: false };
         }
-        const decodePassword = Buffer.from(password, 'base64').toString('utf-8');
-        const isPasswordMatch  = await bcrypt.compare(decodePassword, this.userRespository.userPassword)
-        if (isPasswordMatch !== true) {
-            return { error: "Password mismatch", success: false};
-        }
-        return {success, user};
-       } catch (error) {
-         return { error: error.message, success: false };
-       }
     }
+    /**
+     * 
+     * @param {string} userId 
+     * @returns {Promise<UserResult>}
+     */
     async getUserById(userId) {
         try {
-            let {user, success, error } = await this.userRespository.getUserById(userId);
-            if (!success) {
-                return { error, success };
+            let result = await this.userRespository.getUserById(userId);
+            if (!result.success) {
+                return { error: result.error, success: result.success };
             }
+            if (!('user' in result) || !result.user) {
+                return { success: false, error: 'User not found' };
+            }
+            const { user, success } = result;
             return { user, success };
         } catch (error) {
             return { error: error.message, success: false };
         }
     }
-    async generateOTP(obj, model) {
+    /**
+     * 
+     * @param {*} username 
+     * @param {*} model 
+     * @returns {Promise<UserResult>}
+     */
+    async getUserByUsername(username, model = []) {
         try {
-            let {user, success, error } = await this.userRespository.createTempCustomer(obj, model);
-            if (!success) {
-                return { error, success };
-            }
-            return {user, success };
+            if (!username) return { success: false, error: 'Missing required username' }
+            const result = await this.userRespository.getUserByUsername(username, model);
+            if (!result.success) return { success: false, error: result.error }
+            if (!('user' in result) || !result.user) return { success: false, error: 'User not found!' }
+            const { user, success } = result;
+            return { user, success }
         } catch (error) {
             return { error: error.message, success: false };
         }
     }
-    async sendOTP (notifiable, notificationType) {
-       try {
-           if (notifiable && notificationType) {
-            eventEmmitter.emit('sendOTP-newcustomer', {notifiable, notificationType});
-            return { success: true}
-        }
-       } catch (error) {
-        return { error: error.message, success: false };
-       }
-    }
-    async getUser(username){
+    /**
+     * 
+     * @param {*} obj 
+     * @param {*} model 
+     * @returns {Promise<UserResult>}
+     */
+    async createTempUser(obj, model) {
         try {
-            let {user, success, error } = await this.userRespository.getUserByUsername(username);
-            if (!success) {
-                return { error, success };
+            let result = await this.userRespository.createTempCustomer(obj, model);
+            if (!('success' in result) || !result.success) {
+                return { success: false, error: result.error };
             }
-
-            return {user, success };
+            if (!('user' in result) || !result.user) {
+                return { success: false, error: "User not found" };
+            }
+            const { success, user } = result;
+            return { user, success };
         } catch (error) {
             return { error: error.message, success: false };
         }
     }
+    /**
+     * 
+     * @param {string} username 
+     * @returns {Promise<UserResult>}
+     */
+    async getUser(username) {
+        try {
+            let result = await this.userRespository.getUserByUsername(username);
+            if (!('success' in result) || !result.success) {
+                return { success: false, error: result.error };
+            }
+            if (!('user' in result) || !result.user) {
+                return { success: false, error: "User not found!" };
+            }
+            const { user, success } = result;
+            return { user, success };
+        } catch (error) {
+            return { error: error.message, success: false };
+        }
+    }
+    /**
+     * 
+     * @param {any} user 
+     * @returns {Promise<UserResult>}
+     */
     async deleteUser(user) {
         try {
             let { success, error } = await this.userRespository.delete(user);
@@ -84,24 +138,23 @@ class LoginUseCase {
             return { error: error.message, success: false };
         }
     }
-    async verifyOTP(option, model) {
+    /**
+     * 
+     * @param {any} userId 
+     * @param {object} payload 
+     * @returns {Promise<UserResult>}
+     */
+    async updateUserProfile(userId, payload) {
         try {
-            let { success, error, user } = await this.userRespository.verifyOTP(option, model);
-            if (!success) {
-                return { error, success };
+            if (!userId || !payload || !Object.keys(payload).length) {
+                return { success: false, error: 'Invalid request' }
             }
-            return { success, user };
-        } catch (error) {
-            return { error: error.message, success: false };
-        }
-    }
-    async updateUserProfile(username, payload) {
-        try {
-            const password = Buffer.from(payload.password, 'base64').toString('utf-8');
-            const usrname = Buffer.from(username, 'base64').toString('utf-8');
-            const salt = await bcrypt.genSalt(parseInt(app.pwdRounds));
-            payload.password = await bcrypt.hash(password, salt);
-            let { success, error, user } = await this.userRespository.update(usrname, payload);
+            if (payload.password) {
+                const password = Buffer.from(payload.password, 'base64').toString('utf-8');
+                const salt = await bcrypt.genSalt(parseInt(String(app.pwdRounds || 10)));
+                payload.password = await bcrypt.hash(password, salt);
+            }
+            let { success, error, user } = await this.userRespository.update(userId, payload);
             if (!success) {
                 return { error, success };
             }

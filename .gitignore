@@ -3,12 +3,13 @@ node_modules
 
 # environments
 .env.local
+.env.*
 .env
 .env.production
 .env.dev
 .env.staging
 .env.test
-
+!.env.example
 # lock files
 package-lock.json
 

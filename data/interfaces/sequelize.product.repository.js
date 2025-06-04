@@ -1,8 +1,8 @@
 import { ProductRepository } from "../../core/app/product.interface.js";
-import { Product } from "../../core/types/product.js";
+import { Product } from "../../core/entities/product.js";
 
 export class SequelizeProductRepository extends ProductRepository {
-    constructor(ProductModel) {
+    constructor(ProductModel, ProductCategoryModel) {
         super();
         this.dataSource = ProductModel;
         this.mapToProduct = this.mapToProduct.bind(this);
@@ -32,13 +32,13 @@ export class SequelizeProductRepository extends ProductRepository {
             let products;
             if (eager) {
                 products = await this.dataSource.findAndCountAll({ where: { name }, offset: Number(offset), limit: Number(limit), include: model });
-            }else {
+            } else {
                 products = await this.dataSource.findAndCountAll({ where: { name }, offset: Number(offset), limit: Number(limit) });
             }
             if (!products) {
                 return { error: 'Product not found', success: false };
             }
-            return { success: true, data: products};
+            return { success: true, data: products };
         } catch (error) {
             return { error: error.message, success: false };
         }
@@ -49,21 +49,21 @@ export class SequelizeProductRepository extends ProductRepository {
             if (eager) {
                 products = await this.dataSource.findAndCountAll({
                     where: options,
-                    offset: Number(offset), 
+                    offset: Number(offset),
                     limit: Number(limit),
                     include: model,
                 });
-            }else {
+            } else {
                 products = await this.dataSource.findAndCountAll({
                     where: options,
-                    offset: Number(offset), 
+                    offset: Number(offset),
                     limit: Number(limit),
                 });
             }
             if (!products) {
                 return { error: 'No products at the moment', success: false };
             }
-            return { success: true, data: {count: products.count, rows: products.rows.map(product => this.mapToProduct(product)?.data)} };
+            return { success: true, data: { count: products.count, rows: products.rows.map(product => this.mapToProduct(product)?.data) } };
         } catch (error) {
             return { error: error.message, success: false };
         }
@@ -83,7 +83,7 @@ export class SequelizeProductRepository extends ProductRepository {
     }
     async update(product, payload) {
         try {
-            const {data, success, error } = await this.getProductById(product);
+            const { data, success, error } = await this.getProductById(product);
             if (!success) {
                 return { success: false, error };
             }
@@ -105,7 +105,7 @@ export class SequelizeProductRepository extends ProductRepository {
     }
     async delete(pid) {
         try {
-            return {succuess: true, data: await this.dataSource.destroy({ where: { pid } }), };
+            return { succuess: true, data: await this.dataSource.destroy({ where: { pid } }), };
         } catch (error) {
             return { error: error.message, success: false };
         }

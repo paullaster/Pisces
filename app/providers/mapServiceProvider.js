@@ -1,4 +1,4 @@
-import mapservice from "../../config/mapservice.js";
+import mapservice from "../../infrastructure/config/mapservice.js";
 import axios from "axios";
 import { Client } from "@googlemaps/google-maps-services-js";
 
@@ -111,7 +111,7 @@ export class MapServiceProvider {
             },
             reverseGeocoding: async (lng, lat, service, options = {}) => {
                 try {
-                    const response = service.googleMapClient.reverseGeocode({
+                    const response = await service.googleMapClient.reverseGeocode({
                         params: {
                             latlng: {
                                 lat,
@@ -122,7 +122,6 @@ export class MapServiceProvider {
                             enable_address_descriptor: true
                         },
                     })
-                    console.log('request got here!', response)
                     if (response.statusText === 'OK') {
                         return { success: true, data: response.data };
                     }

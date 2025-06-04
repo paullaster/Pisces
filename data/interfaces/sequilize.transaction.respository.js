@@ -33,7 +33,7 @@ export class SequelizeTransactionRepository extends TransactionRepository {
             return { error: error.message, success: false };
         }
     }
-    async getTransactionByUniqueProperty(query, options = {}){
+    async getTransactionByUniqueProperty(query, options = {}) {
         try {
             const transaction = await this.dataSource.findOne({
                 where: {
@@ -42,7 +42,7 @@ export class SequelizeTransactionRepository extends TransactionRepository {
                 ...options,
             });
             if (!transaction) {
-                return { error: 'This transaction does no exist!', success: false };
+                return { error: 'Transaction not found.', success: false };
             }
             return this.mapTransaction(transaction);
         } catch (error) {
@@ -53,7 +53,7 @@ export class SequelizeTransactionRepository extends TransactionRepository {
         try {
             const products = await this.dataSource.findAndCountAll({
                 where: options,
-                offset: Number(offset), 
+                offset: Number(offset),
                 limit: Number(limit),
             });
             if (!products) {
@@ -74,10 +74,12 @@ export class SequelizeTransactionRepository extends TransactionRepository {
     }
     async update(payload) {
         try {
-            const transaction = await this.dataSource.findOne({where : {
-                merchantRequestID: payload.merchantRequestID,
-                checkoutRequestID: payload.checkoutRequestID,
-            }});
+            const transaction = await this.dataSource.findOne({
+                where: {
+                    merchantRequestID: payload.merchantRequestID,
+                    checkoutRequestID: payload.checkoutRequestID,
+                }
+            });
             if (!transaction) {
                 switch (payload.ResultCode) {
                     case '0':
@@ -100,13 +102,13 @@ export class SequelizeTransactionRepository extends TransactionRepository {
                     transaction.checkoutId = RandomCodeGenerator(12, 'CT');
                     transaction.paymentMethod = 'Mpesa';
                     transaction.checkoutRequestID = payload.checkoutRequestID,
-                    transaction.merchantRequestID = payload.merchantRequestID;
+                        transaction.merchantRequestID = payload.merchantRequestID;
                     return await transaction.save();
-                }else {
+                } else {
                     return transaction;
                 }
             }
-            switch (payload.ResultCode){
+            switch (payload.ResultCode) {
                 case '0':
                     transaction.status = 'Completed';
                     break;
@@ -124,7 +126,7 @@ export class SequelizeTransactionRepository extends TransactionRepository {
                     transaction.phoneNumber = payload.CallbackMetadata.Item[4].Value;
                     transaction.amount = payload.CallbackMetadata.Item[0].Value;
                     transaction.transactionID = payload.CallbackMetadata.Item[1].Value;
-                    transaction.transactionDate = payload.CallbackMetadata.Item[3].Value; 
+                    transaction.transactionDate = payload.CallbackMetadata.Item[3].Value;
                     return await transaction.save();
                 case 'Failed':
                     transaction.transactionMessage = 'Transaction failed';
@@ -157,7 +159,7 @@ export class SequelizeTransactionRepository extends TransactionRepository {
 
                     return await this.createFailedTransaction(unkwn);
             }
-            
+
         } catch (error) {
             return { error: error.message, success: false };
         }
@@ -172,7 +174,7 @@ export class SequelizeTransactionRepository extends TransactionRepository {
     }
     async delete(query) {
         try {
-            return {succuess: true, data: await this.dataSource.destroy({ where: { ...query } }), };
+            return { succuess: true, data: await this.dataSource.destroy({ where: { ...query } }), };
         } catch (error) {
             return { error: error.message, success: false };
         }

@@ -9,6 +9,14 @@ export class SequelizeAssetRepository extends AssetRepository {
         this.getCartById = this.getCartById.bind(this);
         this.update = this.update.bind(this);
     }
+    /**
+     * 
+     * @param {*} assetId 
+     * @param {*} associatedModel 
+     * @param {*} type 
+     * @param {*} eagerLoad 
+     * @returns 
+     */
     async getCartById(assetId, associatedModel = [], type = 'fetch', eagerLoad = false) {
         try {
             let asset;
@@ -33,13 +41,21 @@ export class SequelizeAssetRepository extends AssetRepository {
             return { error: error.message, success: false };
         }
     }
-    async create(asset, model, bulk = false) {
+    /**
+     * 
+     * @param {*} asset 
+     * @param {*} model 
+     * @param {*} bulk 
+     * @returns 
+     */
+    async create(asset, model = [], bulk = false) {
         try {
+            console.log(asset)
             // Create a new asset
-            const newAsset = bulk ? await this.dataSource.bulkCreate(asset) :  await this.dataSource.create(asset);
+            const newAsset = bulk ? await this.dataSource.bulkCreate(asset) : await this.dataSource.create(asset);
             return this.mapToCart(newAsset);
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             // await this.delete(asset.assetId);
             return { error: error.message, success: false };
         }
@@ -59,7 +75,7 @@ export class SequelizeAssetRepository extends AssetRepository {
                 data.Items[itemToUpdate]['dataValues'].size = payload.item.size;
 
             }
-            const passedModel = await model.findByPk(data.Items[itemToUpdate]['dataValues'].itemId); 
+            const passedModel = await model.findByPk(data.Items[itemToUpdate]['dataValues'].itemId);
             await passedModel.update(data.Items[itemToUpdate]['dataValues']);
             return this.mapToCart(asset);
         } catch (error) {
@@ -82,6 +98,11 @@ export class SequelizeAssetRepository extends AssetRepository {
             return { error: error.message, success: false };
         }
     }
+    /**
+     * 
+     * @param {*} asset 
+     * @returns 
+     */
     mapToCart(asset) {
         try {
             return { success: true, data: new Assets(asset['dataValues']) };

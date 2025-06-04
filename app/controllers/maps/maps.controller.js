@@ -11,16 +11,16 @@ export class MapController {
     }
     async durationDistanceMatrix(req, res) {
         try {
-            if (!req.body.source ||!req.body.destination) {
+            if (!req.body.source || !req.body.destination) {
                 return res.ApiResponse.error(400, 'Source and destination coordinates are required');
             }
-            const { success, data, error } = await this.mapService.durationDistanceMatrix(req.body.source, req.body.destination, req.body.options, );
+            const { success, data, error } = await this.mapService.durationDistanceMatrix(req.body.source, req.body.destination, req.body.options,);
             if (!success) {
                 return res.ApiResponse.error(500, error);
             }
             const cartRepo = new SequilizeCartRepository(Cart);
             const cartService = new UpdateCartService(cartRepo);
-            const {success:feedback, errorerLog, cart} = await cartService.updateCartShippingRate(req.user.userId, {shippingRate: data.price});
+            const { success: feedback, errorerLog, cart } = await cartService.updateCartShippingRate(req.user.userId, { shippingRate: data.price });
             if (!feedback) {
                 return res.ApiResponse.error(500, errorerLog);
             }
@@ -29,9 +29,16 @@ export class MapController {
             return res.ApiResponse.error(500, error.message);
         }
     }
+
+    /**
+     * 
+     * @param {*} req 
+     * @param {*} res 
+     * @returns 
+     */
     async reverseGeocoding(req, res) {
         try {
-            if (!req.query.longitude ||!req.query.latitude) {
+            if (!req.query.longitude || !req.query.latitude) {
                 return res.ApiResponse.error(400, 'Longitude and latitude are required');
             }
             const { longitude, latitude, ...options } = req.query;
@@ -49,7 +56,7 @@ export class MapController {
             if (!req.query.q) {
                 return res.ApiResponse.error(400, 'Search query is required');
             }
-            const { q,...options } = req.query;
+            const { q, ...options } = req.query;
             const { success, data, error } = await this.mapService.forwardGeocoding(q, options);
             if (!success) {
                 return res.ApiResponse.error(500, error);

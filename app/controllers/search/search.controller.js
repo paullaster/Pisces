@@ -1,9 +1,14 @@
 import { FetchProductService } from "../../../core/services/product/fetch.product.service.js";
 import Product from "../../../data/integrations/database/models/product.js";
 import { SequelizeProductRepository } from "../../../data/interfaces/sequelize.product.repository.js";
-import Image from "../../../data/integrations/database/models/images.js";
+import { models } from "../../../data/integrations/database/models/index.js";
 
+const { Image } = models;
 export class SearchController {
+    /**
+     * 
+     * @param {*} searchService 
+     */
     constructor(searchService) {
         this.searchService = searchService;
         this.search = this.search.bind(this);
@@ -15,7 +20,7 @@ export class SearchController {
             if (!req.query.q) {
                 return res.ApiResponse.error(400, 'Missing search query');
             }
-            const { success, results, error } = await this.searchService.search({term: req.query.q, tolerance: 1, limit: 20, mode: 'fulltext'});
+            const { success, results, error } = await this.searchService.search({ term: req.query.q, tolerance: 1, limit: 20, mode: 'fulltext' });
             if (!success) {
                 return res.ApiResponse.error(500, error);
             }

@@ -1,5 +1,13 @@
 import Order from "../../data/integrations/database/models/order.js";
-import Item from "../../data/integrations/database/models/cartItem.js";
+import { models } from "../../data/integrations/database/models/index.js";
+const { OrderItem } = models;
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @returns 
+ */
 export const eagerLoadUserOrdersAndRelated = (req, res, next) => {
     try {
         req.model = [
@@ -7,7 +15,7 @@ export const eagerLoadUserOrdersAndRelated = (req, res, next) => {
                 model: Order,
                 include: [
                     {
-                        model: Item,
+                        model: OrderItem,
                     },
                 ],
             },

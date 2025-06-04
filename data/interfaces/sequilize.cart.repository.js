@@ -3,28 +3,25 @@ import { CartRepository } from "../../core/app/cart.interface.js";
 import Product from "../integrations/database/models/product.js";
 
 export class SequilizeCartRepository extends CartRepository {
-    constructor(CartModel) {
+    constructor(CartModel, CartItemModel) {
         super();
         this.dataSource = CartModel;
+        this.cartItemModel = CartItemModel;
         this.mapToCart = this.mapToCart.bind(this);
         this.getUserCart = this.getUserCart.bind(this);
         this.update = this.update.bind(this);
         this.updateCartShippingRate = this.updateCartShippingRate.bind(this);
     }
-    async getUserCart(user, associatedModel = [], type = 'fetch', eagerLoad = false) {
+    async getUserCart(user, type = 'fetch', eagerLoad = false) {
         try {
             let cart;
             if (eagerLoad) {
                 cart = await this.dataSource.findOne({
-                    where: { userEmail: user, cartCheckoutStatus: 'New' },
-                    include: associatedModel,
+                    where: { userId: user },
+                    include: [this.cartItemModel],
                 });
-                // if (cart) {
-                //     const items = await associatedModel.findAll({ where: { cartId: cart['dataValues'].cartId } });
-                //     cart['dataValues'].Items = items;
-                // }
             } else {
-                cart = await this.dataSource.findOne({ where: { userEmail: user, cartCheckoutStatus: 'New' } });
+                cart = await this.dataSource.findOne({ where: { userId: user } });
             }
             if (type === 'fetch') {
                 return this.mapToCart(cart);
@@ -135,15 +132,15 @@ export class SequilizeCartRepository extends CartRepository {
             return { error: error.message, success: false };
         }
     }
-    async updateCartShippingRate (user, obj) {
+    async updateCartShippingRate(user, obj) {
         try {
-            const cart = await this.dataSource.findOne({userId: user, status: 'New'});
+            const cart = await this.dataSource.findOne({ userId: user, status: 'New' });
             if (!cart) {
                 return { success: false, error: "User do not have active cart to update!" };
             }
             cart.shippingRate = obj.shippingRate;
             await cart.save();
-            return { success: true, data: cart };                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+            return { success: true, data: cart };
         } catch (error) {
             console.log(error);
             return { success: false, error: error.message };
