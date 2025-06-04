@@ -11,7 +11,7 @@ export class CreateCategoryService {
             if (!payload || safeTypeChecker(payload) !== 'Object' || !Object.keys(payload).length) {
                 return { success: false, error: 'Invalid cateogry data' };
             }
-            const categoryId = RandomCodeGenerator(10, 'cat');
+            const categoryId = RandomCodeGenerator(6, 'cat');
             const newCategory = Category.createCategoryFromRawObject(
                 {
                     categoryId,
@@ -22,10 +22,10 @@ export class CreateCategoryService {
                     isActive: payload.isActive
                 }
             );
-            const { success, error, data } = await this.categoryRepository.save(newCategory);
-            return { success, error, data };
+            const category = await this.categoryRepository.save(newCategory);
+            return category;
         } catch (error) {
-            return { success: false, error: error.message };
+            return { success: false, error: error.message, data: error.stack };
         }
     }
 }

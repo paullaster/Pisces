@@ -16,4 +16,14 @@ export class Category {
     static createCategoryFromRawObject({ categoryId, name, description, color, icon, isActive }) {
         return new Category(categoryId, name, description, color, icon, isActive);
     }
+    toPersistenceObject() {
+        return {
+            cid: this.categoryId,
+            name: this.name,
+            description: this.description,
+            color: this.color,
+            icon: this.icon,
+            isActive: this.isActive,
+        };
+    }
 }

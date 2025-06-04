@@ -3,51 +3,24 @@ import { prepareImageUrl } from "../../../common/prepare.image.url.js";
 export class FetchCategoryService {
     constructor(categoryRepository) {
         this.categoryRepository = categoryRepository;
-        this.fetchCategoryByID = this.fetchCategoryByID.bind(this);
-        this.fetchAllCategories = this.fetchAllCategories.bind(this);
     }
-    async fetchCategoryByID(cid) {
+    async findById(categoryId) {
         try {
-            if (!cid) {
+            if (!categoryId) {
                 return { success: false, error: 'Category ID is required' };
             }
-            if (typeof cid !== 'string') {
-                return { success: false, error: 'Category ID must be a string' };
-            }
-            if (cid.trim().length === 0) {
-                return { success: false, error: 'Category ID cannot be empty' };
-            }
-            const { success, data, error } = await this.categoryRepository.getCategoryById(cid);
-            if (!success) {
-                return { success: false, error };
-            }
-            return { success: true, category: data };
+            const category = await this.categoryRepository.findById(categoryId);
+            return category;
         } catch (error) {
-            return { success: false, error: error.message }
+            return { success: false, error: error.message, data: error.stack }
         }
     }
-    async fetchAllCategories(options = {}, offset = 0, limit = 10, eager = false, model = []) {
+    async findAll(query) {
         try {
-            const { success, error, data } = await this.categoryRepository.getCategorys(options, offset, limit, eager, model);
-            if (!success) {
-                return { success: false, error };
-            }
-            let categories = data.rows.map(row => {
-                if (row.Images) {
-                    row.Images = row.Images.map(image => {
-                        image['dataValues'].url = prepareImageUrl(image.imgId, image.mimetype);
-                        return image;
-                    });
-                }
-                return row;
-            });
-            categories = {
-                count: data.count,
-                rows: categories,
-            }
-            return { success, categories };
+            const categories = await this.categoryRepository.findAll();
+            return categories;
         } catch (error) {
-            return { success: false, error: error.message }
+            return { success: false, error: error.message, data: error.stack }
         }
     }
 }
