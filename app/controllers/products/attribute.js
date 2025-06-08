@@ -1,41 +1,25 @@
-import { safeTypeChecker } from "../../../common/safeTypeChecker.js";
-import { JoiSanitizer } from "../../middleware/joisanitizer.js";
-
 export class AttributeController {
-    constructor(createAttributeUseCase, updateAttributeUseCase, fetchAttributeUseCase, deleteAttributeUseCase) {
+    constructor(createAttributeUseCase, updateAttributeUseCase, fetchAttributeUseCase, deleteAttributeUseCase, deleteAttributeValueUseCase) {
         this.createAttributeUseCase = createAttributeUseCase;
         this.updateAttributeUseCase = updateAttributeUseCase;
         this.fetchAttributeUseCase = fetchAttributeUseCase;
         this.deleteAttributeUseCase = deleteAttributeUseCase;
+        this.deleteAttributeValueUseCase = deleteAttributeValueUseCase;
     }
     async create(req, res) {
         try {
-            const validator = new JoiSanitizer();
-            const validAttr = validator.validateAttribute(req.payload);
-            if (validAttr.error) {
-                return res.ApiResponse.error(400, validAttr.error.details[0].message);
-            }
-            const { success, data, error } = await this.createAttributeUseCase.execute(req.body);
-            if (!success) {
-                return res.ApiResponse.error(500, error, data);
-            }
-            return res.ApiResponse.success(data, 200);
+            const attribute = await this.createAttributeUseCase.execute(req.body);
+            return res.ApiResponse.success(attribute, 200);
         } catch (error) {
-            return res.ApiResponse.error(500, error.message);
+            return res.ApiResponse.error(500, error.message, error.stack);
         }
     }
     async update(req, res) {
         try {
-            if (safeTypeChecker(req.body) !== 'Object') {
-                return res.ApiResponse.error(400, 'Invalid body');
-            }
-            const { success, data, error } = await this.updateAttributeUseCase.execute(req.params.attributeId, req.body);
-            if (!success) {
-                return res.ApiResponse.error(500, error, data);
-            }
+            const data = await this.updateAttributeUseCase.execute(req.params.attributeId, req.body);
             return res.ApiResponse.success(data, 200);
         } catch (error) {
-            return res.ApiResponse.error(500, error.message);
+            return res.ApiResponse.error(500, error.message, error.stack);
         }
     }
     async findOne(req, res) {
@@ -62,13 +46,18 @@ export class AttributeController {
     }
     async delete(req, res) {
         try {
-            const { success, data, error } = await this.deleteAttributeUseCase.execute(req.params.attributeId);
-            if (!success) {
-                return res.ApiResponse.error(500, error, data);
-            }
-            return res.ApiResponse.success(data, 200);
+            await this.deleteAttributeUseCase.execute(req.params.attributeId);
+            return res.ApiResponse.success({}, 204);
         } catch (error) {
-            return res.ApiResponse.error(500, error.message);
+            return res.ApiResponse.error(500, error.message, error.stack);
+        }
+    }
+    async deleteAttributeValue(req, res) {
+        try {
+            await this.deleteAttributeValueUseCase.execute(req.params.attributeId, req.body);
+            return res.ApiResponse.success({}, 204);
+        } catch (error) {
+            return res.ApiResponse.error(500, error.message, error.stack);
         }
     }
 }

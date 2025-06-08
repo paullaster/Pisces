@@ -2,33 +2,38 @@ import { Attribute } from "../../core/entities/Attribute.js";
 import { IAttributeRepository } from "../../core/repositories/interfaces/attributeRepository.js";
 
 export class SequelizeAttributeRepository extends IAttributeRepository {
-    constructor(attributeModel, attributeValueModel) {
+    constructor(sequelize, attributeModel, attributeValueModel) {
         super();
+        this.sequelize = sequelize;
         this.attributeModel = attributeModel;
         this.attributeValueModel = attributeValueModel;
     }
     async findById(attributeId, { eager, ...rest }) {
+        const t = await this.sequelize.transaction();
         try {
             if (!attributeId) {
-                return { success: false, error: 'Invalid attribute ID' };
+                throw new Error('Invalid attribute ID ' + attributeId);
             }
             let attribute;
             if (eager) {
                 attribute = await this.attributeModel.findByPk(attributeId, {
                     include: this.attributeValueModel,
+                    transaction: t,
                 });
             } else {
 
-                attribute = await this.attributeModel.findByPk(attributeId);
+                attribute = await this.attributeModel.findByPk(attributeId, { transaction: t });
             }
             if (!attribute) {
-                return { success: false, error: 'Attribute not found!' };
+                throw new Error('Attribute not found! ' + attributeId);
             }
             attribute = attribute.toJSON();
             const data = Attribute.createFromORMModel(attribute);
-            return { success: true, data }
+            await t.commit();
+            return data
         } catch (error) {
-            return { success: false, error: error.message };
+            await t.rollback();
+            throw error;
         }
     }
     async findAll({ eager, ...rest }) {
@@ -49,35 +54,45 @@ export class SequelizeAttributeRepository extends IAttributeRepository {
         }
     }
     async save(attribute) {
+        const t = await this.sequelize.transaction();
         try {
-            const attributeData = {
-                id: attribute.attributeId,
-                name: attribute.name,
-            };
-            const attributeExist = await this.attributeModel.findByPk(attributeData.id);
+            const attributeData = attribute.toPersistenceObject();
+            const attributeExist = await this.attributeModel.findByPk(attribute.attributeId, { transaction: t });
             if (attributeExist) {
-                await this.attributeModel.update(attributeData, { where: { id: attribute.attributeId } });
+                await this.attributeModel.update(attributeData, { where: { id: attribute.attributeId }, transaction: t });
             } else {
-                await this.attributeModel.create(attributeData);
+                await this.attributeModel.create(attributeData, { transaction: t });
             }
-            if (attribute.values) {
-                attribute.values.forEach(async (value) => {
-                    const valueData = {
-                        id: value.valueId,
-                        attributeId: value.attributeId,
-                        value: value.value
-                    };
-                    const valueExist = await this.attributeValueModel.findByPk(value.valueId);
-                    if (valueExist) {
-                        await this.attributeValueModel.update(valueData, { where: { id: value.valueId } });
-                    } else {
-                        await this.attributeValueModel.create(valueData);
+            if (attribute.values.length) {
+                let existingDBAttributeValues = await this.attributeValueModel.findAll({ where: { attributeId: attribute.attributeId }, transaction: t });
+                const attributeValuesPromises = attribute.values.map(async (incomingValues) => {
+                    let existingAttributeValue;
+                    if (existingDBAttributeValues) {
+                        existingAttributeValue = existingDBAttributeValues.find((v) => {
+                            const objectV = v.toJSON();
+                            return objectV.id === incomingValues.valueId;
+                        });
                     }
-                })
+                    if (existingAttributeValue) {
+                        await this.attributeValueModel.update(incomingValues.toPersistenceObject(), { where: { id: incomingValues.valueId }, transaction: t });
+                    } else {
+                        await this.attributeValueModel.create(incomingValues.toPersistenceObject(), { transaction: t });
+                    }
+
+                });
+                await Promise.all(attributeValuesPromises);
             }
-            return { success: true, data: attribute };
+            if (attribute.archivedValues.length) {
+                const valuesToDeletePromises = attribute.archivedValues.map(async (valueToDelete) => {
+                    await this.attributeValueModel.destroy({ where: { id: valueToDelete.valueId }, transaction: t });
+                });
+                await Promise.all(valuesToDeletePromises);
+            }
+            await t.commit();
+            return attribute;
         } catch (error) {
-            return { success: false, error: error.message };
+            await t.rollback();
+            throw error;
         }
     }
     async delete(attributeId) {

@@ -66,6 +66,7 @@ export default function (sequelize, DataTypes) {
     sequelize,
     modelName: 'Product',
     timestamps: true,
+    paranoid: true,
     indexes: [
       {
         unique: false,
