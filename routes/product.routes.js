@@ -12,19 +12,19 @@ import { models, sequelize } from '../data/integrations/database/models/index.js
 import { JoiSanitizer } from '../app/middleware/joisanitizer.js';
 import Joi from 'joi';
 import { SequelizeProductRepository } from '../infrastructure/repositories/productRepository.js';
+import { ProductController } from '../app/controllers/products/product.js';
 const { Product, ProductCategory, Image, VariantAttribute, ProductVariant, ProductDiscount } = models;
 
 
 const prodcutRoutes = express.Router();
+
+// repository
 const productRepository = new SequelizeProductRepository(sequelize, Product, ProductCategory, Image, ProductVariant, VariantAttribute, ProductDiscount);
 
-// Create product
+// Use Cases
 const createProductService = new CreateProductService(productRepository);
-const createProductController = new CreateProductController(createProductService);
-
-// Fetch product
 const fetchProductService = new FetchProductService(productRepository);
-const fetchProductController = new FetchProductController(fetchProductService);
+
 
 // update product
 const updateProductService = new UpdateProductService(productRepository);
@@ -34,6 +34,8 @@ const updateProductController = new UpdateProductController(updateProductService
 const deleteProductService = new DeleteProductService(productRepository);
 const deleteProductController = new DeleteProductController(deleteProductService);
 
+// Controller
+const productController = new ProductController(createProductService, updateProductService, fetchProductService, deleteProductService);
 
 // middleware
 const validator = new JoiSanitizer();
@@ -49,10 +51,10 @@ const productCreationSchema = Joi.object({
     discounts: Joi.array().optional(),
 });
 
-prodcutRoutes.post('/', validator.validateBody(productCreationSchema), createProductController.createProduct);
-prodcutRoutes.get('/', productImageMiddleware, fetchProductController.fetchAllProduct);
-prodcutRoutes.get('/:pid', productImageMiddleware, fetchProductController.fetchProductByID);
-prodcutRoutes.get('/name/:name', fetchProductController.fetchProductByName);
+prodcutRoutes.post('/', validator.validateBody(productCreationSchema), productController.create.bind(productController));
+prodcutRoutes.get('/', productController.fetch.bind(productController));
+// prodcutRoutes.get('/:pid', productImageMiddleware, fetchProductController.fetchProductByID);
+// prodcutRoutes.get('/name/:name', fetchProductController.fetchProductByName);
 prodcutRoutes.put('/:pid', updateProductController.updateProduct);
 prodcutRoutes.delete('/:pid', deleteProductController.deleteProduct);
 

@@ -12,17 +12,33 @@ export class SequelizeProductRepository extends IProductRepository {
         this.variantAttributeModel = variantAttributeModel;
         this.productDiscountModel = productDiscountModel;
     }
-    async findById(productId, { ...rest }) {
+    async findById(productId, query) {
+        const t = await this.sequelizeInstance.transaction();
         try {
             let product;
-            product = await this.productModel.findByPk(productId);
-            if (!product) {
-                return { success: false, error: 'Product not found' };
+            const { eager, ...filters } = query;
+
+            if (eager) {
+                product = await this.productModel.findByPk(productId, {
+                    ...filters,
+                    include: [this.productCategoryModel, this.productDiscountModel, this.variantModel, this.variantAttributeModel],
+                    transaction: t
+                });
+
+            } else {
+                product = await this.productModel.findByPk(productId, {
+                    ...filters,
+                    transaction: t
+                });
             }
-            product = product.toJSON();
-            return { succes: true, data: this.mapToProduct(product) };
+            if (!product) {
+                throw new Error('Product not found!');
+            }
+            await t.commit();
+            return Product.createProuctFromORMModel(product.toJSON());
         } catch (error) {
-            return { success: false, error: error.message };
+            await t.rollback();
+            throw error;
         }
     }
     async save(product) {
@@ -103,12 +119,13 @@ export class SequelizeProductRepository extends IProductRepository {
             const { eager, ...filters } = query;
             if (eager) {
                 products = await this.productModel.findAndCountAll({
-                    include: [this.productCategoryModel, this.productDiscountModel, this.variantModel, this.variantAttributeModel],
                     ...filters,
+                    include: [this.productCategoryModel, this.productDiscountModel, this.variantModel, this.variantAttributeModel],
                     transaction: t
                 });
             } else {
                 products = await this.productModel.findAndCountAll({
+                    ...filters,
                     transaction: t
                 });
             }

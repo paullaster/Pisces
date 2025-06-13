@@ -12,10 +12,10 @@ export class CreateProductService {
     async createProduct(product) {
         try {
             if (!product || safeTypeChecker(product) !== 'Object' || !Object.keys(product).length) {
-                return { success: false, error: 'Invalid product' };
+                throw new Error('Invalid request payload');
             }
 
-            const productId = RandomCodeGenerator(10, 'pd');
+            const productId = RandomCodeGenerator(6, 'prod');
             const newProduct = Product.createProductFromRawObject({
                 productId,
                 name: product.name,
@@ -25,7 +25,7 @@ export class CreateProductService {
             });
             if (product.categories && product.categories.length) {
                 newProduct.categories = product.categories.map((category) => {
-                    const id = RandomCodeGenerator(5, 'pc');
+                    const id = RandomCodeGenerator(4, 'pc');
                     return ProductCategory.createProductCategoryFromRawObject({ id, product: productId, category });
                 });
             }
@@ -51,7 +51,7 @@ export class CreateProductService {
             }
             return await this.productRepository.save(newProduct);
         } catch (error) {
-            return { success: false, error: error.message };
+            throw error;
         }
     }
 }
