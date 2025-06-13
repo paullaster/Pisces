@@ -29,7 +29,7 @@ export class SequelizeProductRepository extends IProductRepository {
         const t = await this.sequelizeInstance.transaction();
         try {
             if (!(product instanceof Product)) {
-                return { success: false, error: 'Must of of type Product', data: product };
+                throw new Error('Must of of type Product', product);
             }
             const productData = product.toPersistenceObject();
             const productExist = await this.productModel.findByPk(product.productId, { transaction: t });
@@ -90,10 +90,36 @@ export class SequelizeProductRepository extends IProductRepository {
                 await this.productDiscountModel.bulkCreate(productDiscountProimses, { transaction: t });
             }
             await t.commit();
-            return { success: true, data: product }
+            return product
         } catch (error) {
             await t.rollback();
-            return { success: false, error: error.message, data: error.stack };
+            throw error;
+        }
+    }
+    async findAll(query) {
+        const t = await this.sequelizeInstance.transaction();
+        try {
+            let products;
+            const { eager, ...filters } = query;
+            if (eager) {
+                products = await this.productModel.findAndCountAll({
+                    include: [this.productCategoryModel, this.productDiscountModel, this.variantModel, this.variantAttributeModel],
+                    ...filters,
+                    transaction: t
+                });
+            } else {
+                products = await this.productModel.findAndCountAll({
+                    transaction: t
+                });
+            }
+            if (products.count > 0) {
+                products.rows = products.rows.map((row) => Product.createProuctFromORMModel(row.toJSON()));
+            }
+            await t.commit();
+            return products;
+        } catch (error) {
+            await t.rollback();
+            throw error;
         }
     }
     mapToProduct(product) {

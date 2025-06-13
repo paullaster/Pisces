@@ -1,8 +1,13 @@
+import { ProductCategory } from "./productCategory.js";
+
 export class Product {
     discoutedPrice;
     constructor(productId, name, price, description, recipeTips, createdAt = new Date(), categories = [], variants = [], discounts = [], images = []) {
         if
-            (!productId
+            (!productId ||
+            !name ||
+            !price ||
+            !description
         ) {
             throw new Error('Invalid product');
         }
@@ -16,12 +21,38 @@ export class Product {
         this.images = images;
         this.variants = variants;
         this.discounts = discounts;
+        this.discountedPrice = 0,
+            this.updatedAt = "";
+        this.deletedAt = null;
     }
     static createProuctFromORMModel(model) {
-
+        const product = new Product(
+            model.pid,
+            model.name,
+            model.price,
+            model.description,
+            model.recipeTips,
+            model.createdAt,
+        );
+        product.updatedAt = model.updatedAt;
+        product.deletedAt = model.deletedAt;
+        if (model.ProductCategories) {
+            model.ProductCategories.forEach((categoryModel) => product.addCategoryFromModel(categoryModel));
+        }
+        if (model.ProductVariants) {
+            model.ProductVariants.forEach((variantModel) => product.addCategoryFromModel(variantModel));
+        }
+        return product;
     }
     static createProductFromRawObject({ productId, name, price, description, recipeTips }) {
         return new Product(productId, name, price, description, recipeTips);
+    }
+    addCategoryFromModel(model) {
+        const category = ProductCategory.createProductCategoryFromModel(model);
+        this.categories.push(category);
+    }
+    addVariantFromModel(model) {
+
     }
     calculateDiscoutedPrice() {
         this.discoutedPrice = 0;
