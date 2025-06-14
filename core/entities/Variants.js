@@ -15,10 +15,18 @@ export class Variant {
         this.deletedAt = null;
     }
     static createProductVariantFromRawObject({ id, product, name, sku, price, quantity, attributes }) {
-        return new Variant(id, product, name, sku, price, quantity, attributes);
+        const newVariant = new Variant(id, product, name, sku, price, quantity);
+        if (attributes) {
+            attributes.forEach((attribute) => {
+                console.log('variant attribute: ', attribute.id, newVariant.variantId, attribute.value)
+                const newvariantAttribute = VariantAttribute.createFromRawObject(attribute.id, newVariant.variantId, attribute.value);
+                newVariant.attributes.push(newvariantAttribute);
+            })
+        }
+        return newVariant;
     }
     static createFromModel(model) {
-        const variant = new Variant(model.variantId, model.productId, model.name, model.sku, model.price, model.quantity);
+        const variant = new Variant(model.variantId, model.productId, model.name, model.sku, Number(model.price), Number(model.quantity));
         variant.deletedAt = model.deletedAt;
         if (model.VariantAttributes) {
             model.VariantAttributes.forEach((attrModel) => variant.addVariantAttributesFromModel(attrModel));

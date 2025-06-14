@@ -21,7 +21,7 @@ export class SequelizeProductRepository extends IProductRepository {
             if (eager) {
                 product = await this.productModel.findByPk(productId, {
                     ...filters,
-                    include: [this.productCategoryModel, this.productDiscountModel, this.variantModel, this.variantAttributeModel],
+                    include: [this.productCategoryModel, this.productDiscountModel, { model: this.variantModel, include: [this.variantAttributeModel] }],
                     transaction: t
                 });
 
@@ -57,7 +57,7 @@ export class SequelizeProductRepository extends IProductRepository {
             if (product.variants.length) {
                 let existingDBVariants = await this.variantModel.findAll({
                     where: {
-                        variantId: product.productId,
+                        productId: product.productId,
                     },
                     include: this.variantAttributeModel,
                     transaction: t,
@@ -67,12 +67,12 @@ export class SequelizeProductRepository extends IProductRepository {
                 const variantPromises = product.variants.map(async (incomingVariant) => {
                     let existingDBVariant;
                     if (existingDBVariants) {
-                        existingDBVariant = existingDBVariants.find((v) => v.variantId === incomingVariant.varaintId);
+                        existingDBVariant = existingDBVariants.find((v) => v.toJSON().variantId === incomingVariant.variantId);
                     }
                     if (existingDBVariant) {
                         await this.variantModel.update(incomingVariant.toPersistenceObject(), { where: { variantId: incomingVariant.variantId }, transaction: t });
 
-                        await this.variantAttributeModel.destroy({ where: { variantId: incomingVariant.varaintId }, transaction: t });
+                        await this.variantAttributeModel.destroy({ where: { variantId: incomingVariant.variantId }, transaction: t });
                         if (incomingVariant.attributes && incomingVariant.attributes.length) {
                             const newVariantAttributes = incomingVariant.attributes.map((attr) => {
                                 return attr.toPersistenceObject();
@@ -120,7 +120,7 @@ export class SequelizeProductRepository extends IProductRepository {
             if (eager) {
                 products = await this.productModel.findAndCountAll({
                     ...filters,
-                    include: [this.productCategoryModel, this.productDiscountModel, this.variantModel, this.variantAttributeModel],
+                    include: [this.productCategoryModel, this.productDiscountModel, { model: this.variantModel, include: [this.variantAttributeModel] }],
                     transaction: t
                 });
             } else {

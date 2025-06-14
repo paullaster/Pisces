@@ -16,7 +16,10 @@ import { ProductController } from '../app/controllers/products/product.js';
 const { Product, ProductCategory, Image, VariantAttribute, ProductVariant, ProductDiscount } = models;
 
 
-const prodcutRoutes = express.Router();
+const prodcutRoutes = express.Router({
+    caseSensitive: true,
+    mergeParams: true,
+});
 
 // repository
 const productRepository = new SequelizeProductRepository(sequelize, Product, ProductCategory, Image, ProductVariant, VariantAttribute, ProductDiscount);
@@ -51,11 +54,14 @@ const productCreationSchema = Joi.object({
     discounts: Joi.array().optional(),
 });
 
+const productIdParam = Joi.object({
+    productId: Joi.string().required(),
+})
+
 prodcutRoutes.post('/', validator.validateBody(productCreationSchema), productController.create.bind(productController));
 prodcutRoutes.get('/', productController.fetch.bind(productController));
-// prodcutRoutes.get('/:pid', productImageMiddleware, fetchProductController.fetchProductByID);
-// prodcutRoutes.get('/name/:name', fetchProductController.fetchProductByName);
-prodcutRoutes.put('/:pid', updateProductController.updateProduct);
+prodcutRoutes.get('/:productId', validator.validateParams(productIdParam), productController.fetchById.bind(productController));
+prodcutRoutes.put('/:productId', validator.validateParams(productIdParam), productController.update.bind(productController));
 prodcutRoutes.delete('/:pid', deleteProductController.deleteProduct);
 
 export { prodcutRoutes };
