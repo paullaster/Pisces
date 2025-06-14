@@ -1,3 +1,4 @@
+import { Image } from "./Image.js";
 import { ProductCategory } from "./productCategory.js";
 import { ProductDiscount } from "./ProductDiscount.js";
 import { Variant } from "./Variants.js";
@@ -24,7 +25,7 @@ export class Product {
         this.variants = [];
         this.discounts = [];
         this.discountedPrice = 0,
-            this.updatedAt = "";
+            this.updatedAt = null;
         this.deletedAt = null;
     }
     static createProuctFromORMModel(model) {
@@ -38,6 +39,9 @@ export class Product {
         );
         product.updatedAt = model.updatedAt;
         product.deletedAt = model.deletedAt;
+        if (model.Images) {
+            model.Images.forEach((image) => product.addProductImage(image));
+        }
         if (model.ProductCategories) {
             model.ProductCategories.forEach((categoryModel) => product.addCategoryFromModel(categoryModel));
         }
@@ -57,6 +61,10 @@ export class Product {
         this.price = price;
         this.description = description;
         this.recipeTips = recipeTips;
+    }
+    addProductImage(model) {
+        const image = Image.createImageFromModel(model);
+        this.images.push(image);
     }
     addCategoryFromModel(model) {
         const category = ProductCategory.createProductCategoryFromModel(model);

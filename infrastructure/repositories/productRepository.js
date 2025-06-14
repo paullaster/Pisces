@@ -2,7 +2,19 @@ import { Product } from "../../core/entities/product.js";
 import { IProductRepository } from "../../core/repositories/interfaces/productRepository.js";
 
 export class SequelizeProductRepository extends IProductRepository {
-    constructor(sequelizeInstance, productModel, productCategoryModel, imageModel, variantModel, variantAttributeModel, productDiscountModel) {
+    constructor(
+        sequelizeInstance,
+        productModel,
+        productCategoryModel,
+        imageModel,
+        variantModel,
+        variantAttributeModel,
+        productDiscountModel,
+        categoriesModel,
+        discountModel,
+        attributeValueModel,
+        attributeModel
+    ) {
         super();
         this.sequelizeInstance = sequelizeInstance;
         this.productModel = productModel;
@@ -11,6 +23,10 @@ export class SequelizeProductRepository extends IProductRepository {
         this.variantModel = variantModel;
         this.variantAttributeModel = variantAttributeModel;
         this.productDiscountModel = productDiscountModel;
+        this.categoriesModel = categoriesModel;
+        this.discountModel = discountModel;
+        this.attributeValueModel = attributeValueModel;
+        this.attributeModel = attributeModel;
     }
     async findById(productId, query) {
         const t = await this.sequelizeInstance.transaction();
@@ -21,13 +37,37 @@ export class SequelizeProductRepository extends IProductRepository {
             if (eager) {
                 product = await this.productModel.findByPk(productId, {
                     ...filters,
-                    include: [this.productCategoryModel, this.productDiscountModel, { model: this.variantModel, include: [this.variantAttributeModel] }],
+                    include: [
+                        this.imageModel,
+                        {
+                            model: this.productCategoryModel,
+                            include: {
+                                module: this.categoriesModel
+                            }
+                        },
+                        {
+                            model: this.productDiscountModel,
+                            include: this.discountModel,
+                        },
+                        {
+                            model: this.variantModel,
+                            include: [
+                                {
+                                    model: this.variantAttributeModel,
+                                    include: {
+                                        model: this.attributeValueModel,
+                                        include: this.attributeModel
+                                    }
+                                }
+                            ]
+                        }],
                     transaction: t
                 });
 
             } else {
                 product = await this.productModel.findByPk(productId, {
                     ...filters,
+                    include: this.imageModel,
                     transaction: t
                 });
             }

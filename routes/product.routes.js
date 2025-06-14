@@ -13,7 +13,18 @@ import { JoiSanitizer } from '../app/middleware/joisanitizer.js';
 import Joi from 'joi';
 import { SequelizeProductRepository } from '../infrastructure/repositories/productRepository.js';
 import { ProductController } from '../app/controllers/products/product.js';
-const { Product, ProductCategory, Image, VariantAttribute, ProductVariant, ProductDiscount } = models;
+const {
+    Product,
+    ProductCategory,
+    Image,
+    VariantAttribute,
+    ProductVariant,
+    ProductDiscount,
+    Category,
+    Discount,
+    AttributeValue,
+    Attribute
+} = models;
 
 
 const prodcutRoutes = express.Router({
@@ -22,7 +33,19 @@ const prodcutRoutes = express.Router({
 });
 
 // repository
-const productRepository = new SequelizeProductRepository(sequelize, Product, ProductCategory, Image, ProductVariant, VariantAttribute, ProductDiscount);
+const productRepository = new SequelizeProductRepository(
+    sequelize,
+    Product,
+    ProductCategory,
+    Image,
+    ProductVariant,
+    VariantAttribute,
+    ProductDiscount,
+    Category,
+    Discount,
+    AttributeValue,
+    Attribute
+);
 
 // Use Cases
 const createProductService = new CreateProductService(productRepository);
