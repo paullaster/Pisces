@@ -1,13 +1,10 @@
 import express from 'express';
-import { CreateProductController } from '../app/controllers/products/create.product.js';
 import { CreateProductService } from '../core/services/product/create.product.service.js';
-import { FetchProductController } from '../app/controllers/products/fetch.product.js';
 import { FetchProductService } from '../core/services/product/fetch.product.service.js';
 import { UpdateProductController } from '../app/controllers/products/update.product.js';
 import { UpdateProductService } from '../core/services/product/update.product.service.js';
 import { DeleteProductService } from '../core/services/product/delete.product.service.js';
 import { DeleteProductController } from '../app/controllers/products/delete.product.js';
-import { productImageMiddleware } from '../app/middleware/fetch.product.with.image.js';
 import { models, sequelize } from '../data/integrations/database/models/index.js';
 import { JoiSanitizer } from '../app/middleware/joisanitizer.js';
 import Joi from 'joi';
