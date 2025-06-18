@@ -40,8 +40,8 @@ export class Attribute {
     addValueFromRawObject(id, value) {
         this.values.push(AttributeValues.createAttributeValuesFromRawObject(id, this.attributeId, value));
     }
-    addValueFromModel(value) {
-        this.values.push(AttributeValues.createAttributeValuesFromORMModel(value));
+    async addValueFromModel(value) {
+        this.values.push(await AttributeValues.createAttributeValuesFromORMModel(value));
     }
     updateAttribute(name = '') {
         if (name) {

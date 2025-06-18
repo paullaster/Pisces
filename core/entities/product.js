@@ -4,7 +4,6 @@ import { Image } from "./Image.js";
 import { Variant } from "./Variants.js";
 
 export class Product {
-    discoutedPrice;
     constructor(productId, name, price, description, recipeTips, createdAt = new Date()) {
         if
             (!productId ||
@@ -63,12 +62,12 @@ export class Product {
         } else {
             if (model.ProductCategories) {
                 for (const categoryModel of model.ProductCategories) {
-                    product.addCategoryFromModel(categoryModel);
+                    await product.addCategoryFromModel(categoryModel);
                 }
             }
             if (model.ProductDiscounts) {
                 for (const discount of model.ProductDiscounts) {
-                    product.addDiscountFromModel(discount);
+                    await product.addDiscountFromModel(discount);
                 }
             }
         }
@@ -87,7 +86,7 @@ export class Product {
         const image = Image.createImageFromModel(model);
         this.images.push(image);
     }
-    addCategoryFromModel(model) {
+    async addCategoryFromModel(model) {
         const category = {
             productCategoryId: model.id,
             productId: model.productId,
@@ -131,7 +130,7 @@ export class Product {
         }
         this.discounts.push(newDiscount);
     }
-    addDiscountFromModel(model) {
+    async addDiscountFromModel(model) {
         const newDiscount = {
             id: model.id,
             product: model.productId,

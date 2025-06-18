@@ -12,7 +12,7 @@ export class AttributeValues {
     static createAttributeValuesFromRawObject(id, attribute, value) {
         return new AttributeValues(id, attribute, value);
     }
-    static createAttributeValuesFromORMModel(model) {
+    static async createAttributeValuesFromORMModel(model) {
         return new AttributeValues(model.id, model.attributeId, model.value);;
     }
     static createWithIdOnly(id, attribute) {
