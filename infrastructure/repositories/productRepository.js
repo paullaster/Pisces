@@ -74,7 +74,7 @@ export class SequelizeProductRepository extends IProductRepository {
             if (!product) {
                 throw new Error('Product not found!');
             }
-            const domainProduct = Product.createProuctFromORMModel(product.toJSON(), true)
+            const domainProduct = await Product.createProuctFromORMModel(product.toJSON(), true);
             await t.commit();
             return domainProduct;
         } catch (error) {
@@ -161,17 +161,43 @@ export class SequelizeProductRepository extends IProductRepository {
             if (eager) {
                 products = await this.productModel.findAndCountAll({
                     ...filters,
-                    include: [this.productCategoryModel, this.productDiscountModel, { model: this.variantModel, include: [this.variantAttributeModel] }],
+                    include: [
+                        this.imageModel,
+                        {
+                            model: this.productCategoryModel,
+                            include: [{
+                                model: this.categoriesModel
+                            }]
+                        },
+                        {
+                            model: this.productDiscountModel,
+                            include: [this.discountModel],
+                        },
+                        {
+                            model: this.variantModel,
+                            include: [
+                                {
+                                    model: this.variantAttributeModel,
+                                    include: [{
+                                        model: this.attributeValueModel,
+                                        include: [this.attributeModel]
+                                    }]
+                                }
+                            ]
+                        }],
                     transaction: t
                 });
             } else {
                 products = await this.productModel.findAndCountAll({
                     ...filters,
+                    include: this.imageModel,
                     transaction: t
                 });
             }
             if (products.count > 0) {
-                products.rows = products.rows.map((row) => Product.createProuctFromORMModel(row.toJSON()));
+                products.rows = (await Promise.allSettled(products.rows.map(async (row) => await Product.createProuctFromORMModel(row.toJSON(), true))))
+                    .filter((result) => result.status === 'fulfilled')
+                    .map((result) => result.value);;
             }
             await t.commit();
             return products;
