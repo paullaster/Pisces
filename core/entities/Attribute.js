@@ -19,7 +19,7 @@ export class Attribute {
         }
         return attr;
     }
-    static createFromORMModel(model) {
+    static async createFromORMModel(model) {
         const attr = new Attribute(model.id, model.name);
         if (model.AttributeValues) {
             for (const value of model.AttributeValues) {

@@ -10,7 +10,7 @@ export class Category {
         this.icon = icon;
         this.isActive = isActive;
     }
-    static createCategoryFromModel(model) {
+    static async createCategoryFromModel(model) {
         return new Category(model.cid, model.name, model.description, model.color, model.icon, model.isActive);
     }
     static createCategoryFromRawObject({ categoryId, name, description, color, icon, isActive }) {

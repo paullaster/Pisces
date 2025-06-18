@@ -1,3 +1,5 @@
+import { Attribute } from "./Attribute.js";
+
 export class AttributeValues {
     constructor(valueId, attributeId, value,) {
         if (!valueId || !attributeId) {
@@ -11,7 +13,7 @@ export class AttributeValues {
         return new AttributeValues(id, attribute, value);
     }
     static createAttributeValuesFromORMModel(model) {
-        return new AttributeValues(model.id, model.attributeId, model.value);
+        return new AttributeValues(model.id, model.attributeId, model.value);;
     }
     static createWithIdOnly(id, attribute) {
         return new AttributeValues(id, attribute);

@@ -1,6 +1,6 @@
+import { Category } from "./category.js";
+import { Discount } from "./Discount.js";
 import { Image } from "./Image.js";
-import { ProductCategory } from "./productCategory.js";
-import { ProductDiscount } from "./ProductDiscount.js";
 import { Variant } from "./Variants.js";
 
 export class Product {
@@ -28,7 +28,7 @@ export class Product {
             this.updatedAt = null;
         this.deletedAt = null;
     }
-    static createProuctFromORMModel(model) {
+    static async createProuctFromORMModel(model, hydrate = false) {
         const product = new Product(
             model.pid,
             model.name,
@@ -40,16 +40,37 @@ export class Product {
         product.updatedAt = model.updatedAt;
         product.deletedAt = model.deletedAt;
         if (model.Images) {
-            model.Images.forEach((image) => product.addProductImage(image));
-        }
-        if (model.ProductCategories) {
-            model.ProductCategories.forEach((categoryModel) => product.addCategoryFromModel(categoryModel));
+            for (const image of model.Images) {
+                product.addProductImage(image)
+            }
         }
         if (model.ProductVariants) {
-            model.ProductVariants.forEach((variantModel) => product.addVariantFromModel(variantModel));
+            for (const variantModel of model.ProductVariants) {
+                await product.addVariantFromModel(variantModel, hydrate)
+            }
         }
-        if (model.ProductDiscounts) {
-            model.ProductDiscounts.forEach((discount) => product.addDiscountFromModel(discount));
+        if (hydrate) {
+            if (model.ProductCategories) {
+                for (const categoryModel of model.ProductCategories) {
+                    await product.hydrateCategoryFromModel(categoryModel);
+                }
+            }
+            if (model.ProductDiscounts) {
+                for (const discount of model.ProductDiscounts) {
+                    await product.hydrateDiscountFromModel(discount);
+                }
+            }
+        } else {
+            if (model.ProductCategories) {
+                for (const categoryModel of model.ProductCategories) {
+                    product.addCategoryFromModel(categoryModel);
+                }
+            }
+            if (model.ProductDiscounts) {
+                for (const discount of model.ProductDiscounts) {
+                    product.addDiscountFromModel(discount);
+                }
+            }
         }
         return product;
     }
@@ -67,15 +88,35 @@ export class Product {
         this.images.push(image);
     }
     addCategoryFromModel(model) {
-        const category = ProductCategory.createProductCategoryFromModel(model);
+        const category = {
+            productCategoryId: model.id,
+            productId: model.productId,
+            categoryId: model.categoryId,
+        };
         this.categories.push(category);
     }
+    async hydrateCategoryFromModel(model) {
+        if (model.Category) {
+            const hydratedCategory = await Category.createCategoryFromModel(model.Category);
+            this.categories.push(hydratedCategory);
+        }
+    }
+    async hydrateDiscountFromModel(model) {
+        if (model.Discount) {
+            const discount = await Discount.createFromModel(model.Discount);
+            this.discounts.push(discount);
+        }
+    }
     addCategoryFromRawObject(id, category) {
-        const newProdCategory = ProductCategory.createProductCategoryFromRawObject({ id, product: this.productId, category });
+        const newProdCategory = {
+            productCategoryId: id,
+            productId: this.productId,
+            categoryId: category,
+        };
         this.categories.push(newProdCategory);
     }
-    addVariantFromModel(model) {
-        const newProductVariant = Variant.createFromModel(model);
+    async addVariantFromModel(model, hydrate = false) {
+        const newProductVariant = await Variant.createFromModel(model, hydrate);
         this.variants.push(newProductVariant);
     }
     addVariantFromRawObject({ id, name, sku, price, quantity, attributes }) {
@@ -83,11 +124,19 @@ export class Product {
         this.variants.push(newProductVariant);
     }
     addDiscountFromRawObject(id, discount) {
-        const newDiscount = ProductDiscount.createFromRawObject(id, this.productId, discount);
+        const newDiscount = {
+            id: id,
+            product: this.productId,
+            discount: discount,
+        }
         this.discounts.push(newDiscount);
     }
     addDiscountFromModel(model) {
-        const newDiscount = ProductDiscount.createFromModel(model);
+        const newDiscount = {
+            id: model.id,
+            product: model.productId,
+            discount: model.discountId,
+        }
         this.discounts.push(newDiscount);
     }
     calculateDiscoutedPrice() {
@@ -102,6 +151,20 @@ export class Product {
             description: this.description,
             recipeTips: this.recipeTips,
             createdAt: this.createdAt,
+        }
+    }
+    productCategoryToPersistenceObject(category) {
+        return {
+            id: category.productCategoryId,
+            productId: category.productId,
+            categoryId: category.categoryId,
+        };
+    }
+    productDiscountToPersistenceObject(discount) {
+        return {
+            id: discount.id,
+            productId: discount.product,
+            discountId: discount.discount,
         }
     }
 }

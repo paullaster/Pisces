@@ -1,3 +1,6 @@
+import { Attribute } from "./Attribute.js";
+import { AttributeValues } from "./AttributeValues.js";
+
 export class VariantAttribute {
     constructor(id, variant, value) {
         if (!id) {
@@ -11,7 +14,24 @@ export class VariantAttribute {
         return new VariantAttribute(id, varaint, value);
     }
     static createFromModel(model) {
-        return new VariantAttribute(model.variantAttributeId, model.variantId, model.valueId);
+        let variantAttribute;
+        if (model.AttributeValue) {
+            variantAttribute = AttributeValues.createAttributeValuesFromORMModel(model.AttributeValue);
+        } else {
+            variantAttribute = new VariantAttribute(model.variantAttributeId, model.variantId, model.valueId);
+        }
+        return variantAttribute;
+    }
+    hydrateAttributeFromModel(model) {
+        const rawAttributeValue = model;
+        const rawAttribute = model.Attribute;
+        delete model.Attribute;
+        return {
+            ...Attribute.createFromORMModel(rawAttribute),
+            value: {
+                ...AttributeValues.createAttributeValuesFromORMModel(rawAttributeValue),
+            }
+        }
     }
     toPersistenceObject() {
         return {

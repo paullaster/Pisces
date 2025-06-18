@@ -41,23 +41,23 @@ export class SequelizeProductRepository extends IProductRepository {
                         this.imageModel,
                         {
                             model: this.productCategoryModel,
-                            include: {
-                                module: this.categoriesModel
-                            }
+                            include: [{
+                                model: this.categoriesModel
+                            }]
                         },
                         {
                             model: this.productDiscountModel,
-                            include: this.discountModel,
+                            include: [this.discountModel],
                         },
                         {
                             model: this.variantModel,
                             include: [
                                 {
                                     model: this.variantAttributeModel,
-                                    include: {
+                                    include: [{
                                         model: this.attributeValueModel,
-                                        include: this.attributeModel
-                                    }
+                                        include: [this.attributeModel]
+                                    }]
                                 }
                             ]
                         }],
@@ -74,8 +74,9 @@ export class SequelizeProductRepository extends IProductRepository {
             if (!product) {
                 throw new Error('Product not found!');
             }
+            const domainProduct = Product.createProuctFromORMModel(product.toJSON(), true)
             await t.commit();
-            return Product.createProuctFromORMModel(product.toJSON());
+            return domainProduct;
         } catch (error) {
             await t.rollback();
             throw error;
@@ -115,7 +116,7 @@ export class SequelizeProductRepository extends IProductRepository {
                         await this.variantAttributeModel.destroy({ where: { variantId: incomingVariant.variantId }, transaction: t });
                         if (incomingVariant.attributes && incomingVariant.attributes.length) {
                             const newVariantAttributes = incomingVariant.attributes.map((attr) => {
-                                return attr.toPersistenceObject();
+                                return incomingVariant.variantAttributeToPersistenceObject(attr);
                             });
                             await this.variantAttributeModel.bulkCreate(newVariantAttributes, { transaction: t });
                         }
@@ -123,7 +124,7 @@ export class SequelizeProductRepository extends IProductRepository {
                         await this.variantModel.create(incomingVariant.toPersistenceObject(), { transaction: t });
                         if (incomingVariant.attributes && incomingVariant.attributes.length > 0) {
                             const newVariantAttributes = incomingVariant.attributes.map((attr) => {
-                                return attr.toPersistenceObject();
+                                return incomingVariant.variantAttributeToPersistenceObject(attr);
                             });
                             await this.variantAttributeModel.bulkCreate(newVariantAttributes, { transaction: t });
                         }
@@ -134,14 +135,14 @@ export class SequelizeProductRepository extends IProductRepository {
             if (product.categories.length) {
                 await this.productCategoryModel.destroy({ where: { productId: product.productId }, transaction: t });
                 const productCategoryPromises = product.categories.map((c) => {
-                    return c.toPersistenceObject();
+                    return product.productCategoryToPersistenceObject(c);
                 });
                 await this.productCategoryModel.bulkCreate(productCategoryPromises, { transaction: t });
             }
             if (product.discounts.length) {
                 await this.productDiscountModel.destroy({ where: { productId: product.productId }, transaction: t });
                 const productDiscountProimses = product.discounts.map((d) => {
-                    return d.toPersistenceObject();
+                    return product.productDiscountToPersistenceObject(d);
                 });
                 await this.productDiscountModel.bulkCreate(productDiscountProimses, { transaction: t });
             }

@@ -1,3 +1,5 @@
+import { Category } from "./category.js";
+
 export class ProductCategory {
     constructor(productCategoryId, productId, categoryId) {
         if (!productCategoryId) {
@@ -11,7 +13,14 @@ export class ProductCategory {
         return new ProductCategory(id, product, category);
     }
     static createProductCategoryFromModel(model) {
-        return new ProductCategory(model.id, model.productId, model.categoryId);
+        let category;
+        if (model.Category) {
+            const hydratedCategory = Category.createCategoryFromModel(model.Category);
+            category = hydratedCategory;
+        } else {
+            category = new ProductCategory(model.id, model.productId, model.categoryId);
+        }
+        return category
     }
     toPersistenceObject() {
         return {
