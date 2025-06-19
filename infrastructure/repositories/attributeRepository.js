@@ -8,7 +8,7 @@ export class SequelizeAttributeRepository extends IAttributeRepository {
         this.attributeModel = attributeModel;
         this.attributeValueModel = attributeValueModel;
     }
-    async findById(attributeId, { eager, ...rest }) {
+    async findById(attributeId, { eager }) {
         const t = await this.sequelize.transaction();
         try {
             if (!attributeId) {
@@ -21,14 +21,13 @@ export class SequelizeAttributeRepository extends IAttributeRepository {
                     transaction: t,
                 });
             } else {
-
                 attribute = await this.attributeModel.findByPk(attributeId, { transaction: t });
             }
             if (!attribute) {
                 throw new Error('Attribute not found! ' + attributeId);
             }
             attribute = attribute.toJSON();
-            const data = Attribute.createFromORMModel(attribute);
+            const data = await Attribute.createFromORMModel(attribute);
             await t.commit();
             return data
         } catch (error) {
@@ -37,20 +36,25 @@ export class SequelizeAttributeRepository extends IAttributeRepository {
         }
     }
     async findAll({ eager, ...rest }) {
+        const t = await this.sequelize.transaction();
         try {
             let attributes;
             if (eager) {
-                attributes = await this.attributeModel.findAndCountAll({ include: this.attributeValueModel });
+                attributes = await this.attributeModel.findAndCountAll({ ...rest, include: this.attributeValueModel, transaction: t });
             } else {
 
-                attributes = await this.attributeModel.findAndCountAll();
+                attributes = await this.attributeModel.findAndCountAll({ ...rest, transaction: t });
             }
             if (!attributes) {
-                return { success: false, error: 'Attributes not found' };
+                throw new Error('Attributes not found');
             }
-            return { success: true, data: { count: attributes.count, rows: attributes.rows.map((row) => Attribute.createFromORMModel(row.toJSON())) } };
+            const categories = (await Promise.allSettled(attributes.rows.map(async (row) => await Attribute.createFromORMModel(row.toJSON()))))
+                .filter((result) => result["status"] === "fulfilled").map((c) => c["value"]);
+            await t.commit();
+            return categories;
         } catch (error) {
-            return { success: false, error: error.message };
+            await t.rollback();
+            throw error;
         }
     }
     async save(attribute) {
@@ -96,11 +100,14 @@ export class SequelizeAttributeRepository extends IAttributeRepository {
         }
     }
     async delete(attributeId) {
+        const t = await this.sequelize.transaction();
         try {
             await this.attributeModel.destroy({ where: { id: attributeId } });
-            return { success: true };
+            await t.commit()
+            return attributeId;
         } catch (error) {
-            return { success: false, error: error.message };
+            await t.rollback();
+            throw error;
         }
     }
 }

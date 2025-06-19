@@ -1,13 +1,15 @@
 export class DeleteCategoryService {
     constructor(categoryRepository) {
         this.categoryRepository = categoryRepository;
-        this.deleteCategory = this.deleteCategory.bind(this);
     }
-    async deleteCategory(cid) {
+    async execute(cid) {
         try {
-            return {success: true, category: await this.categoryRepository.delete(cid)};
+            if (cid) {
+                throw new Error('Missing resouce id');
+            }
+            return await this.categoryRepository.delete(cid);
         } catch (error) {
-            return {success: false, error: error.message}
+            throw error;
         }
     }
 }

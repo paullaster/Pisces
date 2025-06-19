@@ -9,7 +9,7 @@ export class CreateCategoryService {
     async createCategory(payload) {
         try {
             if (!payload || safeTypeChecker(payload) !== 'Object' || !Object.keys(payload).length) {
-                return { success: false, error: 'Invalid cateogry data' };
+                throw new Error('Invalid cateogry data');
             }
             const categoryId = RandomCodeGenerator(6, 'cat');
             const newCategory = Category.createCategoryFromRawObject(
@@ -25,7 +25,7 @@ export class CreateCategoryService {
             const category = await this.categoryRepository.save(newCategory);
             return category;
         } catch (error) {
-            return { success: false, error: error.message, data: error.stack };
+            throw error;
         }
     }
 }

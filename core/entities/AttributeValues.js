@@ -1,5 +1,3 @@
-import { Attribute } from "./Attribute.js";
-
 export class AttributeValues {
     constructor(valueId, attributeId, value,) {
         if (!valueId || !attributeId) {
@@ -9,7 +7,7 @@ export class AttributeValues {
         this.attributeId = attributeId;
         this.value = value;
     }
-    static createAttributeValuesFromRawObject(id, attribute, value) {
+    static async createAttributeValuesFromRawObject(id, attribute, value) {
         return new AttributeValues(id, attribute, value);
     }
     static async createAttributeValuesFromORMModel(model) {

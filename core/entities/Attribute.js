@@ -10,11 +10,11 @@ export class Attribute {
         this.values = values;
         this.archivedValues = [];
     }
-    static createFromRawObject(id, name, values = []) {
+    static async createFromRawObject(id, name, values = []) {
         const attr = new Attribute(id, name);
         if (values.length) {
             for (const value of values) {
-                attr.addValueFromRawObject(value);
+                await attr.addValueFromRawObject(value);
             }
         }
         return attr;
@@ -37,8 +37,8 @@ export class Attribute {
             name: this.name,
         };
     }
-    addValueFromRawObject(id, value) {
-        this.values.push(AttributeValues.createAttributeValuesFromRawObject(id, this.attributeId, value));
+    async addValueFromRawObject(id, value) {
+        this.values.push(await AttributeValues.createAttributeValuesFromRawObject(id, this.attributeId, value));
     }
     async addValueFromModel(value) {
         this.values.push(await AttributeValues.createAttributeValuesFromORMModel(value));
@@ -48,7 +48,7 @@ export class Attribute {
             this.name = name;
         }
     }
-    archiveAttributeValue(id) {
-        this.archivedValues.push(AttributeValues.createAttributeValuesFromRawObject(id, this.attributeId));
+    async archiveAttributeValue(id) {
+        this.archivedValues.push(await AttributeValues.createAttributeValuesFromRawObject(id, this.attributeId));
     }
 }

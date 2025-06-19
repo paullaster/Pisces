@@ -24,24 +24,18 @@ export class AttributeController {
     }
     async findOne(req, res) {
         try {
-            const { success, data, error } = await this.fetchAttributeUseCase.findById(req.params.attributeId, req.query);
-            if (!success) {
-                return res.ApiResponse.error(500, error, data);
-            }
-            return res.ApiResponse.success(data, 200);
+            const attribute = await this.fetchAttributeUseCase.findById(req.params.attributeId, req.query);
+            return res.ApiResponse.success(attribute, 200);
         } catch (error) {
-            return res.ApiResponse.error(500, error.message);
+            return res.ApiResponse.error(500, error.message, error.stack);
         }
     }
     async findAll(req, res) {
         try {
-            const { success, data, error } = await this.fetchAttributeUseCase.findAll(req.query);
-            if (!success) {
-                return res.ApiResponse.error(500, error, data);
-            }
-            return res.ApiResponse.success(data, 200);
+            const attributes = await this.fetchAttributeUseCase.findAll(req.query);
+            return res.ApiResponse.success(attributes, 200);
         } catch (error) {
-            return res.ApiResponse.error(500, error.message);
+            return res.ApiResponse.error(500, error.message, error.stack);
         }
     }
     async delete(req, res) {

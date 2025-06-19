@@ -1,14 +1,18 @@
+import { safeTypeChecker } from "../../../common/safeTypeChecker.js";
+
 export class UpdateCategoryService {
     constructor(categoryRepository) {
         this.categoryRepository = categoryRepository;
-        this.updateCategoryRespository = this.updateCategoryRespository.bind(this);
     }
-    async updateCategoryRespository(category, payload) {
+    async execute(category, payload) {
         try {
-            const { success, error, data } = await this.categoryRepository.update(category, payload);
-            return { success, error, data };
+            if (!category || !payload || safeTypeChecker(payload) !== 'Object') {
+                throw new Error('Invalid update request');
+            }
+            const c = await this.categoryRepository.save(category, payload);
+            return c;
         } catch (error) {
-            return { success: false, error: error.message };
+            throw error;
         }
     }
 }

@@ -15,7 +15,10 @@ import { CategoryController } from '../app/controllers/categories/categoryContro
 const { Category } = models;
 
 
-const categoryRoutes = express.Router();
+const categoryRoutes = express.Router({
+    caseSensitive: true,
+    mergeParams: true,
+});
 
 // Repository
 const categoryRepository = new SequelizeCategoryRepository(sequelize, Category);
@@ -23,19 +26,13 @@ const categoryRepository = new SequelizeCategoryRepository(sequelize, Category);
 // UseCases
 const createCategoryService = new CreateCategoryService(categoryRepository);
 const fetchCategoryUseCase = new FetchCategoryService(categoryRepository);
+const updateCategoryService = new UpdateCategoryService(categoryRepository);
+const deleteCategoryService = new DeleteCategoryService(categoryRepository);
 
 
 // Category controlller
-const categoryController = new CategoryController(createCategoryService, fetchCategoryUseCase);
+const categoryController = new CategoryController(createCategoryService, fetchCategoryUseCase, updateCategoryService, deleteCategoryService);
 
-
-// update
-const updateCategoryService = new UpdateCategoryService(categoryRepository);
-const updateCategoryCotroller = new UpdateCategorycontroller(updateCategoryService);
-
-// delete
-const deleteCategoryService = new DeleteCategoryService(categoryRepository);
-const deleteCategoryCotroller = new DeleteCategoryController(deleteCategoryService);
 
 
 // Middlewares
@@ -58,8 +55,8 @@ const categoryIdParam = Joi.object({
 categoryRoutes.post('/', validator.validateBody(validCategoryCreationSchema), categoryController.createCategory.bind(categoryController));
 categoryRoutes.get('/', categoryController.findAll.bind(categoryController));
 categoryRoutes.get('/:categoryId', validator.validateParams(categoryIdParam), categoryController.fetchOne.bind(categoryController));
-categoryRoutes.put('/:categoryId', validator.validateParams(categoryIdParam), updateCategoryCotroller.updateCategory);
-categoryRoutes.delete('/:categoryId', validator.validateParams(categoryIdParam), deleteCategoryCotroller.deleteCategory);
+categoryRoutes.put('/:categoryId', validator.validateParams(categoryIdParam), categoryController.update.bind(categoryController));
+categoryRoutes.delete('/:categoryId', validator.validateParams(categoryIdParam), categoryController.delete.bind(categoryController));
 
 
 

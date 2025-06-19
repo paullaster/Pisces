@@ -12,9 +12,11 @@ export class CreateAttributeUseCase {
                 throw new Error('Invalid Request');
             }
             const id = RandomCodeGenerator(8);
-            let newAttribute = Attribute.createFromRawObject(id, payload.name);
+            let newAttribute = await Attribute.createFromRawObject(id, payload.name);
             if (payload.values) {
-                payload.values.forEach((value) => { newAttribute.addValueFromRawObject(`${RandomCodeGenerator(3)}_${Date.now()}`, value.value) });
+                for (const value of payload.values) {
+                    await newAttribute.addValueFromRawObject(`${RandomCodeGenerator(3)}_${Date.now()}`, value.value);
+                }
             }
             return await this.attributeRepository.save(newAttribute);
         } catch (error) {
@@ -38,7 +40,9 @@ export class UpdateAttributeUseCase {
             }
             attribute.updateAttribute(payload.name);
             if (payload.values) {
-                payload.values.forEach((value) => attribute.addValueFromRawObject(`${RandomCodeGenerator(3)}_${Date.now()}`, value.value));
+                for (const value of payload.values) {
+                    await attribute.addValueFromRawObject(`${RandomCodeGenerator(3)}_${Date.now()}`, value.value);
+                }
             }
             return await this.attributeRepository.save(attribute);
         } catch (error) {
@@ -61,7 +65,9 @@ export class DeleteAttributeValueUseCase {
                 throw new Error('Invalid attribute ' + attributeId);
             }
             if (payload.archivedValues) {
-                payload.archivedValues.forEach((value) => attribute.archiveAttributeValue(value.id));
+                for (const value of payload.values) {
+                    await attribute.archiveAttributeValue(value.id);
+                }
             }
             return await this.attributeRepository.save(attribute);
         } catch (error) {
