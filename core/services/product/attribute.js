@@ -1,7 +1,6 @@
 import { RandomCodeGenerator } from "../../../common/generating_unique_codes.js";
 import { safeTypeChecker } from "../../../common/safeTypeChecker.js";
 import { Attribute } from "../../entities/Attribute.js";
-import { AttributeValues } from "../../entities/AttributeValues.js";
 
 export class CreateAttributeUseCase {
     constructor(attributeRepository) {
@@ -10,22 +9,18 @@ export class CreateAttributeUseCase {
     async execute(payload) {
         try {
             if (!payload || safeTypeChecker(payload) !== 'Object') {
-                return { success: false, error: 'invalid request' }
+                throw new Error('Invalid Request');
             }
             const id = RandomCodeGenerator(8);
-            let newAttribute;
+            let newAttribute = await Attribute.createFromRawObject(id, payload.name);
             if (payload.values) {
-                newAttribute = new Attribute(id, payload.name,
-                    payload.values.map((value) => AttributeValues.createAttributeValuesFromRawObject({ id: `${RandomCodeGenerator(4)}_${Date.now()}`, attribute: id, value: value.value, },))
-                );
-
-            } else {
-
-                newAttribute = new Attribute(id, payload.name,);
+                for (const value of payload.values) {
+                    await newAttribute.addValueFromRawObject(`${RandomCodeGenerator(3)}_${Date.now()}`, value.value);
+                }
             }
             return await this.attributeRepository.save(newAttribute);
         } catch (error) {
-            return { success: false, error: error.message };
+            throw error;
         }
     }
 }
@@ -37,30 +32,50 @@ export class UpdateAttributeUseCase {
     async execute(attributeId, payload) {
         try {
             if (!attributeId || safeTypeChecker(payload) !== 'Object') {
-                return { success: false, error: 'invalid request' }
+                throw new Error('Invalid Request');
             }
-            let newAttribute;
+            const attribute = await this.attributeRepository.findById(attributeId, { eager: true });
+            if (!attribute) {
+                throw new Error('Invalid attribute ' + attributeId);
+            }
+            attribute.updateAttribute(payload.name);
             if (payload.values) {
-                newAttribute = new Attribute(attributeId, payload.name,
-                    payload.values.map((value) => {
-                        if (value.valueId) {
-                            return AttributeValues.createAttributeValuesFromRawObject({ id: value.valueId, attribute: attributeId, value: value.value, },)
-                        } else {
-                            return AttributeValues.createAttributeValuesFromRawObject({ id: `${RandomCodeGenerator(4)}_${Date.now()}`, attribute: attributeId, value: value.value, },)
-                        }
-                    })
-                );
-
-            } else {
-
-                newAttribute = new Attribute(attributeId, payload.name);
+                for (const value of payload.values) {
+                    await attribute.addValueFromRawObject(`${RandomCodeGenerator(3)}_${Date.now()}`, value.value);
+                }
             }
-            return await this.attributeRepository.save(newAttribute);
+            return await this.attributeRepository.save(attribute);
         } catch (error) {
-            return { success: false, error: error.message };
+            throw error;
         }
     }
 }
+
+export class DeleteAttributeValueUseCase {
+    constructor(attributeRepository) {
+        this.attributeRepository = attributeRepository;
+    }
+    async execute(attributeId, payload) {
+        try {
+            if (!attributeId || safeTypeChecker(payload) !== 'Object') {
+                throw new Error('Invalid Request');
+            }
+            const attribute = await this.attributeRepository.findById(attributeId, { eager: true });
+            if (!attribute) {
+                throw new Error('Invalid attribute ' + attributeId);
+            }
+            if (payload.archivedValues) {
+                for (const value of payload.values) {
+                    await attribute.archiveAttributeValue(value.id);
+                }
+            }
+            return await this.attributeRepository.save(attribute);
+        } catch (error) {
+            throw error;
+        }
+    }
+}
+
 export class FetchAttributeUseCase {
     constructor(attributeRepository) {
         this.attributeRepository = attributeRepository;
@@ -68,18 +83,18 @@ export class FetchAttributeUseCase {
     async findById(attributeId, query = {}) {
         try {
             if (!attributeId) {
-                return { success: false, error: 'invalid request' }
+                throw new Error('Invalid Request');
             }
             return await this.attributeRepository.findById(attributeId, query);
         } catch (error) {
-            return { success: false, error: error.message };
+            throw error;
         }
     }
     async findAll(query = {}) {
         try {
             return await this.attributeRepository.findAll(query);
         } catch (error) {
-            return { success: false, error: error.message };
+            throw error;
         }
     }
 }
@@ -91,11 +106,11 @@ export class DeleteAttributeUseCase {
     async execute(attributeId) {
         try {
             if (!attributeId) {
-                return { success: false, error: 'invalid request' }
+                throw new Error('Invalid Request');
             }
             return await this.attributeRepository.delete(attributeId);
         } catch (error) {
-            return { success: false, error: error.message };
+            throw error;
         }
     }
 }

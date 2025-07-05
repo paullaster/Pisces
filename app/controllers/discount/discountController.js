@@ -40,11 +40,8 @@ export class DiscountController {
     }
     async findAll(req, res) {
         try {
-            const { data, success, error } = await this.fetchDiscountUseCase.findAll(req.query);
-            if (!success) {
-                return res.ApiResponse.error(400, error, data);
-            }
-            return res.ApiResponse.success(data, 200, "Success");
+            const discounts = await this.fetchDiscountUseCase.findAll(req.query);
+            return res.ApiResponse.success(discounts);
         } catch (error) {
             return res.ApiResponse.error(500, error.message);
         }

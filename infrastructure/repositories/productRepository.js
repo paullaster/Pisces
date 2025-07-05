@@ -2,7 +2,19 @@ import { Product } from "../../core/entities/product.js";
 import { IProductRepository } from "../../core/repositories/interfaces/productRepository.js";
 
 export class SequelizeProductRepository extends IProductRepository {
-    constructor(sequelizeInstance, productModel, productCategoryModel, imageModel, variantModel, variantAttributeModel, productDiscountModel) {
+    constructor(
+        sequelizeInstance,
+        productModel,
+        productCategoryModel,
+        imageModel,
+        variantModel,
+        variantAttributeModel,
+        productDiscountModel,
+        categoriesModel,
+        discountModel,
+        attributeValueModel,
+        attributeModel
+    ) {
         super();
         this.sequelizeInstance = sequelizeInstance;
         this.productModel = productModel;
@@ -11,25 +23,70 @@ export class SequelizeProductRepository extends IProductRepository {
         this.variantModel = variantModel;
         this.variantAttributeModel = variantAttributeModel;
         this.productDiscountModel = productDiscountModel;
+        this.categoriesModel = categoriesModel;
+        this.discountModel = discountModel;
+        this.attributeValueModel = attributeValueModel;
+        this.attributeModel = attributeModel;
     }
-    async findById(productId, { ...rest }) {
+    async findById(productId, query) {
+        const t = await this.sequelizeInstance.transaction();
         try {
             let product;
-            product = await this.productModel.findByPk(productId);
-            if (!product) {
-                return { success: false, error: 'Product not found' };
+            const { eager, ...filters } = query;
+
+            if (eager) {
+                product = await this.productModel.findByPk(productId, {
+                    ...filters,
+                    include: [
+                        this.imageModel,
+                        {
+                            model: this.productCategoryModel,
+                            include: [{
+                                model: this.categoriesModel
+                            }]
+                        },
+                        {
+                            model: this.productDiscountModel,
+                            include: [this.discountModel],
+                        },
+                        {
+                            model: this.variantModel,
+                            include: [
+                                {
+                                    model: this.variantAttributeModel,
+                                    include: [{
+                                        model: this.attributeValueModel,
+                                        include: [this.attributeModel]
+                                    }]
+                                }
+                            ]
+                        }],
+                    transaction: t
+                });
+
+            } else {
+                product = await this.productModel.findByPk(productId, {
+                    ...filters,
+                    include: this.imageModel,
+                    transaction: t
+                });
             }
-            product = product.toJSON();
-            return { succes: true, data: this.mapToProduct(product) };
+            if (!product) {
+                throw new Error('Product not found!');
+            }
+            const domainProduct = await Product.createProuctFromORMModel(product.toJSON(), true);
+            await t.commit();
+            return domainProduct;
         } catch (error) {
-            return { success: false, error: error.message };
+            await t.rollback();
+            throw error;
         }
     }
     async save(product) {
         const t = await this.sequelizeInstance.transaction();
         try {
             if (!(product instanceof Product)) {
-                return { success: false, error: 'Must of of type Product', data: product };
+                throw new Error('Must of of type Product', product);
             }
             const productData = product.toPersistenceObject();
             const productExist = await this.productModel.findByPk(product.productId, { transaction: t });
@@ -41,7 +98,7 @@ export class SequelizeProductRepository extends IProductRepository {
             if (product.variants.length) {
                 let existingDBVariants = await this.variantModel.findAll({
                     where: {
-                        variantId: product.productId,
+                        productId: product.productId,
                     },
                     include: this.variantAttributeModel,
                     transaction: t,
@@ -51,15 +108,15 @@ export class SequelizeProductRepository extends IProductRepository {
                 const variantPromises = product.variants.map(async (incomingVariant) => {
                     let existingDBVariant;
                     if (existingDBVariants) {
-                        existingDBVariant = existingDBVariants.find((v) => v.variantId === incomingVariant.varaintId);
+                        existingDBVariant = existingDBVariants.find((v) => v.toJSON().variantId === incomingVariant.variantId);
                     }
                     if (existingDBVariant) {
                         await this.variantModel.update(incomingVariant.toPersistenceObject(), { where: { variantId: incomingVariant.variantId }, transaction: t });
 
-                        await this.variantAttributeModel.destroy({ where: { variantId: incomingVariant.varaintId }, transaction: t });
+                        await this.variantAttributeModel.destroy({ where: { variantId: incomingVariant.variantId }, transaction: t });
                         if (incomingVariant.attributes && incomingVariant.attributes.length) {
                             const newVariantAttributes = incomingVariant.attributes.map((attr) => {
-                                return attr.toPersistenceObject();
+                                return incomingVariant.variantAttributeToPersistenceObject(attr);
                             });
                             await this.variantAttributeModel.bulkCreate(newVariantAttributes, { transaction: t });
                         }
@@ -67,7 +124,7 @@ export class SequelizeProductRepository extends IProductRepository {
                         await this.variantModel.create(incomingVariant.toPersistenceObject(), { transaction: t });
                         if (incomingVariant.attributes && incomingVariant.attributes.length > 0) {
                             const newVariantAttributes = incomingVariant.attributes.map((attr) => {
-                                return attr.toPersistenceObject();
+                                return incomingVariant.variantAttributeToPersistenceObject(attr);
                             });
                             await this.variantAttributeModel.bulkCreate(newVariantAttributes, { transaction: t });
                         }
@@ -78,22 +135,75 @@ export class SequelizeProductRepository extends IProductRepository {
             if (product.categories.length) {
                 await this.productCategoryModel.destroy({ where: { productId: product.productId }, transaction: t });
                 const productCategoryPromises = product.categories.map((c) => {
-                    return c.toPersistenceObject();
+                    return product.productCategoryToPersistenceObject(c);
                 });
                 await this.productCategoryModel.bulkCreate(productCategoryPromises, { transaction: t });
             }
             if (product.discounts.length) {
                 await this.productDiscountModel.destroy({ where: { productId: product.productId }, transaction: t });
                 const productDiscountProimses = product.discounts.map((d) => {
-                    return d.toPersistenceObject();
+                    return product.productDiscountToPersistenceObject(d);
                 });
                 await this.productDiscountModel.bulkCreate(productDiscountProimses, { transaction: t });
             }
             await t.commit();
-            return { success: true, data: product }
+            return product
         } catch (error) {
             await t.rollback();
-            return { success: false, error: error.message, data: error.stack };
+            throw error;
+        }
+    }
+    async findAll(query) {
+        const t = await this.sequelizeInstance.transaction();
+        try {
+            let products;
+            const { eager, ...filters } = query;
+            if (eager) {
+                products = await this.productModel.findAndCountAll({
+                    ...filters,
+                    include: [
+                        this.imageModel,
+                        {
+                            model: this.productCategoryModel,
+                            include: [{
+                                model: this.categoriesModel
+                            }]
+                        },
+                        {
+                            model: this.productDiscountModel,
+                            include: [this.discountModel],
+                        },
+                        {
+                            model: this.variantModel,
+                            include: [
+                                {
+                                    model: this.variantAttributeModel,
+                                    include: [{
+                                        model: this.attributeValueModel,
+                                        include: [this.attributeModel]
+                                    }]
+                                }
+                            ]
+                        }],
+                    transaction: t
+                });
+            } else {
+                products = await this.productModel.findAndCountAll({
+                    ...filters,
+                    include: this.imageModel,
+                    transaction: t
+                });
+            }
+            if (products.count > 0) {
+                products.rows = (await Promise.allSettled(products.rows.map(async (row) => await Product.createProuctFromORMModel(row.toJSON(), true))))
+                    .filter((result) => result.status === 'fulfilled')
+                    .map((result) => result.value);;
+            }
+            await t.commit();
+            return products;
+        } catch (error) {
+            await t.rollback();
+            throw error;
         }
     }
     mapToProduct(product) {

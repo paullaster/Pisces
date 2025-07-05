@@ -20,7 +20,7 @@ export class Discount {
         return new Discount(id, title, code, amount, type, usageLimit, startPublishing, endPublishing, status);
     }
 
-    static createFromModel(model) {
+    static async createFromModel(model) {
         return new Discount(
             model.id,
             model.title,

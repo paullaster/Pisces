@@ -7,13 +7,20 @@ export class AttributeValues {
         this.attributeId = attributeId;
         this.value = value;
     }
-    static createAttributeValuesFromRawObject({ id, attribute, value }) {
+    static async createAttributeValuesFromRawObject(id, attribute, value) {
         return new AttributeValues(id, attribute, value);
     }
-    static createAttributeValuesFromORMModel(model) {
-        return new AttributeValues(model.id, model.attributeId, model.value);
+    static async createAttributeValuesFromORMModel(model) {
+        return new AttributeValues(model.id, model.attributeId, model.value);;
     }
     static createWithIdOnly(id, attribute) {
         return new AttributeValues(id, attribute);
+    }
+    toPersistenceObject() {
+        return {
+            id: this.valueId,
+            attributeId: this.attributeId,
+            value: this.value,
+        };
     }
 }

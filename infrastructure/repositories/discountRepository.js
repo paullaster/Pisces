@@ -27,15 +27,15 @@ export class SequelizeDiscountRepository extends IDiscountRepository {
         const t = await this.sequelize.transaction();
         try {
             let discounts;
-            discounts = await this.discountModel.findAndCountAll({ transaction: t });
+            discounts = await this.discountModel.findAndCountAll({ ...query, transaction: t });
             if (discounts.count > 0) {
-                discounts.rows = discounts.rows.map((row) => this.mapToDiscount(row.toJSON()));
+                discounts.rows = await Promise.all(discounts.rows.map(async (row) => await this.mapToDiscount(row.toJSON())));
             }
             await t.commit();
-            return { success: true, data: discounts };
+            return discounts;
         } catch (error) {
             await t.rollback();
-            return { success: false, error: error.message };
+            throw error;
         }
     }
     async save(discount, query) {
@@ -69,7 +69,7 @@ export class SequelizeDiscountRepository extends IDiscountRepository {
             return { success: false, error: error.message };
         }
     }
-    mapToDiscount(discount) {
-        return Discount.createFromModel(discount);
+    async mapToDiscount(discount) {
+        return await Discount.createFromModel(discount);
     }
 }

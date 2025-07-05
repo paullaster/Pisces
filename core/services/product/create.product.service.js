@@ -1,10 +1,6 @@
 import { RandomCodeGenerator } from "../../../common/generating_unique_codes.js";
 import { safeTypeChecker } from "../../../common/safeTypeChecker.js";
 import { Product } from "../../entities/product.js";
-import { ProductCategory } from "../../entities/productCategory.js";
-import { ProductDiscount } from "../../entities/ProductDiscount.js";
-import { VariantAttribute } from "../../entities/VariantAttribute.js";
-import { Variant } from "../../entities/Variants.js";
 export class CreateProductService {
     constructor(productRepository) {
         this.productRepository = productRepository;
@@ -12,10 +8,10 @@ export class CreateProductService {
     async createProduct(product) {
         try {
             if (!product || safeTypeChecker(product) !== 'Object' || !Object.keys(product).length) {
-                return { success: false, error: 'Invalid product' };
+                throw new Error('Invalid request payload');
             }
 
-            const productId = RandomCodeGenerator(10, 'pd');
+            const productId = RandomCodeGenerator(6, 'prod');
             const newProduct = Product.createProductFromRawObject({
                 productId,
                 name: product.name,
@@ -24,34 +20,39 @@ export class CreateProductService {
                 recipeTips: product.recipeTips,
             });
             if (product.categories && product.categories.length) {
-                newProduct.categories = product.categories.map((category) => {
-                    const id = RandomCodeGenerator(5, 'pc');
-                    return ProductCategory.createProductCategoryFromRawObject({ id, product: productId, category });
+                product.categories.forEach((c) => {
+                    const id = `${RandomCodeGenerator(3, '_')}_${Date.now()}`;
+                    newProduct.addCategoryFromRawObject(id, c.category);
                 });
             }
             if (product.variants && product.variants.length) {
-                newProduct.variants = product.variants.map((variant) => {
+                product.variants.forEach((v) => {
                     const id = `${RandomCodeGenerator(3, 'v')}_${Date.now()}`;
-                    const { name, sku, price, quantity } = variant;
-                    const newVariant = {
-                        id, product: productId, name, price, quantity, sku,
-                        attributes: variant.attributes.map((att) => {
-                            const vaId = `${RandomCodeGenerator(2, 'va')}_${Date.now()}`;
-                            return VariantAttribute.createFromRawObject(vaId, id, att.value);
+                    const { name, sku, price, quantity, attributes } = v;
+                    newProduct.addVariantFromRawObject({
+                        id,
+                        name,
+                        sku,
+                        price, quantity,
+                        attributes: attributes.map((attr) => {
+                            const attrId = `${RandomCodeGenerator(3, '_')}_${Date.now()}`;
+                            return {
+                                id: attrId,
+                                ...attr
+                            }
                         }),
-                    };
-                    return Variant.createProductVariantFromRawObject(newVariant);
+                    });
                 });
             }
             if (product.discounts && product.discounts.length) {
-                newProduct.discounts = product.discounts.map((discount) => {
-                    const id = `${RandomCodeGenerator(3, 'pd')}_${Date.now()}`;
-                    return ProductDiscount.createFromRawObject(id, productId, discount);
+                product.discounts.forEach((d) => {
+                    const id = `${RandomCodeGenerator(3, '_')}_${Date.now()}`;
+                    newProduct.addDiscountFromRawObject(id, d.discount);
                 });
             }
             return await this.productRepository.save(newProduct);
         } catch (error) {
-            return { success: false, error: error.message };
+            throw error;
         }
     }
 }

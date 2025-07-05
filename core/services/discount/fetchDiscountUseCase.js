@@ -13,12 +13,12 @@ export class FetchDiscountUseCase {
             return { success: false, error: error.message };
         }
     }
-    async findAll({ ...rest }) {
+    async findAll(query) {
         try {
-            const discounts = await this.discountRepository.findAll();
+            const discounts = await this.discountRepository.findAll(query);
             return discounts;
         } catch (error) {
-            return { success: false, error: error.message };
+            throw error
         }
     }
 }
