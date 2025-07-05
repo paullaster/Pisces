@@ -48,10 +48,10 @@ export class SequelizeAttributeRepository extends IAttributeRepository {
             if (!attributes) {
                 throw new Error('Attributes not found');
             }
-            const categories = (await Promise.allSettled(attributes.rows.map(async (row) => await Attribute.createFromORMModel(row.toJSON()))))
+            attributes.rows = (await Promise.allSettled(attributes.rows.map(async (row) => await Attribute.createFromORMModel(row.toJSON()))))
                 .filter((result) => result["status"] === "fulfilled").map((c) => c["value"]);
             await t.commit();
-            return categories;
+            return attributes;
         } catch (error) {
             await t.rollback();
             throw error;
