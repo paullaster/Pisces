@@ -64,7 +64,7 @@ export class Variant {
         };
     }
     variantAttributeToPersistenceObject(attribute) {
-        const valueId = attribute.values && attribute.values.length > 0 ? attribute.values[0].id : null;
+        const valueId = attribute.id && attribute.value && attribute.variant ? attribute.id : null;
         if (!valueId) {
             throw new Error('Cannot convert hydrated attribute to persistence object: missing value ID');
         }

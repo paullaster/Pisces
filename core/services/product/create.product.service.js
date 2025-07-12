@@ -20,13 +20,13 @@ export class CreateProductService {
                 recipeTips: product.recipeTips,
             });
             if (product.categories && product.categories.length) {
-                product.categories.forEach((c) => {
+                for (const c of product.categories) {
                     const id = `${RandomCodeGenerator(3, '_')}_${Date.now()}`;
                     newProduct.addCategoryFromRawObject(id, c.category);
-                });
+                }
             }
             if (product.variants && product.variants.length) {
-                product.variants.forEach((v) => {
+                for (const v of product.variants) {
                     const id = `${RandomCodeGenerator(3, 'v')}_${Date.now()}`;
                     const { name, sku, price, quantity, attributes } = v;
                     newProduct.addVariantFromRawObject({
@@ -42,13 +42,13 @@ export class CreateProductService {
                             }
                         }),
                     });
-                });
+                }
             }
             if (product.discounts && product.discounts.length) {
-                product.discounts.forEach((d) => {
+                for (const d of product.discounts) {
                     const id = `${RandomCodeGenerator(3, '_')}_${Date.now()}`;
                     newProduct.addDiscountFromRawObject(id, d.discount);
-                });
+                }
             }
             return await this.productRepository.save(newProduct);
         } catch (error) {
