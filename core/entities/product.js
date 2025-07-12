@@ -26,6 +26,7 @@ export class Product {
         this.discountedPrice = 0,
             this.updatedAt = null;
         this.deletedAt = null;
+        this.isAvailable = false;
     }
     static async createProuctFromORMModel(model, hydrate = false) {
         const product = new Product(
@@ -44,6 +45,9 @@ export class Product {
             }
         }
         if (model.ProductVariants) {
+            product.isAvailable = model.ProductVariants.some((variant) => {
+                return variant.quantity > 0
+            });
             for (const variantModel of model.ProductVariants) {
                 await product.addVariantFromModel(variantModel, hydrate)
             }

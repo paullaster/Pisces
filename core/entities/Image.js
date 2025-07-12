@@ -1,3 +1,4 @@
+import { prepareImageUrl } from "../../common/prepare.image.url.js";
 export class Image {
     constructor(imageId, imagableId, imagableType, mimetype, createdAt = new Date()) {
         if (!imageId || !imagableId || !imagableType || !mimetype || !createdAt) {
@@ -8,6 +9,7 @@ export class Image {
         this.imagableType = imagableType;
         this.mimetype = mimetype;
         this.createdAt = createdAt;
+        this.url = null;
     }
     static createImageFromRawObject({ id, relatedId, type, ext }) {
         const newImage = new Image(id, relatedId, type, ext);
@@ -15,6 +17,7 @@ export class Image {
     }
     static createImageFromModel(model) {
         const newImage = new Image(model.imgId, model.imagableId, model.imagableType, model.mimetype, model.createdAt);
+        newImage.url = prepareImageUrl(model.imgId, model.mimetype);
         return newImage;
     }
 }
