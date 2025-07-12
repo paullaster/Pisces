@@ -1,5 +1,3 @@
-import { prepareImageUrl } from "../../../common/prepare.image.url.js";
-
 export class FetchProductService {
     constructor(productRepository) {
         this.productRepository = productRepository;

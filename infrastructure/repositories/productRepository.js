@@ -197,7 +197,7 @@ export class SequelizeProductRepository extends IProductRepository {
             if (products.count > 0) {
                 products.rows = (await Promise.allSettled(products.rows.map(async (row) => await Product.createProuctFromORMModel(row.toJSON(), true))))
                     .filter((result) => result.status === 'fulfilled')
-                    .map((result) => result.value);;
+                    .map((result) => result.value);
             }
             await t.commit();
             return products;
