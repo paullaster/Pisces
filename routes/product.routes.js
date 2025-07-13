@@ -66,7 +66,6 @@ const validator = new JoiSanitizer();
 // schema:
 const productCreationSchema = Joi.object({
     name: Joi.string().required(),
-    price: Joi.number().optional(),
     description: Joi.string().required(),
     recipeTips: Joi.string().optional(),
     variants: Joi.array().optional(),

@@ -4,35 +4,61 @@ import { Image } from "./Image.js";
 import { Variant } from "./Variants.js";
 
 export class Product {
-    constructor(productId, name, price, description, recipeTips, createdAt = new Date()) {
+    constructor(productId, name, description, recipeTips, createdAt = new Date()) {
         if
             (!productId ||
             !name ||
-            !price ||
             !description
         ) {
             throw new Error('Invalid product');
         }
         this.productId = productId;
         this.name = name;
-        this.price = price;
         this.description = description;
         this.recipeTips = recipeTips;
+        this.price = 0;
         this.createdAt = createdAt;
         this.categories = [];
         this.images = [];
         this.variants = [];
         this.discounts = [];
-        this.discountedPrice = 0,
+        this.discountedPrice = this.price,
             this.updatedAt = null;
         this.deletedAt = null;
         this.isAvailable = false;
+    }
+    static applyDiscounts(price, discounts) {
+        let finalPrice = parseFloat(price);
+        const now = new Date();
+
+        const activeDiscounts = discounts.filter(discount => {
+            if (!(discount instanceof Discount)) return false;
+            const isPublished = discount.status === 'Published';
+            const isDateValid = now >= new Date(discount.startPublishing) && now <= new Date(discount.endPublishing);
+            return isPublished && isDateValid;
+        });
+
+        activeDiscounts.sort((a, b) => {
+            if (a.type === 'Fixed' && b.type !== 'Fixed') return -1;
+            if (a.type !== 'Fixed' && b.type === 'Fixed') return 1;
+            return 0;
+        });
+
+        for (const discount of activeDiscounts) {
+            const discountAmount = parseFloat(discount.amount);
+            if (discount.type === 'Percentage') {
+                finalPrice -= finalPrice * (discountAmount / 100);
+            } else if (discount.type === 'Fixed') {
+                finalPrice -= discountAmount;
+            }
+        }
+
+        return parseFloat(Math.max(0, finalPrice).toFixed(2));
     }
     static async createProuctFromORMModel(model, hydrate = false) {
         const product = new Product(
             model.pid,
             model.name,
-            model.price,
             model.description,
             model.recipeTips,
             model.createdAt,
@@ -42,14 +68,6 @@ export class Product {
         if (model.Images) {
             for (const image of model.Images) {
                 product.addProductImage(image)
-            }
-        }
-        if (model.ProductVariants) {
-            product.isAvailable = model.ProductVariants.some((variant) => {
-                return variant.quantity > 0
-            });
-            for (const variantModel of model.ProductVariants) {
-                await product.addVariantFromModel(variantModel, hydrate)
             }
         }
         if (hydrate) {
@@ -75,14 +93,26 @@ export class Product {
                 }
             }
         }
+        if (model.ProductVariants) {
+            product.isAvailable = model.ProductVariants.some((variant) => {
+                return variant.quantity > 0
+            });
+            for (const variantModel of model.ProductVariants) {
+                await product.addVariantFromModel(variantModel, hydrate)
+            }
+        }
+        product.setBasePrice();
+        product.calculateDiscoutedPrice();
         return product;
     }
-    static createProductFromRawObject({ productId, name, price, description, recipeTips }) {
-        return new Product(productId, name, price, description, recipeTips);
+    setBasePrice() {
+        this.price = Math.min(...this.variants.map((variant) => variant.price));
+    }
+    static createProductFromRawObject({ productId, name, description, recipeTips }) {
+        return new Product(productId, name, description, recipeTips);
     }
     updateProduct({ name, price, description, recipeTips }) {
         this.name = name;
-        this.price = price;
         this.description = description;
         this.recipeTips = recipeTips;
     }
@@ -119,7 +149,7 @@ export class Product {
         this.categories.push(newProdCategory);
     }
     async addVariantFromModel(model, hydrate = false) {
-        const newProductVariant = await Variant.createFromModel(model, hydrate);
+        const newProductVariant = await Variant.createFromModel(model, this.discounts, hydrate);
         this.variants.push(newProductVariant);
     }
     addVariantFromRawObject({ id, name, sku, price, quantity, attributes }) {
@@ -143,14 +173,40 @@ export class Product {
         this.discounts.push(newDiscount);
     }
     calculateDiscoutedPrice() {
-        this.discoutedPrice = 0;
+        let finalPrice = this.price;
+        const now = new Date();
+
+        const activeDiscounts = this.discounts.filter(discount => {
+            const isPublished = discount.status === 'Published';
+            const isDateValid = now >= new Date(discount.startPublishing) && now <= new Date(discount.endPublishing);
+            return isPublished && isDateValid;
+        });
+
+        activeDiscounts.sort((a, b) => {
+            if (a.type === 'Fixed' && b.type !== 'Fixed') {
+                return -1;
+            }
+            if (a.type !== 'Fixed' && b.type === 'Fixed') {
+                return 1;
+            }
+            return 0;
+        });
+
+        for (const discount of activeDiscounts) {
+            const discountAmount = parseFloat(discount.amount);
+
+            if (discount.type === 'Percentage') {
+                finalPrice -= finalPrice * (discountAmount / 100);
+            } else if (discount.type === 'Fixed') {
+                finalPrice -= discountAmount;
+            }
+        }
+        this.discountedPrice = parseFloat(Math.max(0, finalPrice).toFixed(2));
     }
     toPersistenceObject() {
         return {
             pid: this.productId,
             name: this.name,
-            price: this.price,
-            discountedPrice: this.discoutedPrice,
             description: this.description,
             recipeTips: this.recipeTips,
             createdAt: this.createdAt,
