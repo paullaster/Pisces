@@ -56,8 +56,6 @@ export default function (sequelize, DataTypes) {
   Product.init({
     pid: { type: DataTypes.STRING(255), primaryKey: true },
     name: DataTypes.STRING(255),
-    discountedPrice: { type: DataTypes.DECIMAL(10, 2), defaultValue: 0 },
-    price: { type: DataTypes.DECIMAL(10, 2), defaultValue: 0 },
     description: DataTypes.TEXT,
     recipeTips: DataTypes.TEXT,
     createdAt: DataTypes.DATE,

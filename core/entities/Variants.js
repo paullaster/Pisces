@@ -1,5 +1,5 @@
 import { Attribute } from "./Attribute.js";
-import { AttributeValues } from "./AttributeValues.js";
+import { Product } from "./product.js";
 
 export class Variant {
     constructor(variantId, productId, name, sku, price, quantity, attributes = []) {
@@ -14,6 +14,8 @@ export class Variant {
         this.quantity = parseInt(quantity);
         this.attributes = attributes;
         this.deletedAt = null;
+        this.isAvailable = this.quantity > 0;
+        this.discountedPrice = this.price;
     }
     static createProductVariantFromRawObject({ id, product, name, sku, price, quantity, attributes }) {
         const newVariant = new Variant(id, product, name, sku, price, quantity);
@@ -29,7 +31,7 @@ export class Variant {
         }
         return newVariant;
     }
-    static async createFromModel(model, hydrate = false) {
+    static async createFromModel(model, productDiscounts = [], hydrate = false) {
         const variant = new Variant(model.variantId, model.productId, model.name, model.sku, model.price, model.quantity);
         variant.deletedAt = model.deletedAt;
 
@@ -44,6 +46,7 @@ export class Variant {
                 }
             }
         }
+        variant.discountedPrice = Product.applyDiscounts(variant.price, productDiscounts)
         return variant
     }
     checkIfValidIntOrFloat(input) {

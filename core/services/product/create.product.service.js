@@ -15,7 +15,6 @@ export class CreateProductService {
             const newProduct = Product.createProductFromRawObject({
                 productId,
                 name: product.name,
-                price: product.price,
                 description: product.description,
                 recipeTips: product.recipeTips,
             });
