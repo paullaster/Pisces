@@ -16,16 +16,13 @@ export class Product {
         this.name = name;
         this.description = description;
         this.recipeTips = recipeTips;
-        this.price = 0;
         this.createdAt = createdAt;
         this.categories = [];
         this.images = [];
         this.variants = [];
         this.discounts = [];
-        this.discountedPrice = this.price,
-            this.updatedAt = null;
+        this.updatedAt = null;
         this.deletedAt = null;
-        this.isAvailable = false;
     }
     static applyDiscounts(price, discounts) {
         let finalPrice = parseFloat(price);
@@ -94,20 +91,13 @@ export class Product {
             }
         }
         if (model.ProductVariants) {
-            product.isAvailable = model.ProductVariants.some((variant) => {
-                return variant.quantity > 0
-            });
             for (const variantModel of model.ProductVariants) {
                 await product.addVariantFromModel(variantModel, hydrate)
             }
         }
-        product.setBasePrice();
-        product.calculateDiscoutedPrice();
         return product;
     }
-    setBasePrice() {
-        this.price = Math.min(...this.variants.map((variant) => variant.price));
-    }
+
     static createProductFromRawObject({ productId, name, description, recipeTips }) {
         return new Product(productId, name, description, recipeTips);
     }
@@ -171,37 +161,6 @@ export class Product {
             discount: model.discountId,
         }
         this.discounts.push(newDiscount);
-    }
-    calculateDiscoutedPrice() {
-        let finalPrice = this.price;
-        const now = new Date();
-
-        const activeDiscounts = this.discounts.filter(discount => {
-            const isPublished = discount.status === 'Published';
-            const isDateValid = now >= new Date(discount.startPublishing) && now <= new Date(discount.endPublishing);
-            return isPublished && isDateValid;
-        });
-
-        activeDiscounts.sort((a, b) => {
-            if (a.type === 'Fixed' && b.type !== 'Fixed') {
-                return -1;
-            }
-            if (a.type !== 'Fixed' && b.type === 'Fixed') {
-                return 1;
-            }
-            return 0;
-        });
-
-        for (const discount of activeDiscounts) {
-            const discountAmount = parseFloat(discount.amount);
-
-            if (discount.type === 'Percentage') {
-                finalPrice -= finalPrice * (discountAmount / 100);
-            } else if (discount.type === 'Fixed') {
-                finalPrice -= discountAmount;
-            }
-        }
-        this.discountedPrice = parseFloat(Math.max(0, finalPrice).toFixed(2));
     }
     toPersistenceObject() {
         return {

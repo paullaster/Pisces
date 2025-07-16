@@ -13,6 +13,7 @@ import { mapRoutes } from './routes/maps.routes.js';
 import useSearchRoute from './routes/search.routes.js';
 import { attributeRoute } from './routes/attribute.route.js';
 import { discountRoutes } from './routes/discount.routes.js';
+import { productV2Routes } from './routes/product.v2.routes.js';
 
 
 appRouter.use('/v1/auth', authRoutes);
@@ -28,5 +29,7 @@ appRouter.use('/v1/maps', mapRoutes);
 appRouter.use('/v1/search', useSearchRoute);
 appRouter.use('/v1/attribute', attributeRoute);
 appRouter.use('/v1/discounts', discountRoutes);
+
+appRouter.use('/v2/products', productV2Routes);
 
 export default appRouter;
