@@ -29,7 +29,6 @@ export class SequelizeProductRepository extends IProductRepository {
         this.attributeModel = attributeModel;
     }
     async findById(productId, query) {
-        const t = await this.sequelizeInstance.transaction();
         try {
             let product;
             const { eager, ...filters } = query;
@@ -61,24 +60,20 @@ export class SequelizeProductRepository extends IProductRepository {
                                 }
                             ]
                         }],
-                    transaction: t
                 });
 
             } else {
                 product = await this.productModel.findByPk(productId, {
                     ...filters,
                     include: this.imageModel,
-                    transaction: t
                 });
             }
             if (!product) {
                 throw new Error('Product not found!');
             }
             const domainProduct = await Product.createProuctFromORMModel(product.toJSON(), true);
-            await t.commit();
             return domainProduct;
         } catch (error) {
-            await t.rollback();
             throw error;
         }
     }
@@ -154,7 +149,6 @@ export class SequelizeProductRepository extends IProductRepository {
         }
     }
     async findAll(query) {
-        const t = await this.sequelizeInstance.transaction();
         try {
             let products;
             const { eager, ...filters } = query;
@@ -185,13 +179,13 @@ export class SequelizeProductRepository extends IProductRepository {
                                 }
                             ]
                         }],
-                    transaction: t
+                    distinct: true
                 });
             } else {
                 products = await this.productModel.findAndCountAll({
                     ...filters,
                     include: this.imageModel,
-                    transaction: t
+                    distinct: true,
                 });
             }
             if (products.count > 0) {
@@ -199,11 +193,57 @@ export class SequelizeProductRepository extends IProductRepository {
                     .filter((result) => result.status === 'fulfilled')
                     .map((result) => result.value);
             }
-            await t.commit();
             return products;
         } catch (error) {
-            await t.rollback();
             throw error;
+        }
+    }
+    async fetchAllForV2(query) {
+        try {
+            const products = await this.productModel.findAndCountAll({
+                ...query,
+                include: [
+                    { model: this.imageModel },
+                    {
+                        model: this.productCategoryModel,
+                        include: [{ model: this.categoriesModel }]
+
+                    },
+                    {
+                        model: this.productDiscountModel,
+                        include: [{ model: this.discountModel }],
+                    },
+                    {
+                        model: this.variantModel,
+                        include: [
+                            {
+                                model: this.variantAttributeModel,
+                                include: [{
+                                    model: this.attributeValueModel,
+                                    include: [{ model: this.attributeModel }]
+
+                                }]
+
+                            }
+                        ]
+                    }
+                ],
+                distinct: true,
+
+            });
+
+
+            const rawProductData = products.rows.map(p => p.toJSON());
+
+            return {
+                count: products.count,
+                rows: rawProductData
+            };
+
+        } catch (error) {
+            console.error("Error in fetchAllForV2:", error);
+            throw error;
+
         }
     }
     mapToProduct(product) {

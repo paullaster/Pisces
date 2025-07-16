@@ -31,7 +31,6 @@ export class FileProcessor {
                 size: 'auto',
                 type: 'auto',
             });
-
             // Process image
             const buffer = await sharp(Buffer.from(base64img, 'base64'))
                 .resize({ ...this.maxDimensions, fit: 'fill' })
