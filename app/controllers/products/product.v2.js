@@ -1,6 +1,7 @@
 export class ProductV2Controller {
-    constructor(fetchV2ProductService) {
+    constructor(fetchV2ProductService, FetchByIdV2ProductService) {
         this.fetchV2ProductService = fetchV2ProductService;
+        this.FetchByIdV2ProductService = FetchByIdV2ProductService;
     }
 
     async fetchAll(req, res, next) {
@@ -16,7 +17,14 @@ export class ProductV2Controller {
 
     async fetchById(req, res, next) {
         try {
-            res.status(404).json({ message: 'Not Implemented' });
+            const { productId } = req.params;
+
+            if (!productId) {
+                return next(new Error('Product ID is required'));
+            }
+            const query = req.query;
+            const result = await this.FetchByIdV2ProductService.execute(productId, query);
+            return res.ApiResponse.success(result);
         } catch (error) {
             next(error);
         }

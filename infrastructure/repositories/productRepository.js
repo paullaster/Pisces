@@ -198,6 +198,48 @@ export class SequelizeProductRepository extends IProductRepository {
             throw error;
         }
     }
+    async fetchByIdForV2(productId, query) {
+        try {
+            const products = await this.productModel.findByPk(productId, {
+                ...query,
+                include: [
+                    { model: this.imageModel },
+                    {
+                        model: this.productCategoryModel,
+                        include: [{ model: this.categoriesModel }]
+
+                    },
+                    {
+                        model: this.productDiscountModel,
+                        include: [{ model: this.discountModel }],
+                    },
+                    {
+                        model: this.variantModel,
+                        include: [
+                            {
+                                model: this.variantAttributeModel,
+                                include: [{
+                                    model: this.attributeValueModel,
+                                    include: [{ model: this.attributeModel }]
+
+                                }]
+
+                            }
+                        ]
+                    }
+                ],
+                distinct: true,
+
+            });
+
+            return products.toJSON();
+
+        } catch (error) {
+            console.error("Error in fetch By Id ForV2:", error);
+            throw error;
+
+        }
+    }
     async fetchAllForV2(query) {
         try {
             const products = await this.productModel.findAndCountAll({

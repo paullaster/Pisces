@@ -1,20 +1,21 @@
 import express from 'express';
 import { SequelizeProductRepository } from '../infrastructure/repositories/productRepository.js';
 import { FetchV2ProductService } from '../core/services/product/fetch.v2.product.service.js';
+import { FetchByIdV2ProductService } from '../core/services/product/fetch.v2.product.by.id.service.js';
 import { ProductV2Controller } from '../app/controllers/products/product.v2.js';
 import { models, sequelize } from '../data/integrations/database/models/index.js';
 
-const { 
-    Product, 
-    ProductCategory, 
-    Image, 
-    VariantAttribute, 
-    ProductVariant, 
-    ProductDiscount, 
-    Category, 
-    Discount, 
-    AttributeValue, 
-    Attribute 
+const {
+    Product,
+    ProductCategory,
+    Image,
+    VariantAttribute,
+    ProductVariant,
+    ProductDiscount,
+    Category,
+    Discount,
+    AttributeValue,
+    Attribute
 } = models;
 
 const productV2Routes = express.Router();
@@ -36,9 +37,9 @@ const productRepository = new SequelizeProductRepository(
 
 // Instantiate the service
 const fetchV2ProductService = new FetchV2ProductService(productRepository);
-
+const fetchByIdV2ProductService = new FetchByIdV2ProductService(productRepository);
 // Instantiate the controller
-const productV2Controller = new ProductV2Controller(fetchV2ProductService);
+const productV2Controller = new ProductV2Controller(fetchV2ProductService, fetchByIdV2ProductService);
 
 // Define the routes
 productV2Routes.get('/', productV2Controller.fetchAll.bind(productV2Controller));
