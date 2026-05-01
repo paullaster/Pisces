@@ -1,5 +1,6 @@
 import { Mpesa } from "../../lib/mpesa/mpesa.lib.js";
 import { getPaymentConfig } from "../config/payment.js";
+import { KCBPaymentProvider } from "./KCBPaymentProvider.js";
 import { NCBAPaymentProvider } from "./NCBAPaymentProvider.js";
 
 export function paymentProviderFactory(provider) {
@@ -13,7 +14,7 @@ export function paymentProviderFactory(provider) {
                 return new Mpesa(config);
             }
             case 'KCB': {
-
+                return new KCBPaymentProvider(config);
             }
             case 'EQUITY': {
 
