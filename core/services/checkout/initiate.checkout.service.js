@@ -12,7 +12,7 @@ export class InitiatePaymentRequestService {
     async initiatePaymentRequest(userId, provider, idempotencyKey, payload) {
         try {
             if (!provider || !idempotencyKey || !payload) {
-                return { success: false, error: "Invalid payload!" };
+                return { success: false, error: "Missing Provider or Valid idempotency key or Invalid payload!" };
             }
             if (typeof payload !== 'object') {
                 return { success: false, error: "Object expected!" };
@@ -45,7 +45,7 @@ export class InitiatePaymentRequestService {
 
             }
             const paymentProvider = this.paymentGateway(provider);
-
+            
             new ValidateObjectPayload(payload);
             const { success, transaction, error } = await this.paymentGateway.NIPush(payload);
             if (!success) {

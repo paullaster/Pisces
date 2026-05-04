@@ -14,7 +14,7 @@ export class KCBPaymentProvider {
             if (cachedToken) {
                 return cachedToken;
             }
-            const url = `${this.#config.baseUrl}/payments/api/v1/auth/token`;
+            const url = `${this.#config.baseUrl}/token`;
             const res = await fetch(url, {
                 method: 'POST',
                 headers: {
@@ -25,7 +25,7 @@ export class KCBPaymentProvider {
             if (!response.ok) {
                 return { success: false, error: response.message }
             }
-            await connection.setex('NCBA_PAYMENT_AUTH_ACCESS_TOKEN', response.expires_in, response.access_token, (error) => {
+            await connection.setex('KCB_PAYMENT_AUTH_ACCESS_TOKEN', response.expires_in, response.access_token, (error) => {
                 return { success: false, error: error?.message }
             });
             return response.access_token;
@@ -53,15 +53,18 @@ export class KCBPaymentProvider {
             if (!validationResult.isValid) {
                 return { success: false, error: `Missing required ${validationResult.missingProperty} property` };
             }
-            const url = `${this.#config.baseUrl}/payments/api/v1/stk-push/initiate`;
+            const url = `${this.#config.baseUrl}/stkpush`;
             const token = await this.getAccessToken();
-            payment['Network'] = 'Safaricom';
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     Authorization: `(Bearer ${token}`,
                     ContentType: 'application/json',
                     'X-Payment-ID': '',
+                    'Access-Control-Allow-Origin': '*',
+                    routeCode: 207,
+                    operation: 'STKPush',
+                    messageId: '232323_KCBOrg_8875661561'
                 },
                 body: JSON.stringify(payment),
             });
@@ -104,6 +107,11 @@ export class KCBPaymentProvider {
             return { success: true, message: response.description };
         } catch (error) {
             return { success: false, error: error?.message };
+        }
+    }
+    async getPayload() {
+        return {
+            
         }
     }
 }
